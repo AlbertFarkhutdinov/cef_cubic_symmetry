@@ -1,14 +1,10 @@
-# Attention! zeeman_hamiltonian is updated with Bohr magneton.
-
 # Questions to think:
-# 1. Why NXsample doesn't work?
-# 2. What difference between numpy.linalg.eigh and scipy.linalg.eigh
+# What difference between numpy.linalg.eigh and scipy.linalg.eigh
 
 import os
 import configparser
 import numpy
 from scipy.linalg import eigh
-from nexusformat.nexus import NXfield, NXentry, NXdata, NXsample
 from fractions import Fraction
 from cef_object_scripts import core
 
@@ -341,45 +337,30 @@ class CF(object):
 
         return self.peaks
 
-    def spectrum(self, eps=None, sigma=None, gamma=None, temperature=None, magnet_field_x=None, magnet_field_z=None):
+    def spectrum(self, energy=None, sigma=None, gamma=None, temperature=None, magnet_field_x=None, magnet_field_z=None):
         # Calculates the neutron scattering cross section.
         temperature = core.get_temperature(temperature, self.temperature)
         peaks = self.get_peaks(temperature, magnet_field_x, magnet_field_z)
 
-        if eps is None:
+        if energy is None:
             # 501 numbers in range from -1.1*E_max to 1.1*E_max
-            eps = numpy.linspace(-1.1 * self.eigenvalues[-1], 1.1 * self.eigenvalues[-1], 501)
+            energy = numpy.linspace(-1.1 * self.eigenvalues[-1], 1.1 * self.eigenvalues[-1], 501)
         if sigma is None and gamma is None:
-            sigma = 0.01 * (max(eps) - min(eps))
+            sigma = 0.01 * (max(energy) - min(energy))
 
-        spectrum = numpy.zeros(eps.size, dtype='float64')
+        spectrum = numpy.zeros(energy.size, dtype='float64')
 
         for peak in peaks:
             if sigma and not gamma:
-                spectrum += peak[1] * core.gauss(eps, peak[0], sigma)
+                spectrum += peak[1] * core.gauss(energy, peak[0], sigma)
             elif gamma and not sigma:
-                spectrum += peak[1] * core.lorentz(eps, peak[0], gamma)
+                spectrum += peak[1] * core.lorentz(energy, peak[0], gamma)
             elif sigma and gamma:
-                spectrum += peak[1] * core.pseudo_voigt(eps, peak[0], sigma, gamma)
+                spectrum += peak[1] * core.pseudo_voigt(energy, peak[0], sigma, gamma)
 
         spectrum *= 72.65 * self.lande_factor ** 2
 
         return spectrum
-
-    def nx_spectrum(self, eps=None, sigma=None, gamma=None, temperature=None, magnet_field_x=None, magnet_field_z=None):
-        # Returns the neutron scattering cross section as a NXentry group
-
-        temperature = core.get_temperature(temperature, self.temperature)
-
-        spectrum = self.spectrum(eps, sigma, gamma, temperature, magnet_field_x, magnet_field_z)
-        entry = NXentry()
-        entry.title = f'Crystal Field Spectra for {self.name} at {temperature} K'
-        entry.sample = NXsample()
-        entry.sample.temperature = temperature
-        entry.sample.temperature.units = 'K'
-        entry.data = NXdata(NXfield(spectrum, name='intensity', units='mb/sr/meV'),
-                            NXfield(eps, name='energy_transfer', units='meV'))
-        return entry
 
     def get_moments(self, temperature=None):
         # Calculate the magnetic moments of the CF model.
@@ -419,27 +400,27 @@ class CF(object):
         # Calculate the susceptibility at a specified temperature.
         temperature = core.get_temperature(temperature, self.temperature)
         statistic_sum = sum(core.bolzman(self.eigenvalues, temperature))
-        chi_curie_zz = 0
-        chi_curie_xx = 0
-        chi_van_vleck_zz = 0
-        chi_van_vleck_xx = 0
+        chi_curie_z = 0
+        chi_curie_x = 0
+        chi_van_vleck_z = 0
+        chi_van_vleck_x = 0
         for m in range(self.eigenvalues.size):
             for n in range(self.eigenvalues.size):
                 if abs(self.eigenvalues[n] - self.eigenvalues[m]) < 0.00001 * core.kelvin_to_mev(temperature):
-                    chi_curie_zz += self.j_z[m, n] ** 2 * core.bolzman(self.eigenvalues, temperature)[m]
-                    chi_curie_xx += (0.25 * (self.j_plus[m, n] ** 2 + self.j_minus[m, n] ** 2) *
-                                     core.bolzman(self.eigenvalues, temperature)[m])
+                    chi_curie_z += self.j_z[m, n] ** 2 * core.bolzman(self.eigenvalues, temperature)[m]
+                    chi_curie_x += (0.25 * (self.j_plus[m, n] ** 2 + self.j_minus[m, n] ** 2) *
+                                    core.bolzman(self.eigenvalues, temperature)[m])
                 else:
-                    chi_van_vleck_zz += (2 * self.j_z[m, n] ** 2 * core.bolzman(self.eigenvalues, temperature)[m] /
-                                         (self.eigenvalues[n] - self.eigenvalues[m]))
-                    chi_van_vleck_xx += (0.5 * (self.j_plus[m, n] ** 2 + self.j_minus[m, n] ** 2)
-                                         * core.bolzman(self.eigenvalues, temperature)[m] /
-                                         (self.eigenvalues[n] - self.eigenvalues[m]))
+                    chi_van_vleck_z += (2 * self.j_z[m, n] ** 2 * core.bolzman(self.eigenvalues, temperature)[m] /
+                                        (self.eigenvalues[n] - self.eigenvalues[m]))
+                    chi_van_vleck_x += (0.5 * (self.j_plus[m, n] ** 2 + self.j_minus[m, n] ** 2)
+                                        * core.bolzman(self.eigenvalues, temperature)[m] /
+                                        (self.eigenvalues[n] - self.eigenvalues[m]))
         chi = {
-            'chi_curie_zz': self.lande_factor ** 2 * chi_curie_zz / (core.kelvin_to_mev(temperature) * statistic_sum),
-            'chi_curie_xx': self.lande_factor ** 2 * chi_curie_xx / (core.kelvin_to_mev(temperature) * statistic_sum),
-            'chi_van_vleck_zz': self.lande_factor ** 2 * chi_van_vleck_zz / statistic_sum,
-            'chi_van_vleck_xx': self.lande_factor ** 2 * chi_van_vleck_xx / statistic_sum
+            'chi_curie_z': self.lande_factor ** 2 * chi_curie_z / (core.kelvin_to_mev(temperature) * statistic_sum),
+            'chi_curie_x': self.lande_factor ** 2 * chi_curie_x / (core.kelvin_to_mev(temperature) * statistic_sum),
+            'chi_van_vleck_z': self.lande_factor ** 2 * chi_van_vleck_z / statistic_sum,
+            'chi_van_vleck_x': self.lande_factor ** 2 * chi_van_vleck_x / statistic_sum
         }
         return chi
 
@@ -448,48 +429,35 @@ class CF(object):
         self.eigen_calculations()
         self.transition_probabilities()
         temperatures = core.get_temperature(temperatures, numpy.linspace(1, 300, 300, dtype=numpy.float32))
-        chi_curie_zz = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
-        chi_curie_xx = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
-        chi_van_vleck_zz = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
-        chi_van_vleck_xx = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_curie_z = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_van_vleck_z = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_z = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_curie_x = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_van_vleck_x = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi_x = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        chi = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
+        inverse_chi = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
         for index in range(len(temperatures)):
-            chi_curie_zz[index] = self.chi(temperatures[index])['chi_curie_zz']
-            chi_curie_xx[index] = self.chi(temperatures[index])['chi_curie_xx']
-            chi_van_vleck_zz[index] = self.chi(temperatures[index])['chi_van_vleck_zz']
-            chi_van_vleck_xx[index] = self.chi(temperatures[index])['chi_van_vleck_xx']
+            chi_curie_z[index] = self.chi(temperatures[index])['chi_curie_z']
+            chi_van_vleck_z[index] = self.chi(temperatures[index])['chi_van_vleck_z']
+            chi_z[index] = chi_curie_z[index] + chi_van_vleck_z[index]
+            chi_curie_x[index] = self.chi(temperatures[index])['chi_curie_x']
+            chi_van_vleck_x[index] = self.chi(temperatures[index])['chi_van_vleck_x']
+            chi_x[index] = chi_curie_x[index] + chi_van_vleck_x[index]
+            chi[index] = (chi_z[index] + 2 * chi_x[index]) / 3
+            inverse_chi[index] = 1 / chi[index]
 
         chi_s = {
-            'chi_curie_zz': chi_curie_zz,
-            'chi_curie_xx': chi_curie_xx,
-            'chi_van_vleck_zz': chi_van_vleck_zz,
-            'chi_van_vleck_xx': chi_van_vleck_xx
+            'chi_curie_z': chi_curie_z,
+            'chi_van_vleck_z': chi_van_vleck_z,
+            'chi_z': chi_z,
+            'chi_curie_x': chi_curie_x,
+            'chi_van_vleck_x': chi_van_vleck_x,
+            'chi_x': chi_x,
+            'chi': chi,
+            'inverse_chi': inverse_chi,
         }
         return chi_s
-
-    def nx_chi(self, temperatures=None):
-        # Returns the susceptibility as a NeXus NXentry
-        temperatures = core.get_temperature(temperatures, numpy.linspace(1.0, 300, 300, dtype=numpy.float32))
-        entry = NXentry()
-        entry.title = f'Susceptibility of {self.name}'
-        temperature = NXfield(temperatures, name='temperature')
-        temperature.units = 'K'
-        chi_curie_zz = self.chi_s(temperatures)['chi_curie_zz']
-        chi_curie_xx = self.chi_s(temperatures)['chi_curie_xx']
-        chi_van_vleck_zz = self.chi_s(temperatures)['chi_van_vleck_zz']
-        chi_van_vleck_xx = self.chi_s(temperatures)['chi_van_vleck_xx']
-        chi = NXfield((chi_curie_zz + chi_van_vleck_zz + 2 * (chi_curie_xx + chi_van_vleck_xx)) / 3, name='chi')
-        inverse_chi = NXfield(1 / chi, name='inverse_chi')
-        chi_z = NXfield(chi_curie_zz + chi_van_vleck_zz, name='chi_z')
-        chi_x = NXfield(chi_curie_xx + chi_van_vleck_xx, name='chi_x')
-        entry.chi = NXdata(chi, temperature)
-        entry.chi.title = f'Susceptibility of {self.name}'
-        entry.inverse_chi = NXdata(inverse_chi, temperature)
-        entry.inverse_chi.title = f'Inverse Susceptibility of {self.name}'
-        entry.chi_z = NXdata(chi_z, temperature)
-        entry.chi_z.title = f'Susceptibility of {self.name} (z-axis)'
-        entry.chi_x = NXdata(chi_x, temperature)
-        entry.chi_x.title = f'Susceptibility of {self.name} (x-axis)'
-        return entry
 
     def __str__(self):
         # Return a summary of the model parameters.
@@ -566,4 +534,3 @@ if __name__ == '__main__':
     cubic_sample.B60 = w * (1 - abs(x)) / f6[rare]
     cubic_sample.B64 = -21 * cubic_sample.B60
     print(cubic_sample)
-

@@ -45,13 +45,5 @@ def ratios_to_console(value1, value2, value3):
     print(core.value_to_write(value1, '\t'), core.value_to_write(value2, '\t'), core.value_to_write(value3, '\n'))
 
 
-def energy_to_file(crystal, rare_earth, w, energy, text_separator):
-    file_path = core.get_paths(crystal, rare_earth, w)['energy_file_path']
-    core.check_path(file_path)
-    with open(file_path, 'a', encoding='utf-8') as my_file:
-        my_file.write(core.value_to_write(energy, text_separator))
-    return file_path
-
-
 if __name__ == '__main__':
     print('Done!')
