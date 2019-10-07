@@ -1,5 +1,6 @@
 import numpy
 import os
+from datetime import *
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 path_to_energy_datafiles = os.path.join(BASE_DIR, 'energy_datafiles')
 path_to_saved_objects = os.path.join(BASE_DIR, 'saved_objects')
@@ -96,28 +97,17 @@ def pseudo_voigt(argument, center, sigma, gamma):
     return (1 - eta) * gauss(argument, center, sigma) + eta * lorentz(argument, center, gamma)
 
 
-<<<<<<< HEAD
-def save_numpy(file_name, data):
-    print(f'Saving file {file_name}...')
-    numpy.savetxt(file_name, data, delimiter='\t')
-    print(f'File "{file_name}" is saved')
-
-
-def create_table(*arrays):
-    data = []
-    for array in arrays:
-        data.append(array)
-    return numpy.transpose(data)
-=======
 def save_numpy(file_name, *arrays):
+    start = datetime.now()
     print(f'Saving file {file_name}...')
     data = []
     for array in arrays:
         data.append(array)
     data = numpy.transpose(data)
     numpy.savetxt(file_name, data, delimiter='\t')
+    print(datetime.now() - start)
     print(f'File "{file_name}" is saved')
->>>>>>> origin/master
+    print(datetime.now() - start)
 
 
 if __name__ == '__main__':
