@@ -96,7 +96,6 @@ def pseudo_voigt(argument, center, sigma, gamma):
     return (1 - eta) * gauss(argument, center, sigma) + eta * lorentz(argument, center, gamma)
 
 
-<<<<<<< HEAD
 def save_numpy(file_name, data):
     print(f'Saving file {file_name}...')
     numpy.savetxt(file_name, data, delimiter='\t')
@@ -108,16 +107,26 @@ def create_table(*arrays):
     for array in arrays:
         data.append(array)
     return numpy.transpose(data)
-=======
-def save_numpy(file_name, *arrays):
-    print(f'Saving file {file_name}...')
-    data = []
-    for array in arrays:
-        data.append(array)
-    data = numpy.transpose(data)
-    numpy.savetxt(file_name, data, delimiter='\t')
-    print(f'File "{file_name}" is saved')
->>>>>>> origin/master
+
+
+# def save_dat(file_name, argument_space, table):
+#     start_time = datetime.now()
+#     check_path(file_name)
+#     if os.path.exists(file_name):
+#         os.remove(file_name)
+#     my_file = open(file_name, 'a', encoding='utf-8')
+#     print(f'Saving file "{file_name}"...')
+#     for index, argument in enumerate(argument_space):
+#         my_file.write(value_to_write(argument, '\t'))
+#         for item in table[index]:
+#             if table[index].index(item) == len(table[index]) - 1:
+#                 my_file.write(value_to_write(table[index], '\n'))
+#             else:
+#                 my_file.write(value_to_write(table[index], '\t'))
+#     my_file.close()
+#     print(f'File "{file_name}" is saved')
+#     finish_time = datetime.now()
+#     print(f'Saving time: {finish_time - start_time}')
 
 
 if __name__ == '__main__':
