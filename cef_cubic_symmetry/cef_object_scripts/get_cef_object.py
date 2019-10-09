@@ -9,8 +9,7 @@ from fractions import Fraction
 from cef_object_scripts import core
 
 parser = configparser.ConfigParser()
-# meV/T
-bohr_magneton = 5.788382e-2
+bohr_magneton = 5.788382e-2  # meV/T
 # list of RE ions names
 rare_earths = ['Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb']
 # list of quantum numbers for total angular momentum of the ground state multiplet for RE ions
@@ -405,10 +404,9 @@ class CF(object):
 
     def chi(self, temperature=None):
         # Calculate the susceptibility at a specified temperature.
-        lande_factor_square = self.lande_factor ** 2
         temperature = core.get_temperature(temperature, self.temperature)
         temperature_as_energy = core.kelvin_to_mev(temperature)
-        statistic_sum = sum(core.bolzman(self.eigenvalues, temperature))
+        coefficient = self.lande_factor ** 2 / sum(core.bolzman(self.eigenvalues, temperature))
         chi_curie_z = 0
         chi_curie_x = 0
         chi_van_vleck_z = 0
@@ -430,10 +428,10 @@ class CF(object):
                     chi_van_vleck_x += (0.5 * (j_plus_square + j_minus_square) * current_bolzman /
                                         (column_value - row_value))
         return {
-            'chi_curie_z': lande_factor_square * chi_curie_z / (temperature_as_energy * statistic_sum),
-            'chi_curie_x': lande_factor_square * chi_curie_x / (temperature_as_energy * statistic_sum),
-            'chi_van_vleck_z': lande_factor_square * chi_van_vleck_z / statistic_sum,
-            'chi_van_vleck_x': lande_factor_square * chi_van_vleck_x / statistic_sum
+            'chi_curie_z': coefficient / temperature_as_energy * chi_curie_z,
+            'chi_curie_x': coefficient / temperature_as_energy * chi_curie_x,
+            'chi_van_vleck_z': coefficient * chi_van_vleck_z,
+            'chi_van_vleck_x': coefficient * chi_van_vleck_x,
         }
 
     def chi_s(self, temperatures=None):

@@ -109,5 +109,25 @@ def create_table(*arrays):
     return numpy.transpose(data)
 
 
+# def save_dat(file_name, argument_space, table):
+#     start_time = datetime.now()
+#     check_path(file_name)
+#     if os.path.exists(file_name):
+#         os.remove(file_name)
+#     my_file = open(file_name, 'a', encoding='utf-8')
+#     print(f'Saving file "{file_name}"...')
+#     for index, argument in enumerate(argument_space):
+#         my_file.write(value_to_write(argument, '\t'))
+#         for item in table[index]:
+#             if table[index].index(item) == len(table[index]) - 1:
+#                 my_file.write(value_to_write(table[index], '\n'))
+#             else:
+#                 my_file.write(value_to_write(table[index], '\t'))
+#     my_file.close()
+#     print(f'File "{file_name}" is saved')
+#     finish_time = datetime.now()
+#     print(f'Saving time: {finish_time - start_time}')
+
+
 if __name__ == '__main__':
     print('Done!')
