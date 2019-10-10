@@ -62,12 +62,11 @@ def check_input(choice):
     return result
 
 
-def kelvin_to_mev(temperature):
-    return temperature / 11.6045
-
-
-def bolzman(energies, temperature):
-    return numpy.exp(-energies / kelvin_to_mev(temperature))
+def thermodynamics(temperature, energies=None):
+    thermo_dict = {'temperature': temperature / 11.6045}
+    if energies.any() and thermo_dict['temperature'] > 0:
+        thermo_dict['bolzmann'] = numpy.exp(-energies / thermo_dict['temperature'])
+    return thermo_dict
 
 
 def get_temperature(old_value, new_value):
@@ -107,26 +106,6 @@ def create_table(*arrays):
     for array in arrays:
         data.append(array)
     return numpy.transpose(data)
-
-
-# def save_dat(file_name, argument_space, table):
-#     start_time = datetime.now()
-#     check_path(file_name)
-#     if os.path.exists(file_name):
-#         os.remove(file_name)
-#     my_file = open(file_name, 'a', encoding='utf-8')
-#     print(f'Saving file "{file_name}"...')
-#     for index, argument in enumerate(argument_space):
-#         my_file.write(value_to_write(argument, '\t'))
-#         for item in table[index]:
-#             if table[index].index(item) == len(table[index]) - 1:
-#                 my_file.write(value_to_write(table[index], '\n'))
-#             else:
-#                 my_file.write(value_to_write(table[index], '\t'))
-#     my_file.close()
-#     print(f'File "{file_name}" is saved')
-#     finish_time = datetime.now()
-#     print(f'Saving time: {finish_time - start_time}')
 
 
 if __name__ == '__main__':

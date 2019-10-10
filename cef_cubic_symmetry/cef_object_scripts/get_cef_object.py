@@ -44,50 +44,6 @@ class CF(object):
     # There is only one basic object, defining the trivalent rare earth, its crystal field parameters, and,
     # if already diagonalized, the eigenvalues and eigenfunctions of the CF Hamiltonian.
 
-    @property
-    def index_of_rare_earth(self):
-        return rare_earths.index(self.rare_earth)
-
-    @property
-    def number_of_f_electrons(self):
-        return self.index_of_rare_earth + 1
-
-    @property
-    def j(self):
-        return total_momentum_ground[self.index_of_rare_earth]
-
-    @property
-    def size(self):
-        return int(2 * self.j + 1)
-
-    @property
-    def lande_factor(self):
-        return lande_factor[self.index_of_rare_earth]
-
-    @property
-    def r2(self):
-        return r2[self.index_of_rare_earth]
-
-    @property
-    def r4(self):
-        return r4[self.index_of_rare_earth]
-
-    @property
-    def r6(self):
-        return r6[self.index_of_rare_earth]
-
-    @property
-    def stevens_factor2(self):
-        return stevens_factor2[self.index_of_rare_earth]
-
-    @property
-    def stevens_factor4(self):
-        return stevens_factor4[self.index_of_rare_earth]
-
-    @property
-    def stevens_factor6(self):
-        return stevens_factor6[self.index_of_rare_earth]
-
     def __init__(self, rare_earth=None, name=None, par_file=None):
         # Initializes the CF object or read it from a file.
         if not par_file:
@@ -111,6 +67,18 @@ class CF(object):
             self.name = name
         else:
             self.load_from_par_file(par_file)
+
+        self.index_of_rare_earth = rare_earths.index(self.rare_earth)
+        self.number_of_f_electrons = self.index_of_rare_earth + 1
+        self.j = total_momentum_ground[self.index_of_rare_earth]
+        self.size = int(2 * self.j + 1)
+        self.lande_factor = lande_factor[self.index_of_rare_earth]
+        self.r2 = r2[self.index_of_rare_earth]
+        self.r4 = r4[self.index_of_rare_earth]
+        self.r6 = r6[self.index_of_rare_earth]
+        self.stevens_factor2 = stevens_factor2[self.index_of_rare_earth]
+        self.stevens_factor4 = stevens_factor4[self.index_of_rare_earth]
+        self.stevens_factor6 = stevens_factor6[self.index_of_rare_earth]
         self.H = numpy.zeros((self.size, self.size), dtype='float64')
         self.j_z = numpy.zeros((self.size, self.size), dtype='float64')
         self.j_plus = numpy.zeros((self.size, self.size), dtype='float64')
@@ -175,6 +143,17 @@ class CF(object):
         self.B66 = parser.getfloat('parameters', 'B66')
         self.magnet_field_z = parser.getfloat('parameters', 'Hz')
         self.magnet_field_x = parser.getfloat('parameters', 'Hx')
+        self.index_of_rare_earth = rare_earths.index(self.rare_earth)
+        self.number_of_f_electrons = self.index_of_rare_earth + 1
+        self.j = total_momentum_ground[self.index_of_rare_earth]
+        self.size = int(2 * self.j + 1)
+        self.lande_factor = lande_factor[self.index_of_rare_earth]
+        self.r2 = r2[self.index_of_rare_earth]
+        self.r4 = r4[self.index_of_rare_earth]
+        self.r6 = r6[self.index_of_rare_earth]
+        self.stevens_factor2 = stevens_factor2[self.index_of_rare_earth]
+        self.stevens_factor4 = stevens_factor4[self.index_of_rare_earth]
+        self.stevens_factor6 = stevens_factor6[self.index_of_rare_earth]
         self.H = numpy.zeros((self.size, self.size), dtype='float64')
         self.j_z = numpy.zeros((self.size, self.size), dtype='float64')
         self.j_plus = numpy.zeros((self.size, self.size), dtype='float64')
@@ -236,15 +215,17 @@ class CF(object):
     def zeeman_hamiltonian(self):
         # Determine the Zeeman terms to the Hamiltonian.
         j = self.j
-        hamiltonian = numpy.zeros((self.size, self.size), dtype='float64')
-        for row in range(self.size):
+        j_2 = j * (j + 1)
+        size = self.size
+        hamiltonian = numpy.zeros((size, size), dtype='float64')
+        for row in range(size):
             m = row - j
             hamiltonian[row, row] -= self.lande_factor * bohr_magneton * m * self.magnet_field_z
-            if row < (self.size - 1):
+            if row < (size - 1):
                 column = row + 1
                 n = m + 1
                 hamiltonian[row, column] -= (0.5 * self.lande_factor * bohr_magneton *
-                                             numpy.sqrt((j * (j + 1) - m * n)) * self.magnet_field_x)
+                                             numpy.sqrt((j_2 - m * n)) * self.magnet_field_x)
                 hamiltonian[column, row] = hamiltonian[row, column]
 
         return hamiltonian
@@ -255,37 +236,46 @@ class CF(object):
 
     def eigen_calculations(self):
         # Calculate eigenvalues and eigenfunctions of the total Hamiltonian.
-        # Attention! Calculation using 'numpy.linalg.eigh' instead of 'scipy.linalg.eigh' gives a different result
-        # The reason is incomprehensible.
-        self.eigenvalues = eigh(self.total_hamiltonian())[0]
-        self.eigenfunctions = eigh(self.total_hamiltonian())[1]
+        hamiltonian = self.total_hamiltonian()
+        self.eigenvalues, self.eigenfunctions = eigh(hamiltonian)
         self.eigenvalues = self.eigenvalues - min(self.eigenvalues)  # E = 0 - minimum of energy.
 
     def transition_probabilities(self):
         # Determine matrix elements for dipole transitions between eigenfunctions of the total Hamiltonian.
         j = self.j
-        self.j_z = numpy.zeros((self.size, self.size), dtype='float64')
-        self.j_plus = numpy.zeros((self.size, self.size), dtype='float64')
-        self.j_minus = numpy.zeros((self.size, self.size), dtype='float64')
-        for row in range(self.size):
-            for column in range(self.size):
-                for row_j in range(self.size):
+        j_2 = j * (j + 1)
+        size = self.size
+        eigenfunctions = self.eigenfunctions
+        self.j_z = numpy.zeros((size, size), dtype='float64')
+        self.j_plus = numpy.zeros((size, size), dtype='float64')
+        self.j_minus = numpy.zeros((size, size), dtype='float64')
+        for row in range(size):
+            for row_j in range(size):
+                self.j_z[row, row] += (eigenfunctions[row_j, row] ** 2) * (row_j - j)
+                if row_j < (size - 1):
+                    self.j_plus[row, row] += (eigenfunctions[row_j + 1, row] * eigenfunctions[row_j, row] *
+                                              numpy.sqrt(j_2 - (row_j - j) * (row_j - j + 1)))
+            self.j_minus[row, row] = self.j_plus[row, row]
+            for column in range(row + 1, size):
+                for row_j in range(size):
                     m = row_j - j
-                    self.j_z[row, column] += (self.eigenfunctions[row_j, row] *
-                                              self.eigenfunctions[row_j, column] * m)
-                    if row_j < (self.size - 1):
+                    self.j_z[row, column] += (eigenfunctions[row_j, row] * eigenfunctions[row_j, column] * m)
+                    if row_j < (size - 1):
                         column_j = row_j + 1
                         n = column_j - j
-                        common_root = numpy.sqrt(j * (j + 1) - m * n)
-                        self.j_plus[row, column] += (self.eigenfunctions[column_j, row] *
-                                                     self.eigenfunctions[row_j, column] *
+                        common_root = numpy.sqrt(j_2 - m * n)
+                        self.j_plus[row, column] += (eigenfunctions[column_j, row] * eigenfunctions[row_j, column] *
                                                      common_root)
-                        self.j_minus[row, column] += (self.eigenfunctions[row_j, row] *
-                                                      self.eigenfunctions[column_j, column] *
+                        self.j_minus[row, column] += (eigenfunctions[row_j, row] * eigenfunctions[column_j, column] *
                                                       common_root)
                 self.transition_probability[row, column] = ((2 * self.j_z[row, column] ** 2 +
                                                              self.j_plus[row, column] ** 2 +
                                                              self.j_minus[row, column] ** 2) / 3)
+
+                self.j_z[column, row] = self.j_z[row, column]
+                self.j_plus[column, row] = self.j_minus[row, column]
+                self.j_minus[column, row] = self.j_plus[row, column]
+                self.transition_probability[column, row] = self.transition_probability[row, column]
 
     def get_peaks(self, temperature=None, magnet_field_x=None, magnet_field_z=None):
         # Determine the peak intensities from the total Hamiltonian.
@@ -300,11 +290,12 @@ class CF(object):
 
         bolzmann_factor = numpy.zeros(self.size, dtype='float64')
         temperature = core.get_temperature(temperature, self.temperature)
-        if core.kelvin_to_mev(temperature) <= 0:
+        thermal = core.thermodynamics(temperature, self.eigenvalues)
+        if thermal['temperature'] <= 0:
             bolzmann_factor[0] = 1
         else:
-            statistic_sum = sum(core.bolzman(self.eigenvalues, temperature))
-            bolzmann_factor = core.bolzman(self.eigenvalues, temperature) / statistic_sum
+            statistic_sum = sum(thermal['bolzmann'])
+            bolzmann_factor = thermal['bolzmann'] / statistic_sum
 
         peaks = []
         for level_1 in range(self.size):
@@ -373,14 +364,16 @@ class CF(object):
         temperature = core.get_temperature(temperature, self.temperature)
         if temperature != self.temperature_used:
             self.get_peaks(temperature)
-        if core.kelvin_to_mev(temperature) > 0:
+        thermal = core.thermodynamics(temperature, self.eigenvalues)
+        if thermal['temperature'] > 0:
             j_z_average = 0
             j_x_average = 0
-            statistic_sum = sum(core.bolzman(self.eigenvalues, temperature))
+            statistic_sum = sum(thermal['bolzmann'])
             for index in range(self.eigenvalues.size):
-                j_z_average += self.j_z[index, index] * core.bolzman(self.eigenvalues, temperature)[index]
+                j_z_average += (self.j_z[index, index] *
+                                thermal['bolzmann'][index])
                 j_x_average += (0.5 * (self.j_plus[index, index] + self.j_minus[index, index]) *
-                                core.bolzman(self.eigenvalues, temperature)[index])
+                                thermal['bolzmann'][index])
             j_z_average = j_z_average / statistic_sum
             j_x_average = j_x_average / statistic_sum
         else:
@@ -405,22 +398,26 @@ class CF(object):
     def chi(self, temperature=None):
         # Calculate the susceptibility at a specified temperature.
         temperature = core.get_temperature(temperature, self.temperature)
-        temperature_as_energy = core.kelvin_to_mev(temperature)
-        coefficient = self.lande_factor ** 2 / sum(core.bolzman(self.eigenvalues, temperature))
+        thermal = core.thermodynamics(temperature, self.eigenvalues)
+        temperature_as_energy = thermal['temperature']
+        statistic_sum = 1
+        if temperature_as_energy > 0:
+            statistic_sum = sum(thermal['bolzmann'])
+
+        coefficient = self.lande_factor ** 2 / statistic_sum
         chi_curie_z = 0
         chi_curie_x = 0
         chi_van_vleck_z = 0
         chi_van_vleck_x = 0
-        resolution = 0.00001 * temperature_as_energy
         for row in range(self.eigenvalues.size):
             for column in range(self.eigenvalues.size):
-                current_bolzman = core.bolzman(self.eigenvalues, temperature)[row]
+                current_bolzman = thermal['bolzmann'][row]
                 j_z_square = self.j_z[row, column] ** 2
                 j_plus_square = self.j_plus[row, column] ** 2
                 j_minus_square = self.j_minus[row, column] ** 2
                 row_value = self.eigenvalues[row]
                 column_value = self.eigenvalues[column]
-                if abs(column_value - row_value) < resolution:
+                if abs(column_value - row_value) < 0.00001 * temperature_as_energy:
                     chi_curie_z += j_z_square * current_bolzman
                     chi_curie_x += (0.25 * (j_plus_square + j_minus_square) * current_bolzman)
                 else:
@@ -448,11 +445,12 @@ class CF(object):
         chi = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
         inverse_chi = numpy.zeros(shape=temperatures.shape, dtype=numpy.float32)
         for index in range(len(temperatures)):
-            chi_curie_z[index] = self.chi(temperatures[index])['chi_curie_z']
-            chi_van_vleck_z[index] = self.chi(temperatures[index])['chi_van_vleck_z']
+            current_chi = self.chi(temperatures[index])
+            chi_curie_z[index] = current_chi['chi_curie_z']
+            chi_van_vleck_z[index] = current_chi['chi_van_vleck_z']
             chi_z[index] = chi_curie_z[index] + chi_van_vleck_z[index]
-            chi_curie_x[index] = self.chi(temperatures[index])['chi_curie_x']
-            chi_van_vleck_x[index] = self.chi(temperatures[index])['chi_van_vleck_x']
+            chi_curie_x[index] = current_chi['chi_curie_x']
+            chi_van_vleck_x[index] = current_chi['chi_van_vleck_x']
             chi_x[index] = chi_curie_x[index] + chi_van_vleck_x[index]
             chi[index] = (chi_z[index] + 2 * chi_x[index]) / 3
             inverse_chi[index] = 1 / chi[index]
