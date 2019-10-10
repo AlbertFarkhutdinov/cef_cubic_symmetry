@@ -1,11 +1,10 @@
 from cef_object_scripts import core
 from cef_object_scripts import get_results
-
-# save_info('Start')
-print('Hello!')
-crystal = input('Input the name of crystal: ')
+# import cProfile
+print('Welcome!')
+crystal = input('Input the name of crystal (e.g. "YNi2"): ')
 while True:
-    command = input('\nInput command: ')
+    command = input('\nInput command (e.g. "help"): ')
     if command == 'get_one_dot':
         rare_earth = core.check_input('rare')
         w = core.check_input('w')
@@ -38,16 +37,15 @@ while True:
         x = core.check_input('x')
         get_results.save_susceptibility(crystal, rare_earth, w, x)
     elif command == 'help':
-        print('Help:')
-        print('get_one_dot - command, which ')
-        print('load_data - command, which ')
-        print('save_energy_dat - command, which ')
-        print('save_parameters - command, which ')
-        print('save_spectra - command, which ')
-        print('save_susceptibility - command, which ')
+        print('\nList of available commands:')
+        print('get_one_dot - prints energy transfers for values inputted by user.')
+        print('save_parameters - saves parameters of CEF to .cgf-file for values inputted by user.')
+        print('load_data - loads CEF-parameters from .cfg-file for values inputted by user.')
+        print('save_energy_dat - saves dependence of energy transfer on x-parameter of CEF to .dat-file for values '
+              'inputted by user.')
+        print('save_spectra - saves neutron inelastic scattering spectra to .dat-file for values inputted by user.')
+        print('save_sus - saves magnetic susceptibilities to .dat-file for values inputted by user.')
     elif command == 'exit':
         break
     else:
         print("If you don't know, which commands can be inputted, enter 'help'")
-
-# save_info('Finish')

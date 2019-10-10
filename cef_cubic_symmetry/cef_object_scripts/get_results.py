@@ -40,6 +40,7 @@ def save_energy_dat(crystal, rare_earth, w, number_of_intervals):
         os.remove(file_name)
     my_file = open(file_name, 'a', encoding='utf-8')
     print(f'Saving file "{file_name}"...')
+    print('It will take some time...')
     for x in x_space:
         cef_object = get_object_with_parameters(w, x, rare_earth)
         energies = cef_object.get_energies()
@@ -79,6 +80,7 @@ def save_spectra(crystal, rare_earth, w, x):
                                    crystal, rare_earth, w, x, temperature)
         core.check_path(file_name)
         core.save_numpy(file_name, core.create_table(energies, spectrum))
+        print(f'File "{file_name}" is saved')
     finish_time = datetime.now()
     print(f'Saving time: {finish_time - start_time}')
 
@@ -89,6 +91,8 @@ def save_susceptibility(crystal, rare_earth, w, x):
     print('\nSaving magnetic susceptibilities')
     common_file_name = core.get_paths(core.path_to_susceptibility_datafiles, 'susceptibility', 'dat',
                                       crystal, rare_earth, w, x)
+    cef_object = get_object_with_parameters(w, x, rare_earth)
+    chi_s = cef_object.chi_s(temperatures)
     for axis in ['z', 'x', 'total']:
         file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
         core.check_path(file_name)
@@ -96,8 +100,10 @@ def save_susceptibility(crystal, rare_earth, w, x):
             os.remove(file_name)
         my_file = open(file_name, 'a', encoding='utf-8')
         print(f'Saving file "{file_name}"...')
-        cef_object = get_object_with_parameters(w, x, rare_earth)
-        chi_s = cef_object.chi_s(temperatures)
+        if axis == 'z' or axis == 'x':
+            my_file.write(f'T(Kelvin)\tchi_curie_{axis}\tchi_van_vleck_{axis}\tchi_{axis}\n')
+        else:
+            my_file.write('T(Kelvin)\tchi_total\tinverse_chi\n')
         for i in range(len(temperatures)):
             my_file.write(core.value_to_write(temperatures[i], '\t'))
             if axis == 'z' or axis == 'x':
@@ -108,7 +114,9 @@ def save_susceptibility(crystal, rare_earth, w, x):
                 my_file.write(core.value_to_write(chi_s['chi'][i], '\t'))
                 my_file.write(core.value_to_write(chi_s['inverse_chi'][i], '\n'))
         my_file.close()
+        print(f'File "{file_name}" is saved')
     finish_time = datetime.now()
+
     print(f'Saving time: {finish_time - start_time}')
 
 
