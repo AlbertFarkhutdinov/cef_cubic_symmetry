@@ -1,6 +1,6 @@
 import numpy
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+BASE_DIR = os.getcwd()
 path_to_energy_datafiles = os.path.join(BASE_DIR, 'energy_datafiles')
 path_to_saved_objects = os.path.join(BASE_DIR, 'saved_objects')
 path_to_spectra_datafiles = os.path.join(BASE_DIR, 'spectra')
@@ -16,6 +16,7 @@ def value_to_write(value, text_separator):
 
 
 def get_paths(directory, data_name, format_name, crystal, rare_earth, w=None, x=None, temperature=None):
+    os.chdir(BASE_DIR)
     short_name = f'{crystal}_{rare_earth}'
     full_name = short_name
     if w:
@@ -63,16 +64,14 @@ def check_input(choice):
 
 
 def thermodynamics(temperature, energies=None):
-    thermo_dict = {'temperature': temperature / 11.6045}
-    if energies.any() and thermo_dict['temperature'] > 0:
-        thermo_dict['bolzmann'] = numpy.exp(-energies / thermo_dict['temperature'])
-    return thermo_dict
+    thermal_dict = {'temperature': temperature / 11.6045}
+    if energies.any() and thermal_dict['temperature'] > 0:
+        thermal_dict['bolzmann'] = numpy.exp(-energies / thermal_dict['temperature'])
+    return thermal_dict
 
 
 def get_temperature(old_value, new_value):
-    if old_value is None:
-        old_value = new_value
-    return old_value
+    return new_value if (old_value is None) else old_value
 
 
 def gauss(argument, center, sigma):
@@ -95,12 +94,6 @@ def pseudo_voigt(argument, center, sigma, gamma):
     return (1 - eta) * gauss(argument, center, sigma) + eta * lorentz(argument, center, gamma)
 
 
-def save_numpy(file_name, data):
-    print(f'Saving file {file_name}...')
-    numpy.savetxt(file_name, data, delimiter='\t')
-    print(f'File "{file_name}" is saved')
-
-
 def create_table(*arrays):
     data = []
     for array in arrays:
@@ -108,5 +101,13 @@ def create_table(*arrays):
     return numpy.transpose(data)
 
 
+def user_input():
+    crystal = input('Input the name of crystal (e.g. "YNi2"): ')
+    rare_earth = check_input('rare')
+    w = check_input('w')
+    x = check_input('x')
+    return crystal, rare_earth, w, x
+
+
 if __name__ == '__main__':
-    print('Done!')
+    print(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))

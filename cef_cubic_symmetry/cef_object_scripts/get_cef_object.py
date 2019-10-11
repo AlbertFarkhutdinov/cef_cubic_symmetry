@@ -411,18 +411,18 @@ class CF(object):
         chi_van_vleck_x = 0
         for row in range(self.eigenvalues.size):
             for column in range(self.eigenvalues.size):
-                current_bolzman = thermal['bolzmann'][row]
+                current_bolzmann = thermal['bolzmann'][row]
                 j_z_square = self.j_z[row, column] ** 2
                 j_plus_square = self.j_plus[row, column] ** 2
                 j_minus_square = self.j_minus[row, column] ** 2
                 row_value = self.eigenvalues[row]
                 column_value = self.eigenvalues[column]
                 if abs(column_value - row_value) < 0.00001 * temperature_as_energy:
-                    chi_curie_z += j_z_square * current_bolzman
-                    chi_curie_x += (0.25 * (j_plus_square + j_minus_square) * current_bolzman)
+                    chi_curie_z += j_z_square * current_bolzmann
+                    chi_curie_x += (0.25 * (j_plus_square + j_minus_square) * current_bolzmann)
                 else:
-                    chi_van_vleck_z += (2 * j_z_square * current_bolzman / (column_value - row_value))
-                    chi_van_vleck_x += (0.5 * (j_plus_square + j_minus_square) * current_bolzman /
+                    chi_van_vleck_z += (2 * j_z_square * current_bolzmann / (column_value - row_value))
+                    chi_van_vleck_x += (0.5 * (j_plus_square + j_minus_square) * current_bolzmann /
                                         (column_value - row_value))
         return {
             'chi_curie_z': coefficient / temperature_as_energy * chi_curie_z,
@@ -540,4 +540,29 @@ if __name__ == '__main__':
     cubic_sample.B44 = 5 * cubic_sample.B40
     cubic_sample.B60 = w * (1 - abs(x)) / f6[rare]
     cubic_sample.B64 = -21 * cubic_sample.B60
-    print(cubic_sample)
+
+    ham = cubic_sample.total_hamiltonian()
+    for i in range(ham.shape[0]):
+        for k in range(ham.shape[1]):
+            print(f'{ham[i][k]: 9.3f}', end='\t')
+        print()
+
+    a = eigh(ham)
+    b = numpy.linalg.eigh(ham)
+    print()
+    for i in range(a[0].shape[0]):
+        print(f'{a[0][i]: 9.3f}', end='\t')
+    print('\n')
+    for i in range(a[1].shape[0]):
+        for k in range(a[1].shape[1]):
+            print(f'{a[1][i][k]: 9.3f}', end='\t')
+        print()
+
+    print()
+    for i in range(b[0].shape[0]):
+        print(f'{b[0][i]: 9.3f}', end='\t')
+    print('\n')
+    for i in range(b[1].shape[0]):
+        for k in range(b[1].shape[1]):
+            print(f'{b[1][i][k]: 9.3f}', end='\t')
+        print()

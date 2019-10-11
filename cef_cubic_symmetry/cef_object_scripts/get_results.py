@@ -5,11 +5,11 @@ from cef_object_scripts import core
 from cef_object_scripts.get_cef_object import CF
 
 
-def get_object_with_parameters(w, x, rare_earth):
+def get_object_with_parameters(crystal, rare_earth, w, x):
     f4 = 60
     f6 = {'Pr': 1260, 'Nd': 2520, 'Pm': 1260, 'Gd': 1260, 'Tb': 7560, 'Dy': 13860, 'Ho': 13860, 'Er': 13860, 'Tm': 7560,
           'Yb': 1260}
-    cef_object = CF(name=f'YNi2: {rare_earth}3+', rare_earth=rare_earth)
+    cef_object = CF(name=f'{crystal}: {rare_earth}3+', rare_earth=rare_earth)
     cef_object.B40 = w * x / f4
     cef_object.B44 = 5 * cef_object.B40
     cef_object.B60 = w * (1 - abs(x)) / f6[rare_earth]
@@ -17,8 +17,8 @@ def get_object_with_parameters(w, x, rare_earth):
     return cef_object
 
 
-def get_one_dot(w, x, rare_earth):
-    cef_object = get_object_with_parameters(w, x, rare_earth)
+def get_one_dot(crystal, rare_earth, w, x):
+    cef_object = get_object_with_parameters(crystal, rare_earth, w, x)
     energies = cef_object.get_energies()
     print(f'x:\t\t{x: 9.3f}')
     for i in range(len(energies)):
@@ -42,7 +42,7 @@ def save_energy_dat(crystal, rare_earth, w, number_of_intervals):
     print(f'Saving file "{file_name}"...')
     print('It will take some time...')
     for x in x_space:
-        cef_object = get_object_with_parameters(w, x, rare_earth)
+        cef_object = get_object_with_parameters(crystal, rare_earth, w, x)
         energies = cef_object.get_energies()
         my_file.write(core.value_to_write(x, '\t'))
         for level in range(len(energies)):
@@ -59,7 +59,7 @@ def save_energy_dat(crystal, rare_earth, w, number_of_intervals):
 def save_parameters(crystal, rare_earth, w, x):
     start_time = datetime.now()
     print('\nSaving CEF parameters')
-    cef_object = get_object_with_parameters(w, x, rare_earth)
+    cef_object = get_object_with_parameters(crystal, rare_earth, w, x)
     file_name = core.get_paths(core.path_to_saved_objects, 'parameters', 'cfg', crystal, rare_earth, w, x)
     print(f'Saving file "{file_name}"...')
     cef_object.save_to_par_file(file_name)
@@ -73,14 +73,16 @@ def save_spectra(crystal, rare_earth, w, x):
     temperatures = [5, 25, 50]
     start_time = datetime.now()
     print('\nSaving neutron inelastic scattering spectra')
-    cef_object = get_object_with_parameters(w, x, rare_earth)
+    cef_object = get_object_with_parameters(crystal, rare_earth, w, x)
     for temperature in temperatures:
         spectrum = cef_object.spectrum(energy=energies, gamma=0.5, temperature=temperature)
         file_name = core.get_paths(core.path_to_spectra_datafiles, 'spectrum', 'dat',
                                    crystal, rare_earth, w, x, temperature)
         core.check_path(file_name)
-        core.save_numpy(file_name, core.create_table(energies, spectrum))
+        print(f'Saving file {file_name}...')
+        numpy.savetxt(file_name, core.create_table(energies, spectrum), delimiter='\t')
         print(f'File "{file_name}" is saved')
+
     finish_time = datetime.now()
     print(f'Saving time: {finish_time - start_time}')
 
@@ -91,7 +93,7 @@ def save_susceptibility(crystal, rare_earth, w, x):
     print('\nSaving magnetic susceptibilities')
     common_file_name = core.get_paths(core.path_to_susceptibility_datafiles, 'susceptibility', 'dat',
                                       crystal, rare_earth, w, x)
-    cef_object = get_object_with_parameters(w, x, rare_earth)
+    cef_object = get_object_with_parameters(crystal, rare_earth, w, x)
     chi_s = cef_object.chi_s(temperatures)
     for axis in ['z', 'x', 'total']:
         file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
@@ -130,3 +132,4 @@ if __name__ == '__main__':
     save_parameters(crystal_name, rare_earth_name, current_w, current_x)
     save_spectra(crystal_name, rare_earth_name, current_w, current_x)
     save_susceptibility(crystal_name, rare_earth_name, current_w, current_x)
+    print('Done!')
