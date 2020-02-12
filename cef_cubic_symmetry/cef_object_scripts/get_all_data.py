@@ -29,8 +29,10 @@ for point in recalculated_crosses:
         colors = {temperature: 'black', 25: 'red', 'diff': 'green'}
         legend = {temperature: f'{temperature} K', 25: '25 K', 'diff': f'{temperature} - 25 K'}
         get_graph.get_energy_transfer_plot(crystal=crystal_name, rare_earth=rare_earth_name,
-                                           w=point.w, x=point.x,
+                                           w=point.w, x=point.x, x_min=0, x_max=4, y_max=4000,
+                                           text_x=2.2, text_y=2300,
                                            temperature_1=temperature, temperature_2=25,
                                            x_data=energies, y_data_set=intensities,
+                                           x_major_locator=1, y_major_locator=500,
                                            color_set=colors, y_legend_set=legend, mode='png')
         print('Graph saved')
