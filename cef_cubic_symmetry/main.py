@@ -1,41 +1,41 @@
-from cef_object_scripts import core
+from cef_object_scripts import common
 from cef_object_scripts import get_results
 # import cProfile
-print(f'Working directory: {core.BASE_DIR}\n')
+print(f'Working directory: {common.BASE_DIR}\n')
 while True:
     command = input('\nInput command (e.g. "help"): ')
     if command == 'get_one_dot':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         get_results.get_one_dot(crystal, rare_earth, w, x)
     elif command == 'get_object':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         cef_object = get_results.get_object_with_parameters(crystal, rare_earth, w, x)
         print(cef_object)
     elif command == 'load_data':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         cef_object = get_results.load_data(crystal, rare_earth, w, x)
         print(cef_object)
     elif command == 'save_energy_dat':
         print()
         crystal = input('Input the name of crystal (e.g. "YNi2"): ')
-        rare_earth = core.check_input('rare')
-        w = core.check_input('w')
-        number_of_intervals = core.check_input('intervals')
+        rare_earth = common.check_input('rare')
+        w = common.check_input('w')
+        number_of_intervals = common.check_input('intervals')
         get_results.save_energy_dat(crystal, rare_earth, w, number_of_intervals)
     elif command == 'save_parameters':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         get_results.save_parameters(crystal, rare_earth, w, x)
     elif command == 'save_spectra':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         get_results.save_parameters(crystal, rare_earth, w, x)
     elif command == 'save_sus':
         print()
-        crystal, rare_earth, w, x = core.user_input()
+        crystal, rare_earth, w, x = common.user_input()
         get_results.save_susceptibility(crystal, rare_earth, w, x)
     elif command == 'help':
         print()

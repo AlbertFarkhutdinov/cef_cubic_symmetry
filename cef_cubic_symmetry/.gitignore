@@ -1,4 +1,4 @@
 *.pyc
 .idea
-*.sqlite3
-conf/
+graphs
+spectra
