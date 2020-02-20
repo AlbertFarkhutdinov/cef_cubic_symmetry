@@ -1,91 +1,109 @@
 """The module contains functions for plotting graphs."""
+from collections import namedtuple
 import matplotlib.pyplot as plt
 from cef_object_scripts import common
 
 plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['font.size'] = 14
 plt.rcParams['mathtext.fontset'] = 'stix'
 plt.rcParams['axes.linewidth'] = 2
+plt.rcParams['xtick.top'] = True
+plt.rcParams['ytick.right'] = True
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+plt.rcParams['xtick.major.width'] = 2
+plt.rcParams['xtick.minor.width'] = 2
+plt.rcParams['ytick.major.width'] = 2
+plt.rcParams['ytick.minor.width'] = 2
+plt.rcParams['xtick.major.size'] = 6
+plt.rcParams['xtick.minor.size'] = 3
+plt.rcParams['ytick.major.size'] = 6
+plt.rcParams['ytick.minor.size'] = 3
+plt.rcParams['figure.subplot.left'] = 0.19
+plt.rcParams['figure.subplot.right'] = 0.98
+plt.rcParams['figure.subplot.top'] = 0.90
+plt.rcParams['figure.subplot.bottom'] = 0.11
+plt.rcParams['figure.subplot.wspace'] = 0
+plt.rcParams['figure.subplot.hspace'] = 0
+FIG_SIZE = (10, 10)
+plt.rcParams['figure.figsize'] = [i / 2.54 for i in FIG_SIZE]
+
+print(plt.rcParams)
 
 
-def get_plot(x_data=None, y_data_set=None,
-             x_label='x_label', y_label='y_label',
-             y_legend_set=None, color_set=None,
-             x_min=None, x_max=None,
-             y_min=None, y_max=None,
-             size=(10, 10), graph_title=None, graph_name='graph', mode='show',
-             tick_label_size=14, tick_major_length=6, tick_minor_length=3,
-             axis_label_size=14, axis_label_pad=0,
-             legend_font_size=14, left=0.19, bottom=0.11, right=0.98, top=0.90,
-             x_major_locator=None, x_minor_locator=None,
-             y_major_locator=None, y_minor_locator=None,
-             text_x=0, text_y=0, text_string='Test text'):
+Data = namedtuple('Data', ['x', 'y_set'])
+Labels = namedtuple('Labels', ['x', 'y'])
+Limits = namedtuple('Limits', ['x_min', 'x_max', 'y_min', 'y_max'])
+Locators = namedtuple('Locators', ['x_major', 'x_minor', 'y_major', 'y_minor'])
+Text = namedtuple('Text', ['x', 'y', 'string'])
+Legend = namedtuple('Legend', ['label_set', 'color_set'])
+GraphInfo = namedtuple('GraphInfo', ['filename', 'title', 'mode'])
+
+
+def get_plot(info=GraphInfo(filename='graph', title=None, mode='show'),
+             labels=Labels(x='x_label', y='y_label'), label_pad=0,
+             limits=None, locators=None, data=None,
+             legend=Legend(label_set=None, color_set=None),
+             text=Text(x=0, y=0, string='Test')):
     """Returns graph with specified parameters"""
-    size_inches = tuple(i / 2.54 for i in size)
-    x_min = min(x_data) if x_min is None else x_min
-    x_max = max(x_data) if x_max is None else x_max
-    y_min = min([min(value) for value in y_data_set.values()]) if y_min is None else y_min
-    y_max = max([max(value) for value in y_data_set.values()]) if y_max is None else y_max
-    dpi = 100 if mode == 'show' else 500
-    fig, _ax = plt.subplots(figsize=size_inches, dpi=dpi)
-    plt.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=None, hspace=None)
-    _ax.set_title(graph_title)
-    _ax.set_xlabel(x_label, labelpad=axis_label_pad, fontsize=axis_label_size)
-    _ax.set_ylabel(y_label, labelpad=axis_label_pad, fontsize=axis_label_size)
-    x_major_locator = (x_max - x_min) // 5 if x_major_locator is None else x_major_locator
-    x_minor_locator = x_major_locator / 5 if x_minor_locator is None else x_minor_locator
-    y_major_locator = (y_max - y_min) // 5 if y_major_locator is None else y_major_locator
-    y_minor_locator = y_major_locator / 5 if y_minor_locator is None else y_minor_locator
-    _ax.xaxis.set_major_locator(plt.MultipleLocator(x_major_locator))
-    _ax.xaxis.set_minor_locator(plt.MultipleLocator(x_minor_locator))
-    _ax.yaxis.set_major_locator(plt.MultipleLocator(y_major_locator))
-    _ax.yaxis.set_minor_locator(plt.MultipleLocator(y_minor_locator))
-    _ax.set_xlim(xmin=x_min, xmax=x_max)
-    _ax.set_ylim(ymin=-float(y_minor_locator), ymax=y_max)
-    _ax.tick_params(which='both', direction='in',
-                    width=2, top=True, right=True, labelsize=tick_label_size)
-    _ax.tick_params(which='major', length=tick_major_length)
-    _ax.tick_params(which='minor', length=tick_minor_length)
-    for key, y_data in y_data_set.items():
-        _ax.plot(x_data, y_data, color=color_set[key], label=y_legend_set[key], linewidth=2)
-    _ax.legend(fontsize=legend_font_size, frameon=False)
-    plt.text(text_x, text_y, text_string, size=14)
-    if mode == 'show':
+    if limits is None and data is not None:
+        limits = Limits(x_min=min(data.x),
+                        x_max=max(data.x),
+                        y_min=min([min(value) for value in data.y_set.values()]),
+                        y_max=max([max(value) for value in data.y_set.values()])
+                        )
+    dpi = 100 if info.mode == 'show' else 500
+    fig, _ax = plt.subplots(dpi=dpi)
+    _ax.set_title(info.title)
+    _ax.set_xlabel(labels.x, labelpad=label_pad)
+    _ax.set_ylabel(labels.y, labelpad=label_pad)
+    if locators is None and limits is not None:
+        locators = Locators(x_major=(limits.x_max - limits.x_min) // 5,
+                            x_minor=(limits.x_max - limits.x_min) // 5 / 5,
+                            y_major=(limits.y_max - limits.y_min) // 5,
+                            y_minor=(limits.y_max - limits.y_min) // 5 / 5)
+    _ax.xaxis.set_major_locator(plt.MultipleLocator(locators.x_major))
+    _ax.xaxis.set_minor_locator(plt.MultipleLocator(locators.x_minor))
+    _ax.yaxis.set_major_locator(plt.MultipleLocator(locators.y_major))
+    _ax.yaxis.set_minor_locator(plt.MultipleLocator(locators.y_minor))
+    _ax.set_xlim(xmin=limits.x_min, xmax=limits.x_max)
+    _ax.set_ylim(ymin=-float(locators.y_minor), ymax=limits.y_max)
+    for key, y_data in data.y_set.items():
+        _ax.plot(data.x, y_data, color=legend.color_set[key],
+                 label=legend.label_set[key], linewidth=2)
+    _ax.legend(frameon=False)
+    plt.text(x=text.x, y=text.y, s=text.string)
+    if info.mode == 'show':
         plt.show()
-    elif mode == 'eps':
-        fig.savefig(f'{graph_name}.eps')
-    elif mode == 'png':
-        fig.savefig(f'{graph_name}.png')
+    elif info.mode == 'eps':
+        fig.savefig(f'{info.filename}.eps')
+    elif info.mode == 'png':
+        fig.savefig(f'{info.filename}.png')
     else:
-        print(f'Mode {mode} is not supported.')
+        print(f'Mode {info.mode} is not supported.')
     plt.close('all')
 
 
-def get_energy_transfer_plot(crystal, rare_earth, w_parameter, x_parameter,
-                             temperature_1, temperature_2,
-                             x_data, y_data_set, y_legend_set, color_set, mode,
-                             x_min=None, x_max=None, y_min=None, y_max=None,
-                             x_major_locator=None, x_minor_locator=None,
-                             y_major_locator=None, y_minor_locator=None,
-                             text_x=0, text_y=0):
+def get_energy_transfer_plot(material: dict, parameters: dict, temperature_1, temperature_2, mode,
+                             data=None, limits=None, locators=None,
+                             legend=Legend(label_set=None, color_set=None),
+                             text=Text(x=0, y=0, string='')):
     """Returns graph for inelastic neutron scattering spectrum with specified parameters"""
+    parameters['T'] = f'{temperature_1}-{temperature_2}'
     file_name = common.get_paths(common.PATH_TO_GRAPHS, 'graph', mode,
-                                 crystal, rare_earth, w_parameter, x_parameter,
-                                 f'{temperature_1}-{temperature_2}')
+                                 material=material, parameters=parameters)
     common.check_path(file_name)
-    get_plot(x_data=x_data, y_data_set=y_data_set,
-             x_label='Energy Transfer, meV', y_label=r'$S(\omega)$, arb.u.',
-             color_set=color_set, y_legend_set=y_legend_set, mode=mode,
-             x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max,
-             graph_name=file_name.rstrip(f'.{mode}'),
-             text_x=text_x, text_y=text_y,
-             text_string=fr'$W={w_parameter: .3f}$' + '\n' + fr'$x = {x_parameter: .3f}$',
-             x_major_locator=x_major_locator, x_minor_locator=x_minor_locator,
-             y_major_locator=y_major_locator, y_minor_locator=y_minor_locator)
+    text.string = fr'$W={parameters["w"]: .3f}$' + '\n' + fr'$x = {parameters["x"]: .3f}$'
+    get_plot(data=data, legend=legend,
+             labels=Labels(x='Energy Transfer, meV', y=r'$S(\omega)$, arb.u.'),
+             info=GraphInfo(filename=file_name.rstrip(f'.{mode}'),
+                            title=None, mode=mode),
+             limits=limits, text=text, locators=locators)
 
 
 if __name__ == '__main__':
     MAXIMUM = 11
-    X_ARRAY = (i for i in range(MAXIMUM))
+    X_ARRAY = list(range(MAXIMUM))
     Y_ARRAY = {
         '4': [i ** 4 for i in range(MAXIMUM)],
         '3': [i ** 3 for i in range(MAXIMUM)],
@@ -104,6 +122,5 @@ if __name__ == '__main__':
         '2': '$x^2$',
         '1': '$x^1$',
     }
-    get_plot(x_data=X_ARRAY, y_data_set=Y_ARRAY,
-             x_label='Energy Transfer, meV', y_label=r'$S(\omega)$, arb.u.',
-             color_set=COLORS, y_legend_set=LEGEND, mode='show')
+    get_plot(data=Data(x=X_ARRAY, y_set=Y_ARRAY),
+             legend=Legend(color_set=COLORS, label_set=LEGEND))

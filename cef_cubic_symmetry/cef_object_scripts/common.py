@@ -23,26 +23,30 @@ def get_sign(value):
     return '-' if value < 0 else '+'
 
 
+def get_value(value):
+    """Returns float number as a string with sign plus or minus."""
+    return f'{get_sign(value)}' + f'{abs(value): .3f}'.lstrip(' ')
+
+
 def value_to_write(value, text_separator):
     """Returns float number as a string
     with tabulation symbol or newline one in the end."""
     return f'{value:10.5f}{text_separator}'
 
 
-def get_paths(directory, data_name, format_name, crystal, rare_earth,
-              w_parameter=None, x_parameter=None, temperature=None):
+def get_paths(directory, data_name, format_name, material: dict = None, parameters: dict = None):
     """Returns path of the file that will be saved."""
     os.chdir(BASE_DIR)
-    short_name = f'{crystal}_{rare_earth}'
+    short_name = ''
+    if material:
+        short_name = f'{material["crystal"]}_{material["rare_earth"]}'
     full_name = short_name
-    if w_parameter:
-        full_name += (f'_w{get_sign(w_parameter)}' +
-                      f'{abs(w_parameter): .3f}'.lstrip(' '))
-    if x_parameter:
-        full_name += (f'_x{get_sign(x_parameter)}' +
-                      f'{abs(x_parameter): .3f}'.lstrip(' '))
-    if temperature:
-        full_name += f'_T{temperature}'
+    if parameters:
+        for key, value in parameters.items():
+            if key != 'T':
+                full_name += f'_{key}{get_value(value)}'
+            else:
+                full_name += f'_{key}{value}'
     return os.path.join(directory, short_name, f'{data_name}_{full_name}.{format_name}')
 
 
@@ -95,8 +99,9 @@ def check_input(choice):
 def thermodynamics(temperature, energies=None):
     """Returns dictionary including value of temperature in meV and Bolzmann factor."""
     thermal_dict = {'temperature': temperature / 11.6045}
-    if energies.any() and thermal_dict['temperature'] > 0:
-        thermal_dict['bolzmann'] = numpy.exp(-energies / thermal_dict['temperature'])
+    if energies is not None and thermal_dict['temperature'] > 0:
+        zeros = numpy.zeros(len(energies))
+        thermal_dict['bolzmann'] = numpy.exp(zeros - energies / thermal_dict['temperature'])
     return thermal_dict
 
 
@@ -182,7 +187,6 @@ def saving_file(function):
 
 
 if __name__ == '__main__':
-    print(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    print(os.getcwd())
-    print(PATH_TO_ENERGY_DATAFILES)
-    check_input('rare')
+    print(get_paths('directory', 'data_name', 'format_name',
+                    material={'crystal': 'YNi2', 'rare_earth': 'Tb'},
+                    parameters={'w': 0.3243, 'x': -0.4687, 'T': 5}))
