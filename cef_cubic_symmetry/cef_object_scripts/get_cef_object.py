@@ -396,9 +396,9 @@ class CF(object):
         self.eigen_calculations()
         self.transition_probabilities()
         temperatures = common.get_temperature(temperatures, linspace(1, 300, 300, dtype='float64'))
-        chi_curie = {}
-        chi_van_vleck = {}
-        chi = {}
+        chi_curie = {'z': None, 'x': None}
+        chi_van_vleck = {'z': None, 'x': None}
+        chi = {'z': None, 'x': None, 'total': None, 'inverse': None}
         for key in ('z', 'x'):
             chi_curie[key] = common.get_empty_matrix(temperatures.shape)
             chi_van_vleck[key] = common.get_empty_matrix(temperatures.shape)
@@ -473,10 +473,8 @@ class CF(object):
 if __name__ == '__main__':
     from cProfile import run
     from cef_object_scripts.get_results import get_object_with_parameters
-    RARE = 'Tb'
-    W = 1
-    X = -1
-    CUBIC_SAMPLE = get_object_with_parameters(crystal=f'YNi2: {RARE}3+', rare_earth=RARE,
-                                              w_parameter=W, x_parameter=X)
+    MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Tb'}
+    PARAMETERS = {'w': 1, 'x': -1}
+    CUBIC_SAMPLE = get_object_with_parameters(MATERIAL, PARAMETERS)
     CUBIC_SAMPLE.eigen_calculations()
-    run('cubic_sample.transition_probabilities()')
+    run('CUBIC_SAMPLE.transition_probabilities()')
