@@ -203,6 +203,38 @@ def get_ratios(material: dict, parameters: dict):
     print(f'File "{ratio_file_name}" is saved.')
 
 
+def check_ratios(numbers, points, material: dict, parameters: dict):
+    """Checks the array of ratios
+    if one of them is approximately equal to the given value."""
+    ratios = numbers[1:]
+    for index, ratio in enumerate(ratios):
+        if abs(parameters['value'] - ratio) < parameters['accuracy']:
+            current = CrossPoint(rare_earth=material['rare_earth'],
+                                 w=parameters['w'],
+                                 x=numbers[0],
+                                 ratio_name=common.RATIOS_NAMES[index],
+                                 difference=parameters['value'] - ratio)
+            if not points:
+                points.append(current)
+            else:
+                previous = points[len(points) - 1]
+                if (current.rare_earth == previous.rare_earth and
+                        current.w == previous.w and
+                        current.ratio_name == previous.ratio_name and
+                        abs(current.x - previous.x) < 1e-3):
+                    current_x = ((current.x * previous.difference -
+                                  previous.x * current.difference) /
+                                 (previous.difference - current.difference))
+                    points[-1] = CrossPoint(rare_earth=material['rare_earth'],
+                                            w=parameters['w'],
+                                            x=current_x,
+                                            difference=0,
+                                            ratio_name=common.RATIOS_NAMES[index])
+                else:
+                    points.append(current)
+    return points
+
+
 def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.005):
     """Returns points of cross experimental and calculated curves."""
     points = []
@@ -215,35 +247,11 @@ def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.
         for line in ratio_file:
             line = line.rstrip('\n')
             numbers = [float(number) for number in line.split('\t')]
-            x_parameter = numbers[0]
-            ratios = numbers[1:]
-            if any(abs(experimental_value - value) < accuracy for value in ratios):
-                for index, ratio in enumerate(ratios):
-                    if abs(experimental_value - ratio) < accuracy:
-                        current = CrossPoint(rare_earth=material['rare_earth'],
-                                             w=w_parameter,
-                                             x=x_parameter,
-                                             ratio_name=common.RATIOS_NAMES[index],
-                                             difference=experimental_value - ratio)
-                        if not points:
-                            points.append(current)
-                        else:
-                            previous = points[len(points) - 1]
-                            if (current.rare_earth == previous.rare_earth and
-                                    current.w == previous.w and
-                                    current.ratio_name == previous.ratio_name and
-                                    abs(current.x - previous.x) < 1e-3):
-                                current_x = ((current.x * previous.difference -
-                                              previous.x * current.difference) /
-                                             (previous.difference - current.difference))
-                                points[-1] = CrossPoint(rare_earth=material['rare_earth'],
-                                                        w=w_parameter,
-                                                        x=current_x,
-                                                        difference=0,
-                                                        ratio_name=common.RATIOS_NAMES[index])
-                            else:
-                                points.append(current)
-
+            if any(abs(experimental_value - value) < accuracy for value in numbers[1:]):
+                points = check_ratios(numbers, points, material,
+                                      parameters={'value': experimental_value,
+                                                  'w': w_parameter,
+                                                  'accuracy': accuracy})
     return points
 
 
