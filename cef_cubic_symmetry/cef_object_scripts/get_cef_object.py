@@ -41,13 +41,12 @@ class CF(object):
             self.name = PARSER.get('material', 'name')
             self.number_of_f_electrons = int(PARSER.get('material', 'number_of_f_electrons'))
             self.rare_earth = RARE_EARTHS[self.number_of_f_electrons - 1]
-            for key in self.parameters.keys():
+            for key, _ in self.parameters.items():
                 self.parameters[key] = PARSER.getfloat('parameters', key)
-            for key in self.magnet_field.keys():
+            for key, _ in self.magnet_field.items():
                 self.magnet_field[key] = PARSER.getfloat('parameters', f'H{key}')
 
         size = self.rare_earth.matrix_size
-        self.H = common.get_empty_matrix(size)
         self.j_z = common.get_empty_matrix(size)
         self.j_plus = common.get_empty_matrix(size)
         self.j_minus = common.get_empty_matrix(size)
@@ -97,21 +96,20 @@ class CF(object):
             return sqrt(result_of_lowering)
 
         for row in range(size):  # row = 0...2J
-            m = row - j  # m = -J...J
-            m2 = m ** 2
-            m4 = m ** 4
-            o20 = 3 * m2 - j_module_square
-            o40 = (35 * m4 -
-                   30 * j_module_square * m2 +
-                   25 * m2 -
+            # mqn[1] = m = -J...J
+            mqn = [(row - j) ** i for i in range(5)]
+            o20 = 3 * mqn[2] - j_module_square
+            o40 = (35 * mqn[4] -
+                   30 * j_module_square * mqn[2] +
+                   25 * mqn[2] -
                    6 * j_module_square +
                    3 * j_module_square ** 2)
-            o60 = (231 * m ** 6 -
-                   315 * j_module_square * m4 +
-                   735 * m4 +
-                   105 * j_module_square ** 2 * m2 -
-                   525 * j_module_square * m2 +
-                   294 * m2 -
+            o60 = (231 * mqn[1] ** 6 -
+                   315 * j_module_square * mqn[4] +
+                   735 * mqn[4] +
+                   105 * j_module_square ** 2 * mqn[2] -
+                   525 * j_module_square * mqn[2] +
+                   294 * mqn[2] -
                    5 * j_module_square ** 3 +
                    40 * j_module_square ** 2 -
                    60 * j_module_square)
@@ -120,13 +118,13 @@ class CF(object):
             for degree in range(2, 7):
                 if row < (size - degree):
                     column = row + degree
-                    n = m + degree
+                    _mqn = [(column - j) ** i for i in range(5)]
                     if degree == 2:
-                        o22 = 0.5 * down_operator(n, degree)
-                        o42 = (3.5 * (m2 + n ** 2) - j_module_square - 5) * o22
-                        o62 = (16.5 * (m4 + n ** 4) -
-                               9 * (m2 + n ** 2) * j_module_square -
-                               61.5 * (m2 + n ** 2) +
+                        o22 = 0.5 * down_operator(_mqn[1], degree)
+                        o42 = (3.5 * (mqn[2] + _mqn[2]) - j_module_square - 5) * o22
+                        o62 = (16.5 * (mqn[4] + _mqn[4]) -
+                               9 * (mqn[2] + _mqn[2]) * j_module_square -
+                               61.5 * (mqn[2] + _mqn[2]) +
                                j_module_square ** 2 +
                                10 * j_module_square +
                                102) * o22
@@ -134,20 +132,20 @@ class CF(object):
                                                          parameters['B42'] * o42 +
                                                          parameters['B62'] * o62)
                     if degree == 3:
-                        o43 = 0.25 * down_operator(n, degree) * (m + n)
-                        o63 = (0.25 * (11 * (m ** 3 + n ** 3) - 3 * (m + n) * j_module_square -
-                                       59 * (m + n)) * down_operator(n, degree))
+                        o43 = 0.25 * down_operator(_mqn[1], degree) * (mqn[1] + _mqn[1])
+                        o63 = (0.25 * (11 * (mqn[1] ** 3 + _mqn[3]) -
+                                       3 * (mqn[1] + _mqn[1]) * j_module_square -
+                                       59 * (mqn[1] + _mqn[1])) * down_operator(_mqn[1], degree))
                         cef_hamiltonian[row, column] += (parameters['B43'] * o43 +
                                                          parameters['B63'] * o63)
                     if degree == 4:
-                        o44 = 0.5 * down_operator(n, degree)
-                        o64 = (5.5 * (m2 + n ** 2) - j_module_square - 38) * o44
+                        o44 = 0.5 * down_operator(_mqn[1], degree)
+                        o64 = (5.5 * (mqn[2] + _mqn[2]) - j_module_square - 38) * o44
                         cef_hamiltonian[row, column] += (parameters['B44'] * o44 +
                                                          parameters['B64'] * o64)
                     if degree == 6:
-                        column = row + 6
-                        n = m + 6
-                        o66 = 0.5 * down_operator(n, degree)
+                        column = row + degree
+                        o66 = 0.5 * down_operator(_mqn[1], degree)
                         cef_hamiltonian[row, column] += parameters['B66'] * o66
                     cef_hamiltonian[column, row] = cef_hamiltonian[row, column]
 
@@ -162,13 +160,15 @@ class CF(object):
         j_2 = j * (j + 1)
         hamiltonian = common.get_empty_matrix(size)
         for row in range(size):
-            m = row - j
-            hamiltonian[row, row] -= lande_factor * BOHR_MAGNETON * m * magnet_field['z']
+            mqn = row - j  # mqn = m = -J...J
+            hamiltonian[row, row] -= (lande_factor * BOHR_MAGNETON *
+                                      mqn * magnet_field['z'])
             if row < (size - 1):
                 column = row + 1
-                n = m + 1
+                _mqn = mqn + 1
                 hamiltonian[row, column] -= (0.5 * lande_factor * BOHR_MAGNETON *
-                                             sqrt((j_2 - m * n)) * magnet_field['x'])
+                                             sqrt((j_2 - mqn * _mqn)) *
+                                             magnet_field['x'])
                 hamiltonian[column, row] = hamiltonian[row, column]
 
         return hamiltonian
@@ -204,16 +204,16 @@ class CF(object):
 
             j_minus[row, row] = j_plus[row, row]
             for column in range(row + 1, size):
-                m = size - 1 - j
+                mqn = size - 1 - j
                 j_z[row, column] += (eigenfunctions[size - 1, row] *
-                                     eigenfunctions[size - 1, column] * m)
+                                     eigenfunctions[size - 1, column] * mqn)
                 for row_j in range(size - 1):
-                    m = row_j - j
+                    mqn = row_j - j
                     j_z[row, column] += (eigenfunctions[row_j, row] *
-                                         eigenfunctions[row_j, column] * m)
+                                         eigenfunctions[row_j, column] * mqn)
                     column_j = row_j + 1
-                    n = column_j - j
-                    common_root = sqrt(j_2 - m * n)
+                    _mqn = column_j - j
+                    common_root = sqrt(j_2 - mqn * _mqn)
                     j_plus[row, column] += (eigenfunctions[column_j, row] *
                                             eigenfunctions[row_j, column] *
                                             common_root)
@@ -408,8 +408,8 @@ class CF(object):
             'total': common.get_empty_matrix(temperatures.shape),
             'inverse': common.get_empty_matrix(temperatures.shape),
         }
-        for index, temperature in enumerate(temperatures):
-            current_chi = self.chi(temperatures[index])
+        for _, temperature in enumerate(temperatures):
+            current_chi = self.chi(temperature)
             for key in ('z', 'x'):
                 chi_curie[key] = current_chi[0][key]
                 chi_van_vleck[key] = current_chi[1][key]
