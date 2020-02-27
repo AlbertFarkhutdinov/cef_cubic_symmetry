@@ -1,14 +1,8 @@
 """The module contains functions for plotting graphs."""
 from collections import namedtuple
-from cycler import cycler
 import matplotlib.pyplot as plt
-from cef_object_scripts import common
-
-
-FIG_SIZE = (10, 10)
-FONT_FAMILY = 'Times New Roman'
-DEFAULT_CYCLER = (cycler(color=['black', 'red', 'green', 'blue']) +
-                  cycler(linestyle=['-', '--', ':', '-.']))
+from .common.constants import PATH_TO_GRAPHS, DEFAULT_CYCLER, FIG_SIZE, FONT_FAMILY
+from .common.path_utils import check_path, get_paths
 
 plt.rcParams['axes.labelpad'] = 0
 plt.rcParams['axes.linewidth'] = 2
@@ -99,9 +93,9 @@ def get_energy_transfer_plot(material: dict, parameters: dict, temperatures: tup
     """Returns graph for inelastic neutron scattering spectrum with specified parameters"""
     mode = 'png'
     parameters['T'] = f'{temperatures[0]}-{temperatures[1]}'
-    file_name = common.get_paths(common.PATH_TO_GRAPHS, 'graph', mode,
-                                 material=material, parameters=parameters)
-    common.check_path(file_name)
+    file_name = get_paths(PATH_TO_GRAPHS, 'graph', mode,
+                          material=material, parameters=parameters)
+    check_path(file_name)
     text = Text(x=2.2, y=2300,
                 string=fr'$W={parameters["w"]: .3f}$' + '\n' + fr'$x = {parameters["x"]: .3f}$')
     get_plot(data=data, scale=scale, text=text,

@@ -1,4 +1,6 @@
 *.pyc
 .idea
-graphs
-spectra
+datafiles/graphs
+datafiles/parameters
+datafiles/spectra
+datafiles/susceptibilities
