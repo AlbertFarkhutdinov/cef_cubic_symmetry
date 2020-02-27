@@ -1,6 +1,6 @@
 """The module contains the procedure of CEF parameters defining with spectra saving."""
-from cef_object_scripts import get_results as gr
-from cef_object_scripts import get_graph as gg
+from . import get_results as gr
+from . import get_graph as gg
 
 MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Tm'}
 PARAMETERS = {'w': 1}

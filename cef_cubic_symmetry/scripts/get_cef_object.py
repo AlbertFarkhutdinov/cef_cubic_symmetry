@@ -1,13 +1,15 @@
 """The module contains CF class."""
-import os
-import configparser
+from os.path import exists, realpath
+from configparser import ConfigParser
 from numpy import sqrt, linspace
 from scipy.linalg import eigh
-from cef_object_scripts import common
-from cef_object_scripts.tabular_information import BOHR_MAGNETON, RARE_EARTHS
+from .common import utils
+from .common.physics import thermodynamics, gauss, lorentz, pseudo_voigt
+from .common.tabular_information import BOHR_MAGNETON, RARE_EARTHS
+from .common.path_utils import check_path
 
 RARE_EARTHS_NAMES = [element.name for element in RARE_EARTHS]
-PARSER = configparser.ConfigParser()
+PARSER = ConfigParser()
 
 
 class CF(object):
@@ -35,8 +37,8 @@ class CF(object):
             self.magnet_field = {'z': 0, 'x': 0}
             self.name = name
         else:
-            if not os.path.exists(par_file):
-                raise OSError(f'"{os.path.realpath(par_file)}" does not exist')
+            if not exists(par_file):
+                raise OSError(f'"{realpath(par_file)}" does not exist')
             PARSER.read(par_file)
             self.name = PARSER.get('material', 'name')
             self.number_of_f_electrons = int(PARSER.get('material', 'number_of_f_electrons'))
@@ -47,12 +49,12 @@ class CF(object):
                 self.magnet_field[key] = PARSER.getfloat('parameters', f'H{key}')
 
         size = self.rare_earth.matrix_size
-        self.j_z = common.get_empty_matrix(size)
-        self.j_plus = common.get_empty_matrix(size)
-        self.j_minus = common.get_empty_matrix(size)
-        self.transition_probability = common.get_empty_matrix(size)
-        self.eigenfunctions = common.get_empty_matrix(size)
-        self.eigenvalues = common.get_empty_matrix(size, dimension=1)
+        self.j_z = utils.get_empty_matrix(size)
+        self.j_plus = utils.get_empty_matrix(size)
+        self.j_minus = utils.get_empty_matrix(size)
+        self.transition_probability = utils.get_empty_matrix(size)
+        self.eigenfunctions = utils.get_empty_matrix(size)
+        self.eigenvalues = utils.get_empty_matrix(size, dimension=1)
         self.peaks = []
         self.temperature = 0
         self.temperature_used = self.temperature
@@ -75,7 +77,7 @@ class CF(object):
             PARSER.set('parameters', f'H{key}', str(value))
         if par_file is None:
             par_file = f'{self.name}.cfg'
-        common.check_path(par_file)
+        check_path(par_file)
         with open(par_file, 'w', encoding='utf-8') as file:
             PARSER.write(file)
 
@@ -83,7 +85,7 @@ class CF(object):
         """Determines the CF Hamiltonian based on the input parameters."""
         size = self.rare_earth.matrix_size
         parameters = self.parameters
-        cef_hamiltonian = common.get_empty_matrix(size)
+        cef_hamiltonian = utils.get_empty_matrix(size)
         j = self.rare_earth.total_momentum_ground
         j_module_square = j * (j + 1)
 
@@ -158,7 +160,7 @@ class CF(object):
         j = self.rare_earth.total_momentum_ground
         magnet_field = self.magnet_field
         j_2 = j * (j + 1)
-        hamiltonian = common.get_empty_matrix(size)
+        hamiltonian = utils.get_empty_matrix(size)
         for row in range(size):
             mqn = row - j  # mqn = m = -J...J
             hamiltonian[row, row] -= (lande_factor * BOHR_MAGNETON *
@@ -190,10 +192,10 @@ class CF(object):
         j_2 = j * (j + 1)
         size = self.rare_earth.matrix_size
         eigenfunctions = self.eigenfunctions
-        j_z = common.get_empty_matrix(size)
-        j_plus = common.get_empty_matrix(size)
-        j_minus = common.get_empty_matrix(size)
-        transition_probability = common.get_empty_matrix(size)
+        j_z = utils.get_empty_matrix(size)
+        j_plus = utils.get_empty_matrix(size)
+        j_minus = utils.get_empty_matrix(size)
+        transition_probability = utils.get_empty_matrix(size)
 
         for row in range(size):
             j_z[row, row] += (eigenfunctions[size - 1, row] ** 2) * (size - 1 - j)
@@ -251,9 +253,9 @@ class CF(object):
         self.eigen_calculations()
         self.transition_probabilities()
 
-        bolzmann_factor = common.get_empty_matrix(size, dimension=1)
-        temperature = common.get_temperature(temperature, self.temperature)
-        thermal = common.thermodynamics(temperature, self.eigenvalues)
+        bolzmann_factor = utils.get_empty_matrix(size, dimension=1)
+        temperature = utils.get_new_if_old_is_none(temperature, self.temperature)
+        thermal = thermodynamics(temperature, self.eigenvalues)
         if thermal['temperature'] <= 0:
             bolzmann_factor[0] = 1
         else:
@@ -304,7 +306,7 @@ class CF(object):
     def spectrum(self, energy=None, sigma=None, gamma=None, temperature=None,
                  magnet_field_x=None, magnet_field_z=None):
         """Calculates the neutron scattering cross section."""
-        temperature = common.get_temperature(temperature, self.temperature)
+        temperature = utils.get_new_if_old_is_none(temperature, self.temperature)
         peaks = self.get_peaks(temperature, magnet_field_x, magnet_field_z)
 
         if energy is None:
@@ -313,15 +315,15 @@ class CF(object):
         if sigma is None and gamma is None:
             sigma = 0.01 * (max(energy) - min(energy))
 
-        spectrum = common.get_empty_matrix(energy.size, dimension=1)
+        spectrum = utils.get_empty_matrix(energy.size, dimension=1)
 
         for peak in peaks:
             if sigma and not gamma:
-                spectrum += peak[1] * common.gauss(energy, peak[0], sigma)
+                spectrum += peak[1] * gauss(energy, peak[0], sigma)
             elif gamma and not sigma:
-                spectrum += peak[1] * common.lorentz(energy, peak[0], gamma)
+                spectrum += peak[1] * lorentz(energy, peak[0], gamma)
             elif sigma and gamma:
-                spectrum += peak[1] * common.pseudo_voigt(energy, peak[0], sigma, gamma)
+                spectrum += peak[1] * pseudo_voigt(energy, peak[0], sigma, gamma)
 
         spectrum *= 72.65 * self.rare_earth.lande_factor ** 2
 
@@ -329,10 +331,10 @@ class CF(object):
 
     def get_moments(self, temperature=None):
         """Calculates the magnetic moments of the CF model."""
-        temperature = common.get_temperature(temperature, self.temperature)
+        temperature = utils.get_new_if_old_is_none(temperature, self.temperature)
         if temperature != self.temperature_used:
             self.get_peaks(temperature)
-        thermal = common.thermodynamics(temperature, self.eigenvalues)
+        thermal = thermodynamics(temperature, self.eigenvalues)
         if thermal['temperature'] > 0:
             j_average = {'z': 0, 'x': 0}
             statistic_sum = sum(thermal['bolzmann'])
@@ -359,8 +361,8 @@ class CF(object):
 
     def chi(self, temperature=None):
         """Calculates the susceptibility at a specified temperature."""
-        temperature = common.get_temperature(temperature, self.temperature)
-        thermal = common.thermodynamics(temperature, self.eigenvalues)
+        temperature = utils.get_new_if_old_is_none(temperature, self.temperature)
+        thermal = thermodynamics(temperature, self.eigenvalues)
         temperature_as_energy = thermal['temperature']
         statistic_sum = 1
         if temperature_as_energy > 0:
@@ -392,21 +394,23 @@ class CF(object):
 
     def chi_s(self, temperatures=None):
         """Calculates the susceptibility at a specified range of temperatures."""
-        temperatures = common.get_temperature(temperatures, linspace(1, 300, 300, dtype='float64'))
+        temperatures = utils.get_new_if_old_is_none(temperatures,
+                                                    linspace(1, 300, 300, dtype='float64'))
         self.eigen_calculations()
         self.transition_probabilities()
-        temperatures = common.get_temperature(temperatures, linspace(1, 300, 300, dtype='float64'))
+        temperatures = utils.get_new_if_old_is_none(temperatures,
+                                                    linspace(1, 300, 300, dtype='float64'))
         chi_curie = {'z': None, 'x': None}
         chi_van_vleck = {'z': None, 'x': None}
         chi = {'z': None, 'x': None, 'total': None, 'inverse': None}
         for key in ('z', 'x'):
-            chi_curie[key] = common.get_empty_matrix(temperatures.shape)
-            chi_van_vleck[key] = common.get_empty_matrix(temperatures.shape)
-            chi[key] = common.get_empty_matrix(temperatures.shape)
+            chi_curie[key] = utils.get_empty_matrix(temperatures.shape)
+            chi_van_vleck[key] = utils.get_empty_matrix(temperatures.shape)
+            chi[key] = utils.get_empty_matrix(temperatures.shape)
 
         chi = {
-            'total': common.get_empty_matrix(temperatures.shape),
-            'inverse': common.get_empty_matrix(temperatures.shape),
+            'total': utils.get_empty_matrix(temperatures.shape),
+            'inverse': utils.get_empty_matrix(temperatures.shape),
         }
         for _, temperature in enumerate(temperatures):
             current_chi = self.chi(temperature)
@@ -451,8 +455,8 @@ class CF(object):
                 for row in range(self.eigenvalues.size):
                     if abs(self.eigenfunctions[row, column]) > 0.0001:
                         j_z = row - self.rare_earth.total_momentum_ground
-                        sign1 = common.get_sign(self.eigenfunctions[row, column])
-                        sign2 = common.get_sign(j_z)
+                        sign1 = utils.get_sign(self.eigenfunctions[row, column])
+                        sign2 = utils.get_sign(j_z)
                         line_to_append = (f'{sign1}' +
                                           f'{abs(self.eigenfunctions[row, column]):7.4f}' +
                                           f'|{sign2}{abs(j_z)}>')
@@ -472,7 +476,7 @@ class CF(object):
 
 if __name__ == '__main__':
     from cProfile import run
-    from cef_object_scripts.get_results import get_object_with_parameters
+    from scripts.get_results import get_object_with_parameters
     MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Tb'}
     PARAMETERS = {'w': 1, 'x': -1}
     CUBIC_SAMPLE = get_object_with_parameters(MATERIAL, PARAMETERS)

@@ -1,5 +1,5 @@
-from cef_object_scripts import common
-from cef_object_scripts import get_results
+from scripts import common
+from scripts import get_results
 # import cProfile
 print(f'Working directory: {common.BASE_DIR}\n')
 while True:
