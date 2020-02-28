@@ -16,6 +16,7 @@ RATIOS_NAMES = ('E2/E1', 'E3/E1', 'E4/E1', 'E5/E1',
                 'E4/E3', 'E5/E3',
                 'E5/E4')
 FIG_SIZE = (10, 10)
+TWO_FIG_SIZE = (20, 10)
 FONT_FAMILY = 'Times New Roman'
-DEFAULT_CYCLER = (cycler(color=['black', 'red', 'green', 'blue']) +
-                  cycler(linestyle=['-', '--', ':', '-.']))
+DEFAULT_CYCLER = (cycler(color=['black', 'red', 'green', 'blue', 'magenta', 'DarkOrange']) +
+                  cycler(linestyle=['-', '--', ':', '-.', '-', '--']))
