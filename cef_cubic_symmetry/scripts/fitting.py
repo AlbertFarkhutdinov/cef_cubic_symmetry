@@ -70,7 +70,7 @@ def fitting_test():
 
 
 if __name__ == '__main__':
-    fitting_test()
+    # fitting_test()
     X_DATA, Y_DATA, ERROR = get_data_from_file(join(PATH_TO_EXPERIMENTAL_DATAFILES,
                                                     'PSI_Tb_YNi2_3meV_1.6K.txt'))
     OPT, ERR = fitting(lorentz_1, X_DATA, Y_DATA, [0, 1248, 0.05])
