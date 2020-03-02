@@ -5,7 +5,7 @@ from numpy.random import random
 from numpy import array, diag, sqrt
 from scipy.optimize import curve_fit
 import scripts.get_graph as gg
-from scripts.common.constants import PATH_TO_EXPERIMENTAL_DATAFILES
+from scripts.common.constants import PATH_TO_EXPERIMENTAL_DATAFILES, ENCODING
 from scripts.common.physics import lorentz
 
 Peak = namedtuple('Peak', ['center', 'amplitude', 'width'])
@@ -32,7 +32,7 @@ def lorentz_3(arg, center1, wid1, amp1, center2, wid2, amp2, center3, wid3, amp3
 def get_data_from_file(file_name):
     """Returns three arrays (x, y, error) from file"""
     experimental_data = [[], [], []]
-    with open(file_name, 'r', encoding='utf-8') as file:
+    with open(file_name, 'r', encoding=ENCODING) as file:
         lines = file.readlines()
         for line in lines:
             line = line.rstrip('\n').split('\t')

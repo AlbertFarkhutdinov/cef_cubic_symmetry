@@ -4,6 +4,7 @@ from configparser import ConfigParser
 from numpy import sqrt, linspace
 from scipy.linalg import eigh
 from .common import utils
+from .common.constants import ENCODING
 from .common.physics import thermodynamics, gauss, lorentz, pseudo_voigt
 from .common.tabular_information import BOHR_MAGNETON, RARE_EARTHS
 from .common.path_utils import check_path
@@ -78,7 +79,7 @@ class CF(object):
         if par_file is None:
             par_file = f'{self.name}.cfg'
         check_path(par_file)
-        with open(par_file, 'w', encoding='utf-8') as file:
+        with open(par_file, 'w', encoding=ENCODING) as file:
             PARSER.write(file)
 
     def cef_hamiltonian(self):

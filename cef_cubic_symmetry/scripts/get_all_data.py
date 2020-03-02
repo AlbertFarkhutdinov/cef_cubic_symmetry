@@ -2,6 +2,15 @@
 from . import get_results as gr
 from . import get_graph as gg
 
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Tb'},
+                         max_energy=350, y_major=50, y_minor=10)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
+                         max_energy=350, y_major=50, y_minor=10)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Er'},
+                         max_energy=1000, y_major=200, y_minor=40)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Ho'},
+                         max_energy=1500, y_major=500, y_minor=100)
+
 MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Tm'}
 PARAMETERS = {'w': 1}
 EXPERIMENTAL_ENERGY_1 = 0.45606
