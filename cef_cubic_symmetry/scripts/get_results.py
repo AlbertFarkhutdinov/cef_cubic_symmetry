@@ -1,11 +1,11 @@
 """The module contains functions for printing or saving results."""
 from collections import namedtuple
 from numpy import linspace, savetxt
-from .common import constants
-from .common.tabular_information import F4
-from .common.path_utils import get_paths, check_path, remove_if_exists
-from .common.utils import create_table, get_time_of_execution, value_to_write
-from .get_cef_object import CF
+from scripts.common import constants
+from scripts.common.tabular_information import F4
+from scripts.common.path_utils import get_paths, check_path, remove_if_exists
+from scripts.common.utils import create_table, get_time_of_execution, value_to_write
+from scripts.get_cef_object import CF
 
 CrossPoint = namedtuple('CrossPoint', ['rare_earth', 'w', 'x', 'ratio_name', 'difference'])
 
@@ -49,7 +49,7 @@ def save_energy_dat(material: dict, parameters: dict, number_of_intervals):
     file_name = get_paths(constants.PATH_TO_ENERGY_DATAFILES, 'energy', 'dat',
                           material=material, parameters=parameters)
     remove_if_exists(file_name)
-    my_file = open(file_name, 'a', encoding='utf-8')
+    my_file = open(file_name, 'a', encoding=constants.ENCODING)
     print(f'\nSaving energy datafiles\nSaving file "{file_name}"...\nIt will take some time...')
     for x_parameter in x_space:
         parameters['x'] = x_parameter
@@ -107,7 +107,7 @@ def save_spectra_with_two_temperatures(material: dict, parameters: dict,
         file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum', 'dat',
                               material=material, parameters=parameters)
         check_path(file_name)
-        with open(file_name, 'r', encoding='utf-8') as file_name:
+        with open(file_name, 'r', encoding=constants.ENCODING) as file_name:
             lines[temperature] = list(file_name)
 
     for index in range(len(lines[temperature_1])):
@@ -123,7 +123,7 @@ def save_spectra_with_two_temperatures(material: dict, parameters: dict,
                           material=material, parameters=parameters)
     remove_if_exists(file_name)
     print(f'Saving file {file_name}...')
-    file = open(file_name, 'a', encoding='utf-8')
+    file = open(file_name, 'a', encoding=constants.ENCODING)
     for index, energy in enumerate(energies):
         for value in (energy, intensities[temperature_1][index],
                       intensities[temperature_2][index]):
@@ -146,7 +146,7 @@ def save_susceptibility(material: dict, parameters: dict):
     for axis in ('z', 'x', 'total'):
         file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
         remove_if_exists(file_name)
-        my_file = open(file_name, 'a', encoding='utf-8')
+        my_file = open(file_name, 'a', encoding=constants.ENCODING)
         print(f'Saving file "{file_name}"...')
         if axis in ('z', 'x'):
             my_file.write(f'T(Kelvin)\tchi_curie_{axis}\tchi_van_vleck_{axis}\tchi_{axis}\n')
@@ -168,6 +168,7 @@ def save_susceptibility(material: dict, parameters: dict):
 @get_time_of_execution
 def get_ratios(material: dict, parameters: dict):
     """Saves the dependence of transition energies ratio on parameter x to file."""
+    levels_number = 7
     ratio_file_name = get_paths(constants.PATH_TO_RATIO_DATAFILES,
                                 'ratio', 'dat',
                                 material=material, parameters=parameters)
@@ -175,20 +176,20 @@ def get_ratios(material: dict, parameters: dict):
                                  'energy', 'dat',
                                  material=material, parameters=parameters)
     remove_if_exists(ratio_file_name)
-    ratio_file = open(ratio_file_name, 'a', encoding='utf-8')
-    energy_file = open(energy_file_name, 'r', encoding='utf-8')
+    ratio_file = open(ratio_file_name, 'a', encoding=constants.ENCODING)
+    energy_file = open(energy_file_name, 'r', encoding=constants.ENCODING)
     print('\n', 'Saving ratio datafiles',
           f'Saving file "{ratio_file_name}"...',
           'It will take some time...', sep='\n')
     for line in energy_file:
         line = line.rstrip('\n')
         energies = [float(energy) for energy in line.split('\t')]
-        if len(energies) < 6:
-            for _ in range(len(energies), 6):
+        if len(energies) < levels_number:
+            for _ in range(len(energies), levels_number):
                 energies.append(0)
         ratios = [energies[0]]
-        for low in range(1, 6):
-            for high in range(low + 1, 6):
+        for low in range(1, levels_number):
+            for high in range(low + 1, levels_number):
                 if energies[low] == 0:
                     ratios.append(0)
                 else:
@@ -237,7 +238,7 @@ def check_ratios(numbers, points, material: dict, parameters: dict):
     return points
 
 
-def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.005):
+def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.003):
     """Returns points of cross experimental and calculated curves."""
     points = []
     for w_parameter in (abs(parameters['w']), -abs(parameters['w'])):
@@ -245,7 +246,7 @@ def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.
         ratio_file_name = get_paths(constants.PATH_TO_RATIO_DATAFILES,
                                     'ratio', 'dat',
                                     material=material, parameters=parameters)
-        ratio_file = open(ratio_file_name, 'r', encoding='utf-8')
+        ratio_file = open(ratio_file_name, 'r', encoding=constants.ENCODING)
         for line in ratio_file:
             line = line.rstrip('\n')
             numbers = [float(number) for number in line.split('\t')]
@@ -263,7 +264,7 @@ def recalculation(points, experimental_energy, material: dict):
     for point in points:
         x_parameter = point.x
         old_w = point.w
-        level = int(point.ratio_name[-1]) - 1
+        level = int(point.ratio_name[-2]) - 1
         cef = get_object_with_parameters(material, {'w': old_w, 'x': x_parameter})
         old_energy = cef.get_energies()[level]
         new_w = experimental_energy / old_energy
@@ -277,9 +278,12 @@ def recalculation(points, experimental_energy, material: dict):
 
 
 if __name__ == '__main__':
-    MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Tm'}
-    PARAMETERS = {'w': 1}
-    CROSSES = find_cross(4.59, MATERIAL, PARAMETERS)
-    RECALCULATED_CROSSES = recalculation(CROSSES, 0.45606, MATERIAL)
-    print(*CROSSES, sep='\n')
-    print(*RECALCULATED_CROSSES, sep='\n')
+    for rare_earth in ('Tb', 'Tm', 'Er', 'Ho'):
+        for w_value in (1, -1):
+            MATERIAL = {'crystal': 'YNi2', 'rare_earth': rare_earth}
+            PARAMETERS = {'w': w_value}
+            get_ratios(material=MATERIAL, parameters=PARAMETERS)
+    # CROSSES = find_cross(4.59, MATERIAL, PARAMETERS)
+    # RECALCULATED_CROSSES = recalculation(CROSSES, 0.45606, MATERIAL)
+    # print(*CROSSES, sep='\n')
+    # print(*RECALCULATED_CROSSES, sep='\n')

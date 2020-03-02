@@ -1,5 +1,9 @@
 """This module contains unittests for module utils.py"""
 import unittest
+from sys import path as sys_path
+from os import getcwd
+from os.path import join
+sys_path.append(join(getcwd(), '..'))
 from scripts.common import utils
 
 

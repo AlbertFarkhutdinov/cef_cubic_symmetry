@@ -1,14 +1,23 @@
 """The module contains the procedure of CEF parameters defining with spectra saving."""
 from os.path import join
-from .common.constants import PATH_TO_EXPERIMENTAL_DATAFILES
-from . import get_results as gr
-from . import get_graph as gg
-from .fitting import get_data_from_file
+from scripts.common.constants import PATH_TO_EXPERIMENTAL_DATAFILES
+from scripts import get_results as gr
+from scripts import get_graph as gg
+from scripts.fitting import get_data_from_file
+
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Tb'},
+                         max_energy=350, y_major=50, y_minor=10)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
+                         max_energy=350, y_major=50, y_minor=10)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Er'},
+                         max_energy=1000, y_major=200, y_minor=40)
+gg.get_llw_energies_plot(material={'crystal': 'YNi2', 'rare_earth': 'Ho'},
+                         max_energy=1500, y_major=500, y_minor=100)
 
 MATERIAL = {'crystal': 'YNi2', 'rare_earth': 'Er'}
 PARAMETERS = {'w': 1}
 EXPERIMENTAL_ENERGY_1 = 0.6
-EXPERIMENTAL_ENERGY_2 = 1.3
+EXPERIMENTAL_ENERGY_2 = 0.9
 EXPERIMENTAL_RATIO = EXPERIMENTAL_ENERGY_2 / EXPERIMENTAL_ENERGY_1
 TEMPERATURE_1 = 1.4
 TEMPERATURE_2 = 15
@@ -19,6 +28,10 @@ DATA_2 = get_data_from_file(join(PATH_TO_EXPERIMENTAL_DATAFILES,
 LEGEND = {TEMPERATURE_1: f'{TEMPERATURE_1} K',
           TEMPERATURE_2: f'{TEMPERATURE_2} K',
           'diff': f'{TEMPERATURE_1} K - {TEMPERATURE_2} K'}
+
+gg.get_llw_ratios_plot(material=MATERIAL,
+                       experimental_value=EXPERIMENTAL_RATIO,
+                       max_value=3, min_value=1, y_major=0.5, y_minor=0.1)
 
 gg.get_energy_transfer_plot(material=MATERIAL,
                             parameters={'w': 0, 'x': 0},
