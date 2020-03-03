@@ -5,7 +5,7 @@ from .constants import BASE_DIR
 from .utils import get_value_with_sign
 
 
-def get_paths(directory, data_name, format_name, material: dict = None, parameters: dict = None):
+def get_paths(directory, data_name, format_name='.dat', material: dict = None, parameters: dict = None):
     """Returns path of the file that will be saved."""
     chdir(BASE_DIR)
     short_name = ''
@@ -18,7 +18,7 @@ def get_paths(directory, data_name, format_name, material: dict = None, paramete
                 full_name += f'_{key}{get_value_with_sign(value)}'
             else:
                 full_name += f'_{key}{value}'
-    return join(directory, short_name, f'{data_name}_{full_name}.{format_name}')
+    return join(directory, short_name, f'{data_name}_{full_name}{format_name}')
 
 
 def check_path(path_to_check):
