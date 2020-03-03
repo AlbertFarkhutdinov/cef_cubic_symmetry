@@ -3,6 +3,7 @@ from os.path import join, dirname, realpath
 from cycler import cycler
 
 BASE_DIR = dirname(dirname(dirname(realpath(__file__))))
+
 DATAFILES_DIR = join(BASE_DIR, 'datafiles')
 GRAPHS_DIR = join(BASE_DIR, 'graphs')
 
@@ -34,3 +35,6 @@ DEFAULT_CYCLER = (cycler(color=['black', 'red', 'green', 'blue',
 
 FIG_FORMAT = 'png'
 ENCODING = 'utf-8'
+ENERGY_TRANSFER = 'Energy Transfer, meV'
+SCATTERING = r'$S(\omega)$, arb.u.'
+INFINITY = float('inf')

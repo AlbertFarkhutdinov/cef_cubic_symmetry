@@ -2,6 +2,7 @@
 from datetime import datetime
 from numpy import transpose, zeros
 from .tabular_information import ACCEPTABLE_RARE_EARTHS
+from .constants import INFINITY
 
 
 def get_sign(value):
@@ -76,6 +77,20 @@ def get_empty_matrix(size, dimension=2):
     if dimension == 1:
         empty_matrix = zeros(size, dtype='float64')
     return empty_matrix
+
+
+def data_popping(data, condition):
+    """Pops items from data, that satisfy condition"""
+    popped_number = 0
+    for key, array in data['y_set'].copy().items():
+        finite_array = [value for value in array if value != INFINITY]
+        if condition(finite_array):
+            data['y_set'].move_to_end(key)
+            data['legend'].move_to_end(key)
+            popped_number += 1
+    for _ in range(popped_number):
+        data['y_set'].popitem()
+        data['legend'].popitem()
 
 
 def get_time_of_execution(function):

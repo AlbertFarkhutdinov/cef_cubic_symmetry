@@ -15,7 +15,7 @@ class PathUtilsTests(unittest.TestCase):
         self.assertEqual(join(constants.DATAFILES_DIR,
                               'energies\\YNi2_Tm\\energy_YNi2_Tm.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
-                                              'energy', 'dat',
+                                              'energy',
                                               material={'crystal': 'YNi2', 'rare_earth': 'Tm'}))
 
     def test_get_paths_with_w(self):
@@ -23,7 +23,7 @@ class PathUtilsTests(unittest.TestCase):
         self.assertEqual(join(constants.DATAFILES_DIR,
                               'energies\\YNi2_Tm\\energy_YNi2_Tm_w+1.000.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
-                                              'energy', 'dat',
+                                              'energy',
                                               material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
                                               parameters={'w': 1}))
 
@@ -32,7 +32,7 @@ class PathUtilsTests(unittest.TestCase):
         self.assertEqual(join(constants.DATAFILES_DIR,
                               'energies\\YNi2_Tm\\energy_YNi2_Tm_x-1.000.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
-                                              'energy', 'dat',
+                                              'energy',
                                               material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
                                               parameters={'x': -1}))
 

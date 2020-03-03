@@ -36,7 +36,8 @@ def get_one_dot(material: dict, parameters: dict):
 
 def load_data(material: dict, parameters: dict):
     """Loads CF object from file"""
-    file_name = get_paths(constants.PATH_TO_SAVED_OBJECTS, 'parameters', 'cfg',
+    file_name = get_paths(constants.PATH_TO_SAVED_OBJECTS, 'parameters',
+                          format_name='.cfg',
                           material=material, parameters=parameters)
     return CF(name=f'{material["crystal"]}: {material["rare_earth"]}3+',
               rare_earth=material["rare_earth"], par_file=file_name)
@@ -46,7 +47,7 @@ def load_data(material: dict, parameters: dict):
 def save_energy_dat(material: dict, parameters: dict, number_of_intervals):
     """Saves the dependence of transition energies on parameter x to file."""
     x_space = linspace(-1, 1, number_of_intervals + 1)
-    file_name = get_paths(constants.PATH_TO_ENERGY_DATAFILES, 'energy', 'dat',
+    file_name = get_paths(constants.PATH_TO_ENERGY_DATAFILES, 'energy',
                           material=material, parameters=parameters)
     remove_if_exists(file_name)
     my_file = open(file_name, 'a', encoding=constants.ENCODING)
@@ -69,7 +70,8 @@ def save_energy_dat(material: dict, parameters: dict, number_of_intervals):
 def save_parameters(material: dict, parameters: dict):
     """Saves CEF parameters to file."""
     cef_object = get_object_with_parameters(material, parameters)
-    file_name = get_paths(constants.PATH_TO_SAVED_OBJECTS, 'parameters', 'cfg',
+    file_name = get_paths(constants.PATH_TO_SAVED_OBJECTS, 'parameters',
+                          format_name='.cfg',
                           material=material, parameters=parameters)
     print(f'\nSaving CEF parameters\nSaving file "{file_name}"...')
     cef_object.save_to_par_file(file_name)
@@ -85,7 +87,7 @@ def save_spectra_with_one_temperature(material: dict, parameters: dict):
     spectrum = cef_object.spectrum(energy=energies,
                                    gamma=parameters['gamma'],
                                    temperature=parameters['T'])
-    file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum', 'dat',
+    file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum',
                           material=material, parameters=parameters)
     check_path(file_name)
     print(f'Saving file {file_name}...')
@@ -104,7 +106,7 @@ def save_spectra_with_two_temperatures(material: dict, parameters: dict,
     for temperature in (temperature_1, temperature_2):
         parameters['T'] = temperature
         intensities[temperature] = []
-        file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum', 'dat',
+        file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum',
                               material=material, parameters=parameters)
         check_path(file_name)
         with open(file_name, 'r', encoding=constants.ENCODING) as file_name:
@@ -119,7 +121,7 @@ def save_spectra_with_two_temperatures(material: dict, parameters: dict,
         intensities['diff'].append(float(line_1[1]) - float(line_2[1]))
 
     parameters['T'] = f'{temperature_1}-{temperature_2}'
-    file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum', 'dat',
+    file_name = get_paths(constants.PATH_TO_SPECTRA_DATAFILES, 'spectrum',
                           material=material, parameters=parameters)
     remove_if_exists(file_name)
     print(f'Saving file {file_name}...')
@@ -139,7 +141,7 @@ def save_susceptibility(material: dict, parameters: dict):
     temperatures = linspace(0.1, 100.0, 300)
     print('\nSaving magnetic susceptibilities')
     common_file_name = get_paths(constants.PATH_TO_SUSCEPTIBILITY_DATAFILES,
-                                 'susceptibility', 'dat',
+                                 'susceptibility',
                                  material=material, parameters=parameters)
     cef_object = get_object_with_parameters(material, parameters)
     chi_curie, chi_van_vleck, chi = cef_object.chi_s(temperatures)
@@ -170,10 +172,10 @@ def get_ratios(material: dict, parameters: dict):
     """Saves the dependence of transition energies ratio on parameter x to file."""
     levels_number = 7
     ratio_file_name = get_paths(constants.PATH_TO_RATIO_DATAFILES,
-                                'ratio', 'dat',
+                                'ratio',
                                 material=material, parameters=parameters)
     energy_file_name = get_paths(constants.PATH_TO_ENERGY_DATAFILES,
-                                 'energy', 'dat',
+                                 'energy',
                                  material=material, parameters=parameters)
     remove_if_exists(ratio_file_name)
     ratio_file = open(ratio_file_name, 'a', encoding=constants.ENCODING)
@@ -244,7 +246,7 @@ def find_cross(experimental_value, material: dict, parameters: dict, accuracy=0.
     for w_parameter in (abs(parameters['w']), -abs(parameters['w'])):
         parameters['w'] = w_parameter
         ratio_file_name = get_paths(constants.PATH_TO_RATIO_DATAFILES,
-                                    'ratio', 'dat',
+                                    'ratio',
                                     material=material, parameters=parameters)
         ratio_file = open(ratio_file_name, 'r', encoding=constants.ENCODING)
         for line in ratio_file:
