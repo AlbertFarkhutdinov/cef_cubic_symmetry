@@ -1,41 +1,48 @@
-from cef_object_scripts import common
-from cef_object_scripts import get_results
-# import cProfile
-print(f'Working directory: {common.BASE_DIR}\n')
+from scripts.common.constants import BASE_DIR
+from scripts.common.utils import user_input, check_input
+from scripts.common.named_tuples import Material
+from scripts.get_cef_object import CF
+from scripts import get_results
+print(f'Working directory: {BASE_DIR}\n')
 while True:
     command = input('\nInput command (e.g. "help"): ')
     if command == 'get_one_dot':
         print()
-        crystal, rare_earth, w, x = common.user_input()
-        get_results.get_one_dot(crystal, rare_earth, w, x)
+        crystal, rare_earth, w, x = user_input()
+        get_results.get_one_dot(material=Material(crystal=crystal,
+                                                  rare_earth=rare_earth),
+                                parameters={'w': w,
+                                            'x': x})
     elif command == 'get_object':
         print()
-        crystal, rare_earth, w, x = common.user_input()
-        cef_object = get_results.get_object_with_parameters(crystal, rare_earth, w, x)
-        print(cef_object)
+        crystal, rare_earth, w, x = user_input()
+        print(CF(Material(crystal=crystal,
+                          rare_earth=rare_earth)).get_llw_cubic_object(parameters={'w': w,
+                                                                                   'x': x}))
     elif command == 'load_data':
         print()
-        crystal, rare_earth, w, x = common.user_input()
-        cef_object = get_results.load_data(crystal, rare_earth, w, x)
+        crystal, rare_earth, w, x = user_input()
+        cef_object = get_results.load_data(material=Material(crystal=crystal,
+                                                             rare_earth=rare_earth))
         print(cef_object)
     elif command == 'save_energy_dat':
         print()
         crystal = input('Input the name of crystal (e.g. "YNi2"): ')
-        rare_earth = common.check_input('rare')
-        w = common.check_input('w')
-        number_of_intervals = common.check_input('intervals')
+        rare_earth = check_input('rare')
+        w = check_input('w')
+        number_of_intervals = check_input('intervals')
         get_results.save_energy_dat(crystal, rare_earth, w, number_of_intervals)
     elif command == 'save_parameters':
         print()
-        crystal, rare_earth, w, x = common.user_input()
+        crystal, rare_earth, w, x = user_input()
         get_results.save_parameters(crystal, rare_earth, w, x)
     elif command == 'save_spectra':
         print()
-        crystal, rare_earth, w, x = common.user_input()
+        crystal, rare_earth, w, x = user_input()
         get_results.save_parameters(crystal, rare_earth, w, x)
     elif command == 'save_sus':
         print()
-        crystal, rare_earth, w, x = common.user_input()
+        crystal, rare_earth, w, x = user_input()
         get_results.save_susceptibility(crystal, rare_earth, w, x)
     elif command == 'help':
         print()
