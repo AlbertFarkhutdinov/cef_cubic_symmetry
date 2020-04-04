@@ -1,32 +1,29 @@
 from scripts.common.constants import BASE_DIR
 from scripts.common.utils import user_input, check_input
+from scripts.common.named_tuples import Material
+from scripts.get_cef_object import CF
 from scripts import get_results
-# import cProfile
 print(f'Working directory: {BASE_DIR}\n')
 while True:
     command = input('\nInput command (e.g. "help"): ')
     if command == 'get_one_dot':
         print()
         crystal, rare_earth, w, x = user_input()
-        get_results.get_one_dot(material={'crystal': crystal,
-                                          'rare_earth': rare_earth},
+        get_results.get_one_dot(material=Material(crystal=crystal,
+                                                  rare_earth=rare_earth),
                                 parameters={'w': w,
                                             'x': x})
     elif command == 'get_object':
         print()
         crystal, rare_earth, w, x = user_input()
-        cef_object = get_results.get_object_with_parameters(material={'crystal': crystal,
-                                                                      'rare_earth': rare_earth},
-                                                            parameters={'w': w,
-                                                                        'x': x})
-        print(cef_object)
+        print(CF(Material(crystal=crystal,
+                          rare_earth=rare_earth)).get_llw_cubic_object(parameters={'w': w,
+                                                                                   'x': x}))
     elif command == 'load_data':
         print()
         crystal, rare_earth, w, x = user_input()
-        cef_object = get_results.load_data(material={'crystal': crystal,
-                                                     'rare_earth': rare_earth},
-                                           parameters={'w': w,
-                                                       'x': x})
+        cef_object = get_results.load_data(material=Material(crystal=crystal,
+                                                             rare_earth=rare_earth))
         print(cef_object)
     elif command == 'save_energy_dat':
         print()

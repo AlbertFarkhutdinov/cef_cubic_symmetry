@@ -1,12 +1,9 @@
 """The module contains some tabular data that used in this project."""
 from fractions import Fraction
-from collections import namedtuple
+from scripts.common.named_tuples import Element
 
 F4 = 60
 BOHR_MAGNETON = 5.788382e-2  # meV/T
-Element = namedtuple('Element',
-                     ['name', 'total_momentum_ground', 'lande_factor', 'matrix_size', 'f_6',
-                      'radial_integrals', 'stevens_factors'])
 
 CERIUM = Element(name='Ce', total_momentum_ground=2.5, lande_factor=Fraction(6, 7),
                  matrix_size=6, f_6=0,

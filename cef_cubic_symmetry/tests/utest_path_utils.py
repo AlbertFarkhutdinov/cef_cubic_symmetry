@@ -6,6 +6,7 @@ from os.path import join
 sys_path.append(join(getcwd(), '..'))
 from scripts.common import path_utils
 from scripts.common import constants
+from scripts.common.named_tuples import Material
 
 
 class PathUtilsTests(unittest.TestCase):
@@ -16,7 +17,7 @@ class PathUtilsTests(unittest.TestCase):
                               'energies\\YNi2_Tm\\energy_YNi2_Tm.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
                                               'energy',
-                                              material={'crystal': 'YNi2', 'rare_earth': 'Tm'}))
+                                              material=Material(crystal='YNi2', rare_earth='Tm')))
 
     def test_get_paths_with_w(self):
         """Tests for function get_paths with parameter W"""
@@ -24,7 +25,7 @@ class PathUtilsTests(unittest.TestCase):
                               'energies\\YNi2_Tm\\energy_YNi2_Tm_w+1.000.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
                                               'energy',
-                                              material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
+                                              material=Material(crystal='YNi2', rare_earth='Tm'),
                                               parameters={'w': 1}))
 
     def test_get_paths_with_x(self):
@@ -33,7 +34,7 @@ class PathUtilsTests(unittest.TestCase):
                               'energies\\YNi2_Tm\\energy_YNi2_Tm_x-1.000.dat'),
                          path_utils.get_paths(constants.PATH_TO_ENERGY_DATAFILES,
                                               'energy',
-                                              material={'crystal': 'YNi2', 'rare_earth': 'Tm'},
+                                              material=Material(crystal='YNi2', rare_earth='Tm'),
                                               parameters={'x': -1}))
 
 

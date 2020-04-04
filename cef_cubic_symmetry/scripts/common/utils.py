@@ -108,11 +108,32 @@ def saving_file(function):
     def wrapper(file, object_to_save, *args, **kwargs):
         print('\n',
               f'***Saving {object_to_save}***:',
-              f'Saving file "{file}"...',
               'It may take some time...', sep='\n')
         function(file, object_to_save, *args, **kwargs)
-        print(f'File "{file}" is saved.')
     return wrapper
+
+
+class OpenedFile:
+    """Context manager for file opening"""
+    def __init__(self, name, mode='r'):
+        """Initialization of class"""
+        self.name = name
+        self.file = None
+        self.mode = mode
+
+    def __enter__(self):
+        """Method for entrance to context manager"""
+        if self.mode != 'r':
+            print(f'Saving file "{self.name}"...')
+        self.file = open(self.name, self.mode, encoding='utf-8')
+        return self.file
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Method for exit from context manager"""
+        if self.file:
+            self.file.close()
+            if self.mode != 'r':
+                print(f'File "{self.name}" is saved.')
 
 
 if __name__ == '__main__':
