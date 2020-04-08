@@ -21,18 +21,13 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual('+0.346', utils.get_value_with_sign(0.3456))
         self.assertEqual('-1.753', utils.get_value_with_sign(-1.75321))
 
-    def test_get_new_if_old_is_none(self):
-        """Tests for function get_new_if_old_is_none"""
-        self.assertEqual(0, utils.get_new_if_old_is_none(0, 10))
-        self.assertEqual(10, utils.get_new_if_old_is_none(10, 0))
-        self.assertEqual(0, utils.get_new_if_old_is_none(None, 0))
-        self.assertEqual(0, utils.get_new_if_old_is_none(0, None))
-        self.assertEqual(None, utils.get_new_if_old_is_none(None, None))
-
-    def test_value_to_write(self):
-        """Tests for function value_to_write"""
-        self.assertEqual('   3.14159\t', utils.value_to_write(3.1415926535, '\t'))
-        self.assertEqual('  -3.14159\n', utils.value_to_write(-3.1415926535, '\n'))
+    def test_get_default(self):
+        """Tests for function get_default"""
+        self.assertEqual(0, utils.get_default(0, 10))
+        self.assertEqual(10, utils.get_default(10, 0))
+        self.assertEqual(0, utils.get_default(None, 0))
+        self.assertEqual(0, utils.get_default(0, None))
+        self.assertEqual(None, utils.get_default(None, None))
 
 
 if __name__ == '__main__':

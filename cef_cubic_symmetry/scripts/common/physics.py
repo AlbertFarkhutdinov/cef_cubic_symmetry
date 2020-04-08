@@ -50,7 +50,8 @@ def lowering_operator(initial_number, squared_j, degree):
 
 
 def steven_operators(key, squared_j, mqn_1, mqn_2=None):
-    """"""
+    """Сalculates the result of the Stevens operators' action
+    on the wave function with quantum numbers m=mqn_1[1] and n=mqn_2[1]"""
     result = {
         'o20': lambda: 3 * mqn_1[2] - squared_j,
         'o40': lambda: (35 * mqn_1[4] -
@@ -89,8 +90,3 @@ def steven_operators(key, squared_j, mqn_1, mqn_2=None):
         result['o64'] = lambda: ((5.5 * (mqn_1[2] + mqn_2[2]) - squared_j - 38) *
                                  0.5 * lowering_operator(mqn_2[1], squared_j, 4))
     return result.get(key, lambda: None)()
-
-
-if __name__ == '__main__':
-    for value in ('20', '40', '60', '22', '42', '62', '43', '63', '44', '64', '66'):
-        print(steven_operators(f'o{value}', 56, [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]))

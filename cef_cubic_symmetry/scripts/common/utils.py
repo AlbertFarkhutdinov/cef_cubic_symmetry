@@ -1,8 +1,8 @@
 """The module contains some common functions that used in this project."""
 from datetime import datetime
-from numpy import transpose, zeros
-from .tabular_information import ACCEPTABLE_RARE_EARTHS
-from .constants import INFINITY
+from numpy import zeros
+from scripts.common.tabular_information import ACCEPTABLE_RARE_EARTHS
+from scripts.common.constants import INFINITY
 
 
 def get_sign(value):
@@ -13,18 +13,22 @@ def get_sign(value):
 
 def get_value_with_sign(value):
     """Returns float number as a string with sign plus or minus."""
-    return f'{get_sign(value)}' + f'{abs(value): .3f}'.lstrip(' ')
+    if value:
+        return f'{get_sign(value)}' + f'{abs(value): .3f}'.lstrip(' ')
+    return None
 
 
-def get_new_if_old_is_none(old_value, new_value):
-    """Returns new_value if old_value is None, else it returns old_value."""
-    return new_value if (old_value is None) else old_value
+def get_default(value, default):
+    """Returns default if value is None, else it returns value."""
+    return default if (value is None) else value
 
 
-def value_to_write(value, text_separator):
-    """Returns float number as a string
-    with tabulation symbol or newline one in the end."""
-    return f'{value:10.5f}{text_separator}'
+def write_row(file, row):
+    """Writes to file the row of the float numbers
+    separated with tabulation symbol."""
+    for _, value in enumerate(row[:-1]):
+        file.write(f'{value:10.5f}\t')
+    file.write(f'{row[-1]:10.5f}\n')
 
 
 def check_input(choice):
@@ -50,14 +54,6 @@ def check_input(choice):
         except ValueError:
             condition = False
     return result
-
-
-def create_table(*arrays):
-    """Return transposed array of arrays."""
-    data = []
-    for array in arrays:
-        data.append(array)
-    return transpose(data)
 
 
 def user_input():
@@ -99,17 +95,7 @@ def get_time_of_execution(function):
         start_time = datetime.now()
         function(*args, **kwargs)
         finish_time = datetime.now()
-        print(f'Saving time: {finish_time - start_time}')
-    return wrapper
-
-
-def saving_file(function):
-    """Prints information about saved file."""
-    def wrapper(file, object_to_save, *args, **kwargs):
-        print('\n',
-              f'***Saving {object_to_save}***:',
-              'It may take some time...', sep='\n')
-        function(file, object_to_save, *args, **kwargs)
+        print(f'Saving time: {finish_time - start_time}\n')
     return wrapper
 
 
@@ -125,7 +111,7 @@ class OpenedFile:
         """Method for entrance to context manager"""
         if self.mode != 'r':
             print(f'Saving file "{self.name}"...')
-        self.file = open(self.name, self.mode, encoding='utf-8')
+        self.file = open(self.name, mode=self.mode, encoding='utf-8')
         return self.file
 
     def __exit__(self, exc_type, exc_val, exc_tb):
