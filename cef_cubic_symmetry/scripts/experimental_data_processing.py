@@ -3,14 +3,14 @@ import os
 from copy import deepcopy
 from scripts.common.constants import DATA_PATHS, Material, Data, Scale
 from scripts.common.utils import get_time_of_execution
+from scripts.common.fitting_utils import get_data_from_file
 from scripts.cubic_cef_object import Cubic
 from scripts import plot_objects as gg
-from scripts.fitting import get_data_from_file
 
 
 class Experiment:
     """Class contains experimental parameters"""
-    def __init__(self, material, experimental_energies: tuple, temperatures: tuple):
+    def __init__(self, material: Material, experimental_energies: tuple, temperatures: tuple):
         """Initialization of class Experiment"""
         self.material = material
         self.experimental_energies = experimental_energies
@@ -27,7 +27,8 @@ class Experiment:
             f"temperatures={self.temperatures!r})",
         ])
 
-    def get_llw_ratios_plot(self, min_value, max_value, y_minor, y_major):
+    def get_llw_ratios_plot(self, min_value: float, max_value: float,
+                            y_minor: float, y_major: float):
         """Method saves the plot for LLW diagram of energies ratio"""
         gg.get_llw_ratios_plot(
             material=self.material,
@@ -124,7 +125,7 @@ class Experiment:
 
 
 @get_time_of_execution
-def get_fixed_results(crystal):
+def get_fixed_results(crystal: str):
     """Saves the dependence of transition energies, their ratio
     on parameter x to file and its graphs for specified RE ions"""
     rare_earths = ('Tb', 'Tm', 'Er', 'Ho')

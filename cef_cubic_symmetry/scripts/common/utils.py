@@ -5,16 +5,16 @@ from scripts.common.tabular_information import ACCEPTABLE_RARE_EARTHS
 from scripts.common.constants import INFINITY
 
 
-def get_sign(value):
+def get_sign(value: float):
     """Returns minus, if argument is negative,
     else it returns plus."""
     return '-' if value < 0 else '+'
 
 
-def get_value_with_sign(value):
+def get_value_with_sign(value: float):
     """Returns float number as a string with sign plus or minus."""
     if value:
-        return f'{get_sign(value)}' + f'{abs(value): .3f}'.lstrip(' ')
+        return f'{get_sign(value)}{abs(value):.3f}'
     return None
 
 
@@ -26,12 +26,13 @@ def get_default(value, default):
 def write_row(file, row):
     """Writes to file the row of the float numbers
     separated with tabulation symbol."""
-    for _, value in enumerate(row[:-1]):
-        file.write(f'{value:10.5f}\t')
-    file.write(f'{row[-1]:10.5f}\n')
+    result = ''
+    for value in row:
+        result += f'{value:10.5f}\t'
+    file.write(f'{result.strip()}\n')
 
 
-def check_input(choice):
+def check_input(choice: str):
     """Checks a value inputted by user, returns it,
     if it satisfies the condition, else requests input again."""
     result = 0
@@ -65,7 +66,7 @@ def user_input():
     return crystal, rare_earth, w_parameter, x_parameter
 
 
-def get_empty_matrix(size, dimension=2):
+def get_empty_matrix(size: int, dimension=2):
     """Returns 1D or 2D array filled by zeros."""
     empty_matrix = None
     if dimension == 2:
@@ -75,7 +76,7 @@ def get_empty_matrix(size, dimension=2):
     return empty_matrix
 
 
-def data_popping(data, condition):
+def data_popping(data: dict, condition):
     """Pops items from data, that satisfy condition"""
     popped_number = 0
     for key, array in data['y_set'].copy().items():
@@ -101,7 +102,7 @@ def get_time_of_execution(function):
 
 class OpenedFile:
     """Context manager for file opening"""
-    def __init__(self, name, mode='r'):
+    def __init__(self, name: str, mode='r'):
         """Initialization of class"""
         self.name = name
         self.file = None
