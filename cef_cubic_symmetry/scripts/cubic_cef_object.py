@@ -55,7 +55,7 @@ class Cubic(CEF):
             print(f'E[{i + 1}]:\t{energy: 9.3f} meV')
 
     @get_time_of_execution
-    def save_energy_dat(self, number_of_intervals):
+    def save_energy_dat(self, number_of_intervals: int):
         """Saves the dependence of transition energies on parameter x to file."""
         file_name = get_paths(
             data_name='energies',
@@ -71,7 +71,7 @@ class Cubic(CEF):
                 write_row(file, (x_parameter, *energies))
 
     @get_time_of_execution
-    def save_spectra_with_one_temperature(self, gamma, temperature):
+    def save_spectra_with_one_temperature(self, gamma: float, temperature: float):
         """Saves inelastic neutron scattering spectra at specified temperature to file."""
         energies = linspace(-5, 30, 10001)
         spectrum = self.get_spectrum(energies=energies,
@@ -90,7 +90,8 @@ class Cubic(CEF):
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
 
-    def save_spectra_with_two_temperatures(self, gamma, temperature_1, temperature_2):
+    def save_spectra_with_two_temperatures(self, gamma: float,
+                                           temperature_1: float, temperature_2: float):
         """Saves inelastic neutron scattering spectra at two specified temperatures to file."""
         lines = {}
         parameters = {**self.llw_parameters, 'gamma': gamma}
@@ -199,7 +200,7 @@ class Cubic(CEF):
                                 ratios.append(energies[high] / energies[low])
                     write_row(ratio_file, ratios)
 
-    def check_ratios(self, numbers, experimental_value, points, accuracy):
+    def check_ratios(self, numbers, experimental_value: float, points, accuracy: float):
         """Checks the array of ratios
         if one of them is approximately equal to the given value."""
         ratios = numbers[1:]
@@ -233,7 +234,7 @@ class Cubic(CEF):
                         points.append(current)
         return points
 
-    def find_cross(self, experimental_value, experimental_energy, accuracy=0.003):
+    def find_cross(self, experimental_value: float, experimental_energy: float, accuracy=0.003):
         """Returns points of cross experimental and calculated curves,
         recalculated with correct value of W."""
         points = []
@@ -271,14 +272,13 @@ class Cubic(CEF):
 
 
 if __name__ == '__main__':
-    MATERIAL = Material(crystal='YNi2', rare_earth='Ce')
-    LLW_PARAMETERS = {'w': 1, 'x': 0.1}
+    from cProfile import run
+    MATERIAL = Material(crystal='YNi2', rare_earth='Nd')
+    LLW_PARAMETERS = {
+        'w': 1,
+    }
     CUBIC_SAMPLE = Cubic(
         material=MATERIAL,
         llw_parameters=LLW_PARAMETERS
     )
-    print(dir(CUBIC_SAMPLE))
-    print(repr(CUBIC_SAMPLE))
-    print(CUBIC_SAMPLE)
-    CUBIC_SAMPLE.get_one_dot()
-    CUBIC_SAMPLE.save_to_file()
+    run('CUBIC_SAMPLE.save_energy_dat(5000)')

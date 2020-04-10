@@ -5,7 +5,7 @@ from scripts.common.constants import BASE_DIR, Material, DATA_PATHS, GRAPHS_PATH
 from scripts.common.utils import get_value_with_sign
 
 
-def check_parent_dirs(path_to_check):
+def check_parent_dirs(path_to_check: str):
     """Makes parent directories for argument, if they do not exist."""
     condition = False
     paths = []
@@ -19,7 +19,7 @@ def check_parent_dirs(path_to_check):
         mkdir(path)
 
 
-def get_paths(data_name, format_name='.dat', is_graph=False,
+def get_paths(data_name: str, format_name='.dat', is_graph=False,
               material: Material = None, parameters: dict = None):
     """Returns path of the file that will be saved."""
     chdir(BASE_DIR)
@@ -37,7 +37,7 @@ def get_paths(data_name, format_name='.dat', is_graph=False,
             elif key == 'T':
                 full_name += f'_{key}{value}'
             else:
-                full_name += f'_{key}' + f'{value: .3f}'.lstrip(' ')
+                full_name += f'_{key}{value:.3f}'
     if is_graph:
         result_path = join(GRAPHS_PATHS[data_name],
                            short_name,
@@ -50,7 +50,7 @@ def get_paths(data_name, format_name='.dat', is_graph=False,
     return result_path
 
 
-def remove_if_exists(path_to_check):
+def remove_if_exists(path_to_check: str):
     """Makes remove file, if it exists."""
     check_parent_dirs(path_to_check)
     if exists(path_to_check):

@@ -217,7 +217,7 @@ def get_llw_energies_plot(material: con.Material, max_energy, y_major, y_minor):
         with OpenedFile(energy_file_name) as file:
             for line in file:
                 array = line.rstrip('\n').split('\t')
-                array = [float(value.lstrip(' ')) for value in array]
+                array = [float(value.strip()) for value in array]
                 data['x'].append(array[0])
                 for level in range(1, levels_number):
                     try:
@@ -272,7 +272,7 @@ def get_llw_ratios_plot(material: con.Material, experimental_value, y_limits, y_
         with OpenedFile(ratio_file_name) as file:
             for line in file:
                 array = line.rstrip('\n').split('\t')
-                array = [float(value.lstrip(' ')) for value in array]
+                array = [float(value.strip()) for value in array]
                 data['x'].append(array[0])
                 data['y_set']['Experiment'].append(experimental_value)
                 for level, name in enumerate(con.RATIOS_NAMES):

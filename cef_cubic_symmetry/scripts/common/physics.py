@@ -2,7 +2,77 @@
 from numpy import zeros, exp, sqrt, pi, log
 
 
-def thermodynamics(temperature, energies=None):
+def gaussian_normalized(argument: float, center: float, sigma: float):
+    """Returns value of normalized Gauss function.
+    Integral with infinite limits equals 1.
+    Full width at half-maximum (FWHM) is 2 * sqrt(2*ln(2)) * sigma.
+    Value at the maximum is 1 / (sigma * sqrt(2 * pi)) """
+    return (exp(-(argument - center) ** 2 / (2 * sigma ** 2)) /
+            (sigma * sqrt(2 * pi)))
+
+
+def lorentzian_normalized(argument: float, center: float, gamma: float):
+    """Returns value of normalized Lorentz function.
+    Integral with infinite limits equals 1.
+    Full width at half-maximum (FWHM) is 2 * gamma.
+    Value at the maximum is 1 / (pi * gamma)"""
+    return (gamma / pi) / ((argument - center) ** 2 + gamma ** 2)
+
+
+def gaussian(arg: float, center: float, width: float, amplitude: float):
+    """Returns value of Gauss function.
+    Integral with infinite limits equals amplitude.
+    Value at the maximum is amplitude / (sigma * sqrt(2 * pi)) """
+    return amplitude * gaussian_normalized(arg, center, width)
+
+
+def lorentzian(arg: float, center: float, width: float, amplitude: float):
+    """Returns value of Lorentz function.
+    Integral with infinite limits equals amplitude.
+    Value at the maximum is amplitude / (pi * gamma)"""
+    return amplitude * lorentzian_normalized(arg, center, width)
+
+
+def pseudo_voigt_normalized(argument: float, center: float, sigma: float, gamma: float):
+    """Returns value of normalized pseudo-Voigt function.
+    Integral with infinite limits equals 1.
+    Full width at half-maximum (FWHM) is fwhm_total."""
+    fwhm_gauss = 2 * sigma * sqrt(2 * log(2))
+    fwhm_lorentz = 2 * gamma
+    fwhm_total = (fwhm_gauss ** 5 +
+                  2.69269 * fwhm_gauss ** 4 * fwhm_lorentz +
+                  2.42843 * fwhm_gauss ** 3 * fwhm_lorentz ** 2 +
+                  4.47163 * fwhm_gauss ** 2 * fwhm_lorentz ** 3 +
+                  0.07842 * fwhm_gauss * fwhm_lorentz ** 4 +
+                  fwhm_lorentz ** 5) ** 0.2
+    ratio = fwhm_lorentz / fwhm_total
+    eta = 1.36603 * ratio - 0.47719 * ratio ** 2 + 0.11116 * ratio ** 3
+    result = ((1 - eta) * gaussian_normalized(argument, center, sigma) +
+              eta * lorentzian_normalized(argument, center, gamma))
+    return result
+
+
+def multi_peak(function, arg: float, *parameters):
+    """Returns value of several peaks sum"""
+    background = parameters[0]
+    peaks_parameters = parameters[1:]
+    peaks = []
+    for index in range(0, len(peaks_parameters), 3):
+        peaks.append(function(arg, *peaks_parameters[index: index + 3]))
+    return background + sum(peaks)
+
+
+def multi_lorentzian(arg: float, *parameters):
+    """Returns value of multi_peak function for lorentzian"""
+    return multi_peak(lorentzian, arg, *parameters)
+
+
+def multi_gaussian(arg: float, *parameters):
+    """Returns value of multi_peak function for gaussian"""
+    return multi_peak(gaussian, arg, *parameters)
+
+
+def thermodynamics(temperature: float, energies=None):
     """Returns dictionary including value of temperature in meV and Bolzmann factor."""
     thermal_dict = {'temperature': temperature / 11.6045}
     if energies is not None and thermal_dict['temperature'] > 0:
@@ -11,35 +81,8 @@ def thermodynamics(temperature, energies=None):
     return thermal_dict
 
 
-def gauss(argument, center, sigma):
-    """Returns value of Gauss function."""
-    return (exp(-(argument - center) ** 2 / (2 * sigma ** 2)) /
-            (sigma * sqrt(2 * pi)))
-
-
-def lorentz(argument, center, gamma):
-    """Returns value of Lorentz function."""
-    return (gamma / pi) / ((argument - center) ** 2 + gamma ** 2)
-
-
-def pseudo_voigt(argument, center, sigma, gamma):
-    """Returns value of pseudo-Voigt function."""
-    width_gauss = 2 * sigma * sqrt(2 * log(2))
-    width_lorentz = 2 * gamma
-    full_width_at_half_maximum = (width_gauss ** 5 +
-                                  2.69269 * width_gauss ** 4 * width_lorentz +
-                                  2.42843 * width_gauss ** 3 * width_lorentz ** 2 +
-                                  4.47163 * width_gauss ** 2 +
-                                  width_lorentz ** 3 +
-                                  0.07842 * width_lorentz ** 4 * width_gauss +
-                                  width_lorentz ** 5) ** 0.2
-    ratio = width_lorentz / full_width_at_half_maximum
-    eta = 1.36603 * ratio - 0.47719 * ratio ** 2 + 0.11116 * ratio ** 3
-    return (1 - eta) * gauss(argument, center, sigma) + eta * lorentz(argument, center, gamma)
-
-
-def lowering_operator(initial_number, squared_j, degree):
-    """Сalculates the result of the lowering operator’s action
+def lowering_operator(initial_number: float, squared_j: float, degree: int):
+    """Returns the result of the lowering operator’s action
     on the wave function with quantum number initial_number"""
     result = 1
     for step in range(degree):
@@ -49,8 +92,8 @@ def lowering_operator(initial_number, squared_j, degree):
     return sqrt(result)
 
 
-def steven_operators(key, squared_j, mqn_1, mqn_2=None):
-    """Сalculates the result of the Stevens operators' action
+def steven_operators(key: str, squared_j: float, mqn_1, mqn_2=None):
+    """Returns the result of the Stevens operators' action
     on the wave function with quantum numbers m=mqn_1[1] and n=mqn_2[1]"""
     result = {
         'o20': lambda: 3 * mqn_1[2] - squared_j,
