@@ -132,7 +132,7 @@ class CEF:
         between eigenfunctions of the total Hamiltonian."""
         j = self.material.rare_earth.total_momentum_ground
         squared_j = j * (j + 1)
-        size = 2 * j + 1
+        size = int(2 * j + 1)
         j_ops = {
             'z': utils.get_empty_matrix(size),
             '+': utils.get_empty_matrix(size),
@@ -214,6 +214,7 @@ class CEF:
             sum_peaks = peak['energy'] * peak['intensity']
             for other_peak in peaks:
                 if (
+                        peak['intensity'] > 0 and
                         other_peak is not peak and
                         abs(peak['energy'] - other_peak['energy']) < self.__class__.resolution
                 ):
@@ -428,16 +429,13 @@ class CEF:
 
 
 if __name__ == '__main__':
-    from cProfile import run
     MATERIAL = Material(rare_earth='Nd', crystal='YNi2')
     CUBIC_SAMPLE = CEF(MATERIAL)
-    X_PARAMETER = 0
-    W_PARAMETER = 0.3
+    X_PARAMETER = -1
+    W_PARAMETER = 1
     CUBIC_SAMPLE.parameters['B40'] = W_PARAMETER * X_PARAMETER / 60
     CUBIC_SAMPLE.parameters['B44'] = 5 * CUBIC_SAMPLE.parameters['B40']
     CUBIC_SAMPLE.parameters['B60'] = (W_PARAMETER * (1 - abs(X_PARAMETER)) /
                                       CUBIC_SAMPLE.material.rare_earth.f_6)
     CUBIC_SAMPLE.parameters['B64'] = -21 * CUBIC_SAMPLE.parameters['B60']
-    run('CUBIC_SAMPLE.get_energies()')
-    E_V, E_F = CUBIC_SAMPLE.get_eigenvalues_and_eigenfunctions()
-    run('CUBIC_SAMPLE.get_transition_probabilities(E_F)')
+    print(CUBIC_SAMPLE.parameters)

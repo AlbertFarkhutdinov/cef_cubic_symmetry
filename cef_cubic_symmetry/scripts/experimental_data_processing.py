@@ -10,6 +10,7 @@ from scripts import plot_objects as gg
 
 class Experiment:
     """Class contains experimental parameters"""
+
     def __init__(self, material: Material, experimental_energies: tuple, temperatures: tuple):
         """Initialization of class Experiment"""
         self.material = material
@@ -128,9 +129,9 @@ class Experiment:
 def get_fixed_results(crystal: str):
     """Saves the dependence of transition energies, their ratio
     on parameter x to file and its graphs for specified RE ions"""
-    rare_earths = ('Tb', 'Tm', 'Er', 'Ho')
-    max_energies = (350, 350, 1000, 1500)
-    locators = (50, 50, 200, 500)
+    rare_earths = ('Nd', 'Pr', 'Tb', 'Tm', 'Er', 'Ho')
+    max_energies = (140, 100, 350, 350, 1000, 1500)
+    locators = (20, 20, 50, 50, 200, 500)
     for index, value in enumerate(rare_earths):
         material = Material(crystal=crystal, rare_earth=value)
         for w_parameter in (1, -1):
@@ -140,51 +141,52 @@ def get_fixed_results(crystal: str):
         gg.get_llw_energies_plot(material=material,
                                  max_energy=max_energies[index],
                                  y_major=locators[index],
-                                 y_minor=locators[index] // 5)
+                                 y_minor=locators[index] // 5,
+                                 )
 
 
 if __name__ == '__main__':
-    # get_fixed_results('YNi2')
+    get_fixed_results('YNi2')
 
-    EXPERIMENT = Experiment(
-        material=Material(crystal='YNi2', rare_earth='Er'),
-        experimental_energies=(0.6, 1.3),
-        temperatures=(1.4, 15)
-    )
-
-    EXPERIMENT.get_llw_ratios_plot(
-        max_value=3,
-        min_value=1,
-        y_major=0.5,
-        y_minor=0.1,
-    )
-    EXPERIMENT.get_spectrum_experiment(
-        limits={
-            'x_min': 0,
-            'x_max': 2.2,
-            'y_min': 0,
-            'y_max': 20,
-        },
-        locators={
-            'x_major': 1,
-            'x_minor': 0.2,
-            'y_major': 5,
-            'y_minor': 1,
-        }
-    )
-    RECALCULATED_CROSSES = EXPERIMENT.get_cross_points()
-    EXPERIMENT.get_spectrum_theory(
-        RECALCULATED_CROSSES,
-        limits={
-            'x_min': 0,
-            'x_max': 2.2,
-            'y_min': 0,
-            'y_max': 4000,
-        },
-        locators={
-            'x_major': 1,
-            'x_minor': 0.2,
-            'y_major': 500,
-            'y_minor': 100,
-        }
-    )
+    # EXPERIMENT = Experiment(
+    #     material=Material(crystal='YNi2', rare_earth='Er'),
+    #     experimental_energies=(0.6, 1.3),
+    #     temperatures=(1.4, 15)
+    # )
+    #
+    # EXPERIMENT.get_llw_ratios_plot(
+    #     max_value=3,
+    #     min_value=1,
+    #     y_major=0.5,
+    #     y_minor=0.1,
+    # )
+    # EXPERIMENT.get_spectrum_experiment(
+    #     limits={
+    #         'x_min': 0,
+    #         'x_max': 2.2,
+    #         'y_min': 0,
+    #         'y_max': 20,
+    #     },
+    #     locators={
+    #         'x_major': 1,
+    #         'x_minor': 0.2,
+    #         'y_major': 5,
+    #         'y_minor': 1,
+    #     }
+    # )
+    # RECALCULATED_CROSSES = EXPERIMENT.get_cross_points()
+    # EXPERIMENT.get_spectrum_theory(
+    #     RECALCULATED_CROSSES,
+    #     limits={
+    #         'x_min': 0,
+    #         'x_max': 2.2,
+    #         'y_min': 0,
+    #         'y_max': 4000,
+    #     },
+    #     locators={
+    #         'x_major': 1,
+    #         'x_minor': 0.2,
+    #         'y_major': 500,
+    #         'y_minor': 100,
+    #     }
+    # )

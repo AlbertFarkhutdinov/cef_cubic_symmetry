@@ -272,13 +272,14 @@ class Cubic(CEF):
 
 
 if __name__ == '__main__':
-    from cProfile import run
     MATERIAL = Material(crystal='YNi2', rare_earth='Nd')
     LLW_PARAMETERS = {
         'w': 1,
+        'x': -1,
     }
     CUBIC_SAMPLE = Cubic(
         material=MATERIAL,
         llw_parameters=LLW_PARAMETERS
     )
-    run('CUBIC_SAMPLE.save_energy_dat(5000)')
+    for peak in CUBIC_SAMPLE.get_peaks():
+        print(*peak)
