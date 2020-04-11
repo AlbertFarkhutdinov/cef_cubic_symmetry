@@ -239,14 +239,16 @@ def get_llw_energies_plot(material: con.Material, max_energy, y_major, y_minor):
             plot.set_labels(x_label=r'$x$',
                             y_label=con.ENERGY_TRANSFER,
                             title=fr'{material.rare_earth}, $W={parameters["w"]}$ meV')
-            plot.set_limits(x_min=-1,
-                            x_max=1,
-                            y_min=-10,
-                            y_max=max_energy)
-            plot.set_locators(x_major=0.5,
-                              x_minor=0.1,
-                              y_major=y_major,
-                              y_minor=y_minor)
+            if max_energy:
+                plot.set_limits(x_min=-1,
+                                x_max=1,
+                                y_min=-10,
+                                y_max=max_energy)
+            if y_major and y_minor:
+                plot.set_locators(x_major=0.5,
+                                  x_minor=0.1,
+                                  y_major=y_major,
+                                  y_minor=y_minor)
             plot.make_plot(filename=graph_file_name,
                            mode='scatter',
                            form=con.FIG_FORMAT)
