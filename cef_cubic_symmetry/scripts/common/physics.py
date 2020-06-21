@@ -82,7 +82,7 @@ def thermodynamics(temperature: float, energies=None):
 
 
 def lowering_operator(initial_number: float, squared_j: float, degree: int):
-    """Returns the result of the lowering operator’s action
+    """Returns the result of the lowering operator's action
     on the wave function with quantum number initial_number"""
     result = 1
     for step in range(degree):

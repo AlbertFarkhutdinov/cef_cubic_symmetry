@@ -1,8 +1,10 @@
 """The module contains some common functions that used in this project."""
+from json import load
+from os.path import join
 from datetime import datetime
 from numpy import zeros
 from scripts.common.tabular_information import ACCEPTABLE_RARE_EARTHS
-from scripts.common.constants import INFINITY
+from scripts.common.constants import INFINITY, JSON_DIR
 
 
 def get_sign(value: float):
@@ -28,7 +30,7 @@ def write_row(file, row):
     separated with tabulation symbol."""
     result = ''
     for value in row:
-        result += f'{value:10.5f}\t'
+        result += f'{value:11.5f}\t'
     file.write(f'{result.strip()}\n')
 
 
@@ -57,23 +59,10 @@ def check_input(choice: str):
     return result
 
 
-def user_input():
-    """Returns data inputted by user."""
-    crystal = input('Input the name of crystal (e.g. "YNi2"): ')
-    rare_earth = check_input('rare')
-    w_parameter = check_input('w')
-    x_parameter = check_input('x')
-    return crystal, rare_earth, w_parameter, x_parameter
-
-
 def get_empty_matrix(size: int, dimension=2):
     """Returns 1D or 2D array filled by zeros."""
-    empty_matrix = None
-    if dimension == 2:
-        empty_matrix = zeros((size, size), dtype='float64')
-    if dimension == 1:
-        empty_matrix = zeros(size, dtype='float64')
-    return empty_matrix
+    sizes = size if dimension == 1 else (size, size)
+    return zeros(sizes, dtype='float64')
 
 
 def data_popping(data: dict, condition):
@@ -95,9 +84,32 @@ def get_time_of_execution(function):
     def wrapper(*args, **kwargs):
         start_time = datetime.now()
         function(*args, **kwargs)
-        finish_time = datetime.now()
-        print(f'Saving time: {finish_time - start_time}\n')
+        print(f'Saving time: {datetime.now() - start_time}\n')
     return wrapper
+
+
+def get_label(number: int, choice=0):
+    """Return label for legend"""
+    index = 1 if choice != 0 else choice
+    return (fr'$E_{number}$', fr'$I_{number}$')[index]
+
+
+def get_ratios_names(choice=0):
+    """Returns list of ratios names"""
+    letter = 'E' if choice == 0 else 'I'
+    result = []
+    for low in range(1, 7):
+        for high in range(low + 1, 7):
+            result.append(f'${letter}_{high}/{letter}_{low}$')
+    return result
+
+
+def get_repr(obj, *args):
+    """Method returns string representation of the object."""
+    result = f'{obj.__class__.__name__}('
+    for arg in args:
+        result += f'{arg}={obj.__getattribute__(arg)!r}, '
+    return f'{result.rstrip(", ")})'
 
 
 class OpenedFile:
@@ -123,5 +135,8 @@ class OpenedFile:
                 print(f'File "{self.name}" is saved.')
 
 
-if __name__ == '__main__':
-    pass
+def get_json_object(file_name: str):
+    """Returns object from JSON file"""
+    with OpenedFile(join(JSON_DIR, file_name)) as file:
+        obj = load(file)
+    return obj

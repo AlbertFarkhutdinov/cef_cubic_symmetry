@@ -6,6 +6,7 @@ F4 = 60
 BOHR_MAGNETON = 5.788382e-2  # meV/T
 
 CERIUM = Element(
+    number_of_f_electrons=1,
     name='Ce',
     total_momentum_ground=2.5,
     lande_factor=Fraction(6, 7),
@@ -20,10 +21,11 @@ CERIUM = Element(
         '2': Fraction(-2, 35),
         '4': Fraction(2, 315),
         '6': 0,
-    }
+    },
 )
 
 PRASEODYMIUM = Element(
+    number_of_f_electrons=2,
     name='Pr',
     total_momentum_ground=4,
     lande_factor=Fraction(4, 5),
@@ -42,6 +44,7 @@ PRASEODYMIUM = Element(
 )
 
 NEODYMIUM = Element(
+    number_of_f_electrons=3,
     name='Nd',
     total_momentum_ground=4.5,
     lande_factor=Fraction(8, 11),
@@ -60,6 +63,7 @@ NEODYMIUM = Element(
 )
 
 PROMETHIUM = Element(
+    number_of_f_electrons=4,
     name='Pm',
     total_momentum_ground=4,
     lande_factor=Fraction(3, 5),
@@ -78,6 +82,7 @@ PROMETHIUM = Element(
 )
 
 SAMARIUM = Element(
+    number_of_f_electrons=5,
     name='Sm',
     total_momentum_ground=2.5,
     lande_factor=Fraction(2, 7),
@@ -96,6 +101,7 @@ SAMARIUM = Element(
 )
 
 EUROPIUM = Element(
+    number_of_f_electrons=6,
     name='Eu',
     total_momentum_ground=0,
     lande_factor=0,
@@ -114,6 +120,7 @@ EUROPIUM = Element(
 )
 
 GADOLINIUM = Element(
+    number_of_f_electrons=7,
     name='Gd',
     total_momentum_ground=3.5,
     lande_factor=2,
@@ -132,6 +139,7 @@ GADOLINIUM = Element(
 )
 
 TERBIUM = Element(
+    number_of_f_electrons=8,
     name='Tb',
     total_momentum_ground=6,
     lande_factor=Fraction(3, 2),
@@ -150,6 +158,7 @@ TERBIUM = Element(
 )
 
 DYSPROSIUM = Element(
+    number_of_f_electrons=9,
     name='Dy',
     total_momentum_ground=7.5,
     lande_factor=Fraction(4, 3),
@@ -168,6 +177,7 @@ DYSPROSIUM = Element(
 )
 
 HOLMIUM = Element(
+    number_of_f_electrons=10,
     name='Ho',
     total_momentum_ground=8,
     lande_factor=Fraction(5, 4),
@@ -186,6 +196,7 @@ HOLMIUM = Element(
 )
 
 ERBIUM = Element(
+    number_of_f_electrons=11,
     name='Er',
     total_momentum_ground=7.5,
     lande_factor=Fraction(6, 5),
@@ -204,6 +215,7 @@ ERBIUM = Element(
 )
 
 THULIUM = Element(
+    number_of_f_electrons=12,
     name='Tm',
     total_momentum_ground=6,
     lande_factor=Fraction(7, 6),
@@ -222,6 +234,7 @@ THULIUM = Element(
 )
 
 YTTERBIUM = Element(
+    number_of_f_electrons=13,
     name='Yb',
     total_momentum_ground=3.5,
     lande_factor=Fraction(8, 7),

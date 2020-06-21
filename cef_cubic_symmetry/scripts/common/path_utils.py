@@ -36,16 +36,22 @@ def get_paths(data_name: str, format_name='.dat', is_graph=False,
                 full_name += f'_{key}{get_value_with_sign(value)}'
             elif key == 'T':
                 full_name += f'_{key}{value}'
+            elif key == 'setup':
+                full_name += f'_{key}_{value}'
             else:
                 full_name += f'_{key}{value:.3f}'
     if is_graph:
-        result_path = join(GRAPHS_PATHS[data_name],
-                           short_name,
-                           f'{data_name}_{full_name}')
+        result_path = join(
+            GRAPHS_PATHS[data_name],
+            short_name,
+            f'{data_name}_{full_name}',
+        )
     else:
-        result_path = join(DATA_PATHS[data_name],
-                           short_name,
-                           f'{data_name}_{full_name}{format_name}')
+        result_path = join(
+            DATA_PATHS[data_name],
+            short_name,
+            f'{data_name}_{full_name}{format_name}',
+        )
     check_parent_dirs(result_path)
     return result_path
 

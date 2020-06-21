@@ -1,0 +1,38 @@
+{
+  "Pr": {
+    "max_energy": 140,
+    "energy_locator": 20,
+    "max_intensity": 20,
+    "intensity_locator": 5
+  },
+  "Nd": {
+    "max_energy": 100,
+    "energy_locator": 20,
+    "max_intensity": 10,
+    "intensity_locator": 5
+  },
+  "Tb": {
+    "max_energy": 350,
+    "energy_locator": 50,
+    "max_intensity": 40,
+    "intensity_locator": 10
+  },
+  "Ho": {
+    "max_energy": 1500,
+    "energy_locator": 500,
+    "max_intensity": 60,
+    "intensity_locator": 20
+  },
+  "Er": {
+    "max_energy": 1000,
+    "energy_locator": 200,
+    "max_intensity": 60,
+    "intensity_locator": 20
+  },
+  "Tm": {
+    "max_energy": 350,
+    "energy_locator": 50,
+    "max_intensity": 40,
+    "intensity_locator": 10
+  }
+}
