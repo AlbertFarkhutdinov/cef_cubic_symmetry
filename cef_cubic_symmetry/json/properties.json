@@ -1,0 +1,188 @@
+{
+  "Pr": {
+    "experimental_energies": [
+      2.8,
+      3.7
+    ],
+    "temperatures": [
+      5,
+      20,
+      50,
+      100
+    ],
+    "ratios": {
+      "limits": {
+        "x_min": -0.72,
+        "x_max": -0.38,
+        "y_min": 1.2,
+        "y_max": 1.4
+      },
+      "ticks": {
+        "x_minor": 0.02,
+        "x_major": 0.1,
+        "y_major": 0.1,
+        "y_minor": 0.02
+      }
+    },
+    "experiment": {
+      "NERA": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 10,
+          "y_min": 0,
+          "y_max": 1000
+        },
+        "locators": {
+          "x_major": 1,
+          "x_minor": 0.2,
+          "y_major": 200,
+          "y_minor": 40
+        },
+        "initial_energy": 25
+      }
+    },
+    "experiment_diff": {
+      "NERA": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 15,
+          "y_min": -10,
+          "y_max": 230
+        },
+        "locators": {
+          "x_major": 5,
+          "x_minor": 1,
+          "y_major": 50,
+          "y_minor": 10
+        },
+        "initial_energy": 25
+      },
+      "DIN": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 2.8,
+          "y_min": -0.4,
+          "y_max": 9.2
+        },
+        "locators": {
+          "x_major": 1,
+          "x_minor": 0.2,
+          "y_major": 2,
+          "y_minor": 0.4
+        },
+        "initial_energy": 4
+      }
+    },
+    "theory": {
+      "limits": {
+        "x_min": 0,
+        "x_max": 8,
+        "y_min": 0,
+        "y_max": 200
+      },
+      "locators": {
+        "x_major": 2,
+        "x_minor": 0.4,
+        "y_major": 50,
+        "y_minor": 10
+      },
+      "gamma": 1
+    },
+    "intensities": {
+      "y_max": 10
+    }
+  },
+  "Nd": {
+    "experimental_energies": [
+      4.01,
+      6.27
+    ],
+    "temperatures": [
+      5,
+      20,
+      50,
+      100
+    ],
+    "ratios": {
+      "limits": {
+        "x_min": -0.92,
+        "x_max": -0.56,
+        "y_min": 1.5,
+        "y_max": 1.6
+      },
+      "ticks": {
+        "x_minor": 0.02,
+        "x_major": 0.1,
+        "y_major": 0.02,
+        "y_minor": 0.004
+      }
+    },
+    "experiment": {
+      "NERA": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 10,
+          "y_min": 0,
+          "y_max": 1000
+        },
+        "locators": {
+          "x_major": 1,
+          "x_minor": 0.2,
+          "y_major": 200,
+          "y_minor": 40
+        },
+        "initial_energy": 25
+      }
+    },
+    "experiment_diff": {
+      "NERA": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 15,
+          "y_min": -10,
+          "y_max": 230
+        },
+        "locators": {
+          "x_major": 5,
+          "x_minor": 1,
+          "y_major": 50,
+          "y_minor": 10
+        },
+        "initial_energy": 25
+      },
+      "DIN": {
+        "limits": {
+          "x_min": 0,
+          "x_max": 2.8,
+          "y_min": -0.4,
+          "y_max": 9.2
+        },
+        "locators": {
+          "x_major": 1,
+          "x_minor": 0.2,
+          "y_major": 2,
+          "y_minor": 0.4
+        },
+        "initial_energy": 4
+      }
+    },
+    "theory": {
+      "limits": {
+        "x_min": 0,
+        "x_max": 10,
+        "y_min": 0,
+        "y_max": 200
+      },
+      "locators": {
+        "x_major": 2,
+        "x_minor": 0.4,
+        "y_major": 50,
+        "y_minor": 10
+      },
+      "gamma": 1
+    },
+    "intensities": {
+      "y_max": 100
+    }
+  }
+}

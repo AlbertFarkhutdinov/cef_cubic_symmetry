@@ -6,7 +6,7 @@ from scripts.common import utils
 from scripts.common import physics
 from scripts.common.tabular_information import BOHR_MAGNETON, RARE_EARTHS, RARE_EARTHS_NAMES
 from scripts.common.path_utils import get_paths
-from scripts.common.utils import OpenedFile
+from scripts.common.utils import OpenedFile, get_repr
 from scripts.common.constants import Material
 
 
@@ -15,8 +15,8 @@ class CEF:
     its crystal field parameters and the eigenvalues and eigenfunctions
     of the CEF Hamiltonian, if it is already diagonalized."""
 
-    resolution = 0.01
-    threshold = 0.0001
+    resolution = 1e-2
+    threshold = 1e-4
 
     def __init__(self, material: Material):
         """Initializes the CEF object or read it from a file."""
@@ -27,10 +27,13 @@ class CEF:
             material=self.material,
         )
         self.magnet_field = {'z': 0, 'x': 0}
-        self.number_of_f_electrons = RARE_EARTHS_NAMES.index(self.material.rare_earth) + 1
         self.material = Material(
             crystal=self.material.crystal,
-            rare_earth=RARE_EARTHS[self.number_of_f_electrons - 1]
+            rare_earth=RARE_EARTHS[
+                RARE_EARTHS_NAMES.index(
+                    self.material.rare_earth
+                )
+            ]
         )
         self.temperature = 0
 
@@ -38,11 +41,13 @@ class CEF:
     def parameters(self):
         """CEF parameters"""
         return {
-            'B20': 0, 'B40': 0, 'B60': 0,
-            'B22': 0, 'B42': 0, 'B62': 0,
-            'B43': 0, 'B63': 0,
-            'B44': 0, 'B64': 0,
-            'B66': 0,
+            param: 0 for param in (
+                'B20', 'B40', 'B60',
+                'B22', 'B42', 'B62',
+                'B43', 'B63',
+                'B44', 'B64',
+                'B66',
+            )
         }
 
     def load_data(self):
@@ -55,14 +60,16 @@ class CEF:
         saved_object = {
             'crystal': self.material.crystal,
             'rare_earth': self.material.rare_earth.name,
-            'number_of_f_electrons': self.number_of_f_electrons,
             'parameters': self.parameters,
             'magnet_field': self.magnet_field,
         }
         with OpenedFile(self.file_name, mode='w') as file:
             dump(saved_object, file, indent=4, sort_keys=True)
 
-    def get_cef_hamiltonian(self, size: int, j: float, squared_j: float):
+    def get_cef_hamiltonian(self,
+                            size: int,
+                            j: float,
+                            squared_j: float):
         """Determines the CEF Hamiltonian based on the input parameters."""
         hamiltonian = utils.get_empty_matrix(size)
         parameters = self.parameters
@@ -71,23 +78,34 @@ class CEF:
             # mqn_1[1] = m = -J...J
             mqn_1 = [(row - j) ** i for i in range(5)]
             for key in ('20', '40', '60'):
-                hamiltonian[row, row] += (parameters[f'B{key}'] *
-                                          physics.steven_operators(f'o{key}',
-                                                                   squared_j,
-                                                                   mqn_1))
+                hamiltonian[row, row] += (
+                    parameters[f'B{key}'] *
+                    physics.steven_operators(
+                        f'o{key}',
+                        squared_j,
+                        mqn_1,
+                    )
+                )
             for degree in range(2, size - row):
                 mqn_2 = [(row - j + degree) ** i for i in range(5)]
                 for key in ('22', '42', '62', '43', '63', '44', '64', '66'):
                     if key[-1] == str(degree):
-                        hamiltonian[row, row + degree] += (parameters[f'B{key}'] *
-                                                           physics.steven_operators(f'o{key}',
-                                                                                    squared_j,
-                                                                                    mqn_1,
-                                                                                    mqn_2))
+                        hamiltonian[row, row + degree] += (
+                            parameters[f'B{key}'] *
+                            physics.steven_operators(
+                                f'o{key}',
+                                squared_j,
+                                mqn_1,
+                                mqn_2,
+                            )
+                        )
                 hamiltonian[row + degree, row] = hamiltonian[row, row + degree]
         return hamiltonian
 
-    def get_zeeman_hamiltonian(self, size: int, j: float, squared_j: float,
+    def get_zeeman_hamiltonian(self,
+                               size: int,
+                               j: float,
+                               squared_j: float,
                                magnet_field: dict = None):
         """Determines the Zeeman terms to the Hamiltonian."""
         if magnet_field is None:
@@ -96,17 +114,21 @@ class CEF:
         for row in range(size):
             # mqn_1 =  m = -J...J
             mqn_1 = row - j
-            hamiltonian[row, row] -= (self.material.rare_earth.lande_factor *
-                                      BOHR_MAGNETON *
-                                      mqn_1 *
-                                      magnet_field['z'])
+            hamiltonian[row, row] -= (
+                self.material.rare_earth.lande_factor *
+                BOHR_MAGNETON *
+                mqn_1 *
+                magnet_field['z']
+            )
             if row < (size - 1):
                 column = row + 1
                 mqn_2 = mqn_1 + 1
-                hamiltonian[row, column] -= (0.5 * self.material.rare_earth.lande_factor *
-                                             BOHR_MAGNETON *
-                                             sqrt((squared_j - mqn_1 * mqn_2)) *
-                                             magnet_field['x'])
+                hamiltonian[row, column] -= (
+                    0.5 * self.material.rare_earth.lande_factor *
+                    BOHR_MAGNETON *
+                    sqrt((squared_j - mqn_1 * mqn_2)) *
+                    magnet_field['x']
+                )
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian
 
@@ -118,13 +140,15 @@ class CEF:
         return (self.get_cef_hamiltonian(size, j, squared_j) +
                 self.get_zeeman_hamiltonian(size, j, squared_j, magnet_field))
 
-    def get_eigenvalues_and_eigenfunctions(self, total_hamiltonian=None):
+    def get_eigenvalues_and_eigenfunctions(self,
+                                           total_hamiltonian=None,
+                                           ground_state_is_zero=True):
         """Calculates eigenvalues and eigenfunctions of the total Hamiltonian."""
         if total_hamiltonian is None:
             total_hamiltonian = self.get_total_hamiltonian()
         eigenvalues, eigenfunctions = eigh(total_hamiltonian)
-        # E = 0 - minimum of energy.
-        eigenvalues = eigenvalues - min(eigenvalues)
+        if ground_state_is_zero:
+            eigenvalues = eigenvalues - min(eigenvalues)
         return eigenvalues, eigenfunctions
 
     def get_transition_probabilities(self, eigenfunctions):
@@ -140,35 +164,53 @@ class CEF:
         }
         transition_probability = utils.get_empty_matrix(size)
         for row in range(size):
-            j_ops['z'][row, row] += (eigenfunctions[size - 1, row] ** 2 * (size - 1 - j))
+            j_ops['z'][row, row] += (
+                eigenfunctions[size - 1, row] ** 2 *
+                (size - 1 - j)
+            )
             for row_j in range(size - 1):
-                j_ops['z'][row, row] += (eigenfunctions[row_j, row] ** 2) * (row_j - j)
-                j_ops['+'][row, row] += (eigenfunctions[row_j + 1, row] *
-                                         eigenfunctions[row_j, row] *
-                                         sqrt(squared_j - (row_j - j) * (row_j - j + 1)))
+                j_ops['z'][row, row] += (
+                    eigenfunctions[row_j, row] ** 2 *
+                    (row_j - j)
+                )
+                j_ops['+'][row, row] += (
+                    eigenfunctions[row_j + 1, row] *
+                    eigenfunctions[row_j, row] *
+                    sqrt(squared_j - (row_j - j) * (row_j - j + 1))
+                )
 
             j_ops['-'][row, row] = j_ops['+'][row, row]
             for column in range(row + 1, size):
                 mqn_1 = size - 1 - j
-                j_ops['z'][row, column] += (eigenfunctions[size - 1, row] *
-                                            eigenfunctions[size - 1, column] * mqn_1)
+                j_ops['z'][row, column] += (
+                    eigenfunctions[size - 1, row] *
+                    eigenfunctions[size - 1, column] * mqn_1
+                )
                 for row_j in range(size - 1):
                     mqn_1 = row_j - j
-                    j_ops['z'][row, column] += (eigenfunctions[row_j, row] *
-                                                eigenfunctions[row_j, column] * mqn_1)
+                    j_ops['z'][row, column] += (
+                        eigenfunctions[row_j, row] *
+                        eigenfunctions[row_j, column] * mqn_1
+                    )
                     column_j = row_j + 1
                     mqn_2 = column_j - j
                     common_root = sqrt(squared_j - mqn_1 * mqn_2)
-                    j_ops['+'][row, column] += (eigenfunctions[column_j, row] *
-                                                eigenfunctions[row_j, column] *
-                                                common_root)
-                    j_ops['-'][row, column] += (eigenfunctions[row_j, row] *
-                                                eigenfunctions[column_j, column] *
-                                                common_root)
+                    j_ops['+'][row, column] += (
+                        eigenfunctions[column_j, row] *
+                        eigenfunctions[row_j, column] *
+                        common_root
+                    )
+                    j_ops['-'][row, column] += (
+                        eigenfunctions[row_j, row] *
+                        eigenfunctions[column_j, column] *
+                        common_root
+                    )
 
-                transition_probability[row, column] = ((2 * j_ops['z'][row, column] ** 2 +
-                                                        j_ops['+'][row, column] ** 2 +
-                                                        j_ops['-'][row, column] ** 2) / 3)
+                transition_probability[row, column] = (
+                    (2 * j_ops['z'][row, column] ** 2 +
+                     j_ops['+'][row, column] ** 2 +
+                     j_ops['-'][row, column] ** 2) / 3
+                )
                 j_ops['z'][column, row] = j_ops['z'][row, column]
                 j_ops['+'][column, row] = j_ops['-'][row, column]
                 j_ops['-'][column, row] = j_ops['+'][row, column]
@@ -176,7 +218,10 @@ class CEF:
 
         return j_ops, transition_probability
 
-    def get_bolzmann_factor(self, size: int, eigenvalues, temperature=None):
+    def get_bolzmann_factor(self,
+                            size: int,
+                            eigenvalues,
+                            temperature=None):
         """Determines bolzmann_factor at specified temperature."""
         temperature = utils.get_default(temperature, self.temperature)
         thermal = physics.thermodynamics(temperature, eigenvalues)
@@ -187,7 +232,9 @@ class CEF:
             bolzmann_factor = thermal['bolzmann'] / sum(thermal['bolzmann'])
         return bolzmann_factor
 
-    def get_all_peaks(self, temperature=None, magnet_field: dict = None):
+    def get_all_peaks(self,
+                      temperature=None,
+                      magnet_field: dict = None):
         """Determines the peak energies and intensities from the total Hamiltonian."""
         size = self.material.rare_earth.matrix_size
         if magnet_field is None:
@@ -199,14 +246,20 @@ class CEF:
         _, transition_probabilities = self.get_transition_probabilities(eigenfunctions)
         for level_1 in range(size):
             for level_2 in range(size):
-                intensity_of_transition = (transition_probabilities[level_2, level_1] *
-                                           bolzmann_factor[level_1])
+                intensity_of_transition = (
+                    transition_probabilities[level_2, level_1] *
+                    bolzmann_factor[level_1]
+                )
                 if intensity_of_transition > 0:
-                    peaks.append({'energy': eigenvalues[level_2] - eigenvalues[level_1],
-                                  'intensity': intensity_of_transition})
+                    peaks.append({
+                        'energy': eigenvalues[level_2] - eigenvalues[level_1],
+                        'intensity': intensity_of_transition
+                    })
         return peaks
 
-    def get_peaks(self, temperature=None, magnet_field: dict = None):
+    def get_peaks(self,
+                  temperature=None,
+                  magnet_field: dict = None):
         """Returns peaks for non-degenerate levels."""
         result = []
         peaks = self.get_all_peaks(temperature, magnet_field)
@@ -225,21 +278,30 @@ class CEF:
                 peak['energy'] = sum_peaks / peak['intensity']
                 result.append((peak['energy'], peak['intensity']))
         result.sort()
+        intensity_sum = 2 * (self.material.rare_earth.total_momentum_ground *
+                             (self.material.rare_earth.total_momentum_ground + 1)) / 3
+        intensities = [item[1] for item in result]
+        if sum(intensities) != intensity_sum:
+            result[0] = (result[0][0], intensity_sum - sum(intensities[1:]))
+
         return result
 
     def get_energies(self, peaks=None):
         """Returns transition energies"""
         if peaks is None:
             peaks = self.get_peaks()
-        return (peak[0] for peak in peaks)
+        return [peak[0] for peak in peaks]
 
     def get_intensities(self, peaks=None):
         """Returns transition intensities"""
         if peaks is None:
             peaks = self.get_peaks()
-        return (peak[1] for peak in peaks)
+        return [peak[1] for peak in peaks]
 
-    def get_spectrum(self, energies=None, temperature=None, width_dict: dict = None,
+    def get_spectrum(self,
+                     energies=None,
+                     temperature=None,
+                     width_dict: dict = None,
                      magnet_field: dict = None):
         """Calculates the neutron scattering cross section."""
         temperature = utils.get_default(temperature, self.temperature)
@@ -258,30 +320,38 @@ class CEF:
         gamma = width_dict.get('gamma', None)
         for peak in peaks:
             if sigma and not gamma:
-                spectrum += peak[1] * physics.gaussian_normalized(energies,
-                                                                  peak[0],
-                                                                  sigma)
+                spectrum += peak[1] * physics.gaussian_normalized(
+                    energies,
+                    peak[0],
+                    sigma,
+                )
             elif gamma and not sigma:
-                spectrum += peak[1] * physics.lorentzian_normalized(energies,
-                                                                    peak[0],
-                                                                    gamma)
+                spectrum += peak[1] * physics.lorentzian_normalized(
+                    energies,
+                    peak[0],
+                    gamma,
+                )
             elif sigma and gamma:
-                spectrum += peak[1] * physics.pseudo_voigt_normalized(energies,
-                                                                      peak[0],
-                                                                      sigma,
-                                                                      gamma)
+                spectrum += peak[1] * physics.pseudo_voigt_normalized(
+                    energies,
+                    peak[0],
+                    sigma,
+                    gamma,
+                )
 
         spectrum *= 72.65 * self.material.rare_earth.lande_factor ** 2
 
         return spectrum
 
-    def get_moments(self, temperature=None, eigenvalues=None, eigenfunctions=None):
+    def get_moments(self,
+                    temperature=None,
+                    eigenvalues=None,
+                    eigenfunctions=None):
         """Calculates the magnetic moments of the CEF model."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = self.get_eigenvalues_and_eigenfunctions()
         j_ops, _ = self.get_transition_probabilities(eigenfunctions)
         temperature = utils.get_default(temperature, self.temperature)
-        # self.get_peaks(temperature)
         thermal = physics.thermodynamics(temperature, eigenvalues)
         if thermal['temperature'] > 0:
             j_average = {'z': 0, 'x': 0}
@@ -310,7 +380,10 @@ class CEF:
             # magnetic moments are given in units of Bohr magneton
         return j_average, magnetic_moment
 
-    def get_chi(self, temperature=None, eigenvalues=None, eigenfunctions=None):
+    def get_chi(self,
+                temperature=None,
+                eigenvalues=None,
+                eigenfunctions=None):
         """Calculates the susceptibility at a specified temperature."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = self.get_eigenvalues_and_eigenfunctions()
@@ -347,7 +420,10 @@ class CEF:
             chi['van_vleck'][key] = coefficient * chi['van_vleck'][key]
         return chi
 
-    def get_chi_dependence(self, temperatures=None, eigenvalues=None, eigenfunctions=None):
+    def get_chi_dependence(self,
+                           temperatures=None,
+                           eigenvalues=None,
+                           eigenfunctions=None):
         """Calculates the susceptibility at a specified range of temperatures."""
         temperatures = utils.get_default(temperatures,
                                          linspace(1, 300, 300, dtype='float64'))
@@ -355,9 +431,20 @@ class CEF:
             eigenvalues, eigenfunctions = self.get_eigenvalues_and_eigenfunctions()
         temperatures = utils.get_default(temperatures,
                                          linspace(1, 300, 300, dtype='float64'))
-        chi_curie = {'z': None, 'x': None}
-        chi_van_vleck = {'z': None, 'x': None}
-        chi = {'z': None, 'x': None, 'total': None, 'inverse': None}
+        chi_curie = {
+            'z': None,
+            'x': None,
+        }
+        chi_van_vleck = {
+            'z': None,
+            'x': None,
+        }
+        chi = {
+            'z': None,
+            'x': None,
+            'total': None,
+            'inverse': None,
+        }
         for key in ('z', 'x'):
             chi_curie[key] = utils.get_empty_matrix(temperatures.shape)
             chi_van_vleck[key] = utils.get_empty_matrix(temperatures.shape)
@@ -379,17 +466,19 @@ class CEF:
         return chi_curie, chi_van_vleck, chi
 
     def __repr__(self):
-        """Method returns string representation of the object."""
-        return f"{self.__class__.__name__}(material={self.material}!r)"
+        """Method returns string representation of the CEF object."""
+        return get_repr(self, 'material')
 
     def __str__(self):
         """Return a summary of the model parameters.
         This includes the rare earth, the CEF parameters, and,
         if diagonalized, the eigenvalues and eigenfunctions."""
-        output = [self.material.crystal,
-                  f'Rare-earth ion: {self.material.rare_earth.name};',
-                  f'Number of 4f-electrons = {self.number_of_f_electrons};',
-                  f'J = {self.material.rare_earth.total_momentum_ground};']
+        output = [
+            self.material.crystal,
+            f'Rare-earth ion: {self.material.rare_earth.name};',
+            f'Number of 4f-electrons = {self.material.rare_earth.number_of_f_electrons};',
+            f'J = {self.material.rare_earth.total_momentum_ground};',
+        ]
 
         j_average, magnetic_moment = self.get_moments()
 
@@ -426,16 +515,3 @@ class CEF:
                 output.append(f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}')
 
         return '\n'.join(output)
-
-
-if __name__ == '__main__':
-    MATERIAL = Material(rare_earth='Nd', crystal='YNi2')
-    CUBIC_SAMPLE = CEF(MATERIAL)
-    X_PARAMETER = -1
-    W_PARAMETER = 1
-    CUBIC_SAMPLE.parameters['B40'] = W_PARAMETER * X_PARAMETER / 60
-    CUBIC_SAMPLE.parameters['B44'] = 5 * CUBIC_SAMPLE.parameters['B40']
-    CUBIC_SAMPLE.parameters['B60'] = (W_PARAMETER * (1 - abs(X_PARAMETER)) /
-                                      CUBIC_SAMPLE.material.rare_earth.f_6)
-    CUBIC_SAMPLE.parameters['B64'] = -21 * CUBIC_SAMPLE.parameters['B60']
-    print(CUBIC_SAMPLE.parameters)

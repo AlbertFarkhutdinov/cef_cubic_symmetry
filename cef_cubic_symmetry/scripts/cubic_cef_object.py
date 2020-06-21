@@ -2,9 +2,10 @@
 import sys
 from numpy import linspace
 from scripts.cef_object import CEF
-from scripts.common.constants import CrossPoint, Material, RATIOS_NAMES
+from scripts.common.constants import CrossPoint, Material
 from scripts.common.tabular_information import F4
-from scripts.common.utils import get_time_of_execution, OpenedFile, write_row
+from scripts.common.utils import get_time_of_execution, OpenedFile, write_row, get_ratios_names
+from scripts.common.utils import get_repr
 from scripts.common.path_utils import get_paths, remove_if_exists
 
 
@@ -38,14 +39,8 @@ class Cubic(CEF):
         return parameters
 
     def __repr__(self):
-        """Method returns string representation of the object."""
-        return ''.join(
-            [
-                f"{self.__class__.__name__}",
-                f"(material={self.material!r}, ",
-                f"llw_parameters={self.llw_parameters!r}')"
-            ]
-        )
+        """Method returns string representation of the Cubic object."""
+        return get_repr(self, 'material', 'llw_parameters')
 
     def get_one_dot(self):
         """Prints information about RE ion with specified parameters"""
@@ -54,78 +49,87 @@ class Cubic(CEF):
         for i, energy in enumerate(self.get_energies()):
             print(f'E[{i + 1}]:\t{energy: 9.3f} meV')
 
-    @get_time_of_execution
-    def save_energy_dat(self, number_of_intervals: int):
-        """Saves the dependence of transition energies on parameter x to file."""
-        file_name = get_paths(
-            data_name='energies',
+    def get_file_name(self, data_name: str, parameters=None):
+        """Returns file_name for data saving"""
+        parameters = self.llw_parameters if parameters is None else parameters
+        return get_paths(
+            data_name=data_name,
             material=self.material,
-            parameters=self.llw_parameters
+            parameters=parameters,
+        )
+
+    @get_time_of_execution
+    def save_peak_dat(self, number_of_intervals: int, choice=0):
+        """Saves the dependence of transition energies or intensities on parameter x to file."""
+        file_name = self.get_file_name(
+            data_name='energies' if choice == 0 else 'intensities'
         )
         remove_if_exists(file_name)
-        print(f'Saving of energy datafiles will take some time...')
+        print(f'Saving of {"energies" if choice == 0 else "intensities"} '
+              f'datafiles will take some time...')
         with OpenedFile(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
-                energies = self.get_energies()
-                write_row(file, (x_parameter, *energies))
+                row = self.get_energies() if choice == 0 else self.get_intensities()
+                write_row(file, (x_parameter, *row))
 
     @get_time_of_execution
     def save_spectra_with_one_temperature(self, gamma: float, temperature: float):
         """Saves inelastic neutron scattering spectra at specified temperature to file."""
         energies = linspace(-5, 30, 10001)
-        spectrum = self.get_spectrum(energies=energies,
-                                     width_dict={'gamma': gamma},
-                                     temperature=temperature)
-        file_name = get_paths(
+        spectrum = self.get_spectrum(
+            energies=energies,
+            width_dict={'gamma': gamma},
+            temperature=temperature,
+        )
+        file_name = self.get_file_name(
             data_name='spectra',
-            material=self.material,
             parameters={
                 **self.llw_parameters,
                 'gamma': gamma,
                 'T': temperature,
             }
         )
+        remove_if_exists(file_name)
         with OpenedFile(file_name, mode='a') as file:
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
 
-    def save_spectra_with_two_temperatures(self, gamma: float,
-                                           temperature_1: float, temperature_2: float):
-        """Saves inelastic neutron scattering spectra at two specified temperatures to file."""
+    def save_spectra_with_many_temperatures(self,
+                                            gamma: float,
+                                            temperatures):
+        """Saves inelastic neutron scattering spectra
+        at several specified temperatures to file."""
         lines = {}
-        parameters = {**self.llw_parameters, 'gamma': gamma}
-        for temperature in (temperature_1, temperature_2):
+        parameters = {
+            **self.llw_parameters,
+            'gamma': gamma,
+        }
+        data = {
+            'energies': [],
+        }
+        for t_number, temperature in enumerate(temperatures):
+            data[temperature] = []
             parameters['T'] = temperature
-            file_name = get_paths(
+            file_name = self.get_file_name(
                 data_name='spectra',
-                material=self.material,
                 parameters=parameters,
             )
             with OpenedFile(file_name) as file:
                 lines[temperature] = list(file)
 
-        data = {
-            'energies': [],
-            temperature_1: [],
-            temperature_2: [],
-            'diff': [],
-        }
+            for index, line in enumerate(lines[temperature]):
+                row = line.split('\t')
+                if t_number == 0:
+                    data['energies'].append(float(row[0]))
+                data[temperature].append(float(row[1]))
 
-        for index, line in enumerate(lines[temperature_1]):
-            line_1 = line.split('\t')
-            line_2 = lines[temperature_2][index].split('\t')
-            data['energies'].append(float(line_1[0]))
-            data[temperature_1].append(float(line_1[1]))
-            data[temperature_2].append(float(line_2[1]))
-            data['diff'].append(float(line_1[1]) - float(line_2[1]))
-
-        parameters['T'] = f'{temperature_1}-{temperature_2}'
-        file_name = get_paths(
+        del parameters['T']
+        file_name = self.get_file_name(
             data_name='spectra',
-            material=self.material,
             parameters=parameters,
         )
+        remove_if_exists(file_name)
         with OpenedFile(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
                 write_row(file, row=[data[key][index] for key in data])
@@ -135,10 +139,8 @@ class Cubic(CEF):
     def save_susceptibility(self):
         """Saves temperature dependence of magnetic susceptibilities to file."""
         temperatures = linspace(0.1, 100.0, 300)
-        common_file_name = get_paths(
+        common_file_name = self.get_file_name(
             data_name='susceptibilities',
-            material=self.material,
-            parameters=self.llw_parameters,
         )
         chi_curie, chi_van_vleck, chi = self.get_chi_dependence(temperatures)
         for axis in ('z', 'x', 'total'):
@@ -174,30 +176,36 @@ class Cubic(CEF):
                     write_row(file, row)
 
     @get_time_of_execution
-    def get_ratios(self):
+    def get_ratios(self, choice=0):
         """Saves the dependence of transition energies ratio on parameter x to file."""
+        peak_data = 'energies' if choice == 0 else 'intensities'
         levels_number = 7
-        path_args = {
-            'material': self.material,
-            'parameters': {'w': self.llw_parameters['w']},
+        parameters = {
+            'w': self.llw_parameters['w'],
         }
-        ratio_file_name = get_paths(data_name='ratios', **path_args)
-        energy_file_name = get_paths(data_name='energies', **path_args)
+        ratio_file_name = self.get_file_name(
+            data_name=f'ratios_{peak_data}',
+            parameters=parameters
+        )
+        peak_file_name = self.get_file_name(
+            data_name=peak_data,
+            parameters=parameters
+        )
         remove_if_exists(ratio_file_name)
         with OpenedFile(ratio_file_name, mode='a') as ratio_file:
-            with OpenedFile(energy_file_name) as energy_file:
-                for line in energy_file:
+            with OpenedFile(peak_file_name) as peak_file:
+                for line in peak_file:
                     line = line.rstrip('\n')
-                    energies = [float(energy) for energy in line.split('\t')]
-                    for _ in range(len(energies), levels_number):
-                        energies.append(0)
-                    ratios = [energies[0]]
+                    peak_row = [float(energy) for energy in line.split('\t')]
+                    for _ in range(len(peak_row), levels_number):
+                        peak_row.append(0)
+                    ratios = [peak_row[0]]
                     for low in range(1, levels_number):
                         for high in range(low + 1, levels_number):
-                            if energies[low] == 0:
+                            if peak_row[low] == 0:
                                 ratios.append(0)
                             else:
-                                ratios.append(energies[high] / energies[low])
+                                ratios.append(peak_row[high] / peak_row[low])
                     write_row(ratio_file, ratios)
 
     def check_ratios(self, numbers, experimental_value: float, points, accuracy: float):
@@ -206,20 +214,22 @@ class Cubic(CEF):
         ratios = numbers[1:]
         for index, ratio in enumerate(ratios):
             if abs(experimental_value - ratio) < accuracy:
-                current = CrossPoint(rare_earth=self.material.rare_earth.name,
-                                     w=self.llw_parameters['w'],
-                                     x=numbers[0],
-                                     ratio_name=RATIOS_NAMES[index],
-                                     difference=experimental_value - ratio)
+                current = CrossPoint(
+                    rare_earth=self.material.rare_earth.name,
+                    w=self.llw_parameters['w'],
+                    x=numbers[0],
+                    ratio_name=get_ratios_names(0)[index],
+                    difference=experimental_value - ratio,
+                )
                 if not points:
                     points.append(current)
                 else:
                     previous = points[-1]
                     if (
                             current.rare_earth == previous.rare_earth and
-                            current.w == previous.w and
                             current.ratio_name == previous.ratio_name and
-                            abs(current.x - previous.x) < 1e-3
+                            abs(current.w - previous.w) < accuracy and
+                            abs(current.x - previous.x) < accuracy
                     ):
                         current_x = ((current.x * previous.difference -
                                       previous.x * current.difference) /
@@ -229,20 +239,19 @@ class Cubic(CEF):
                                                 w=self.llw_parameters['w'],
                                                 x=current_x,
                                                 difference=0,
-                                                ratio_name=RATIOS_NAMES[index])
+                                                ratio_name=get_ratios_names(0)[index])
                     else:
                         points.append(current)
         return points
 
-    def find_cross(self, experimental_value: float, experimental_energy: float, accuracy=0.003):
+    def find_cross(self, experimental_value: float, experimental_energy: float, accuracy=0.005):
         """Returns points of cross experimental and calculated curves,
         recalculated with correct value of W."""
         points = []
         for w_parameter in (abs(self.llw_parameters['w']), -abs(self.llw_parameters['w'])):
             self.llw_parameters['w'] = w_parameter
-            ratio_file_name = get_paths(
-                data_name='ratios',
-                material=self.material,
+            ratio_file_name = self.get_file_name(
+                data_name='ratios_energies',
                 parameters={'w': w_parameter},
             )
             with OpenedFile(ratio_file_name) as ratio_file:
@@ -256,30 +265,43 @@ class Cubic(CEF):
                             experimental_value=experimental_value,
                             accuracy=accuracy
                         )
-        for point in points:
+        for index, point in enumerate(points):
             self.llw_parameters['x'] = point.x
+            self.llw_parameters['w'] = point.w
             level = int(point.ratio_name[-2]) - 1
             old_energy = self.get_energies()[level]
             new_w = experimental_energy / old_energy
             new_w = -new_w if self.llw_parameters['w'] < 0 else new_w
-            point = CrossPoint(w=new_w,
-                               rare_earth=point.rare_earth,
-                               x=point.x,
-                               difference=point.difference,
-                               ratio_name=point.ratio_name)
-            self.llw_parameters = {'w': point.w, 'x': point.x}
+            points[index] = CrossPoint(
+                w=new_w,
+                rare_earth=point.rare_earth,
+                x=point.x,
+                difference=point.difference,
+                ratio_name=point.ratio_name,
+            )
+            self.llw_parameters = {'w': points[index].w, 'x': points[index].x}
         return points
+
+    @get_time_of_execution
+    def save_intensities(self):
+        """Saves temperature dependence of magnetic susceptibilities to file."""
+        temperatures = linspace(0, 200, 1001)
+        file_name = self.get_file_name(
+            data_name='intensities_on_temperature',
+        )
+        remove_if_exists(file_name)
+        with OpenedFile(file_name, mode='a') as file:
+            for _, temperature in enumerate(temperatures):
+                peaks = self.get_peaks(temperature=temperature)
+                intensities = [peak[1] for peak in peaks if peak[0] >= 0]
+                row = [temperature] + intensities
+                write_row(file, row)
 
 
 if __name__ == '__main__':
-    MATERIAL = Material(crystal='YNi2', rare_earth='Nd')
-    LLW_PARAMETERS = {
-        'w': 1,
-        'x': -1,
-    }
-    CUBIC_SAMPLE = Cubic(
-        material=MATERIAL,
-        llw_parameters=LLW_PARAMETERS
+    print(
+        Cubic(
+            material=Material(rare_earth='Pr', crystal='YNi2'),
+            llw_parameters={'w': -0.505, 'x': -0.107},
+        )
     )
-    for peak in CUBIC_SAMPLE.get_peaks():
-        print(*peak)
