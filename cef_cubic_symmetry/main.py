@@ -1,4 +1,10 @@
-"""The module contains the procedure of CEF parameters defining with spectra saving."""
+"""
+The module contains the procedure of CEF parameters defining
+with spectra saving.
+
+"""
+
+
 from scripts.common.constants import Material
 from scripts.common.utils import get_time_of_execution, get_json_object
 from scripts.cubic_cef_object import Cubic

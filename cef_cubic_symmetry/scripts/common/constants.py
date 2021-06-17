@@ -1,6 +1,13 @@
-"""The module contains some common constants and named_tuples that used in this project."""
+"""
+The module contains some common constants and named_tuples that used
+in this project.
+
+"""
+
+
 from os.path import join, dirname, realpath
 from collections import namedtuple
+
 
 BASE_DIR = dirname(dirname(dirname(realpath(__file__))))
 

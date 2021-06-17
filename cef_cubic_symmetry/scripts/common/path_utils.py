@@ -1,11 +1,23 @@
-"""The module contains functions working with paths to directories used in this project."""
+"""
+The module contains functions working with paths to directories used
+in this project.
+
+"""
+
+
 from os import chdir, mkdir, remove
 from os.path import join, exists, dirname
-from scripts.common.constants import BASE_DIR, Material, DATA_PATHS, GRAPHS_PATHS
+
+
+from scripts.common.constants import (
+    BASE_DIR, Material, DATA_PATHS, GRAPHS_PATHS,
+)
 from scripts.common.utils import get_value_with_sign
 
 
-def check_parent_dirs(path_to_check: str):
+def check_parent_dirs(
+        path_to_check: str,
+):
     """Makes parent directories for argument, if they do not exist."""
     condition = False
     paths = []
@@ -19,8 +31,13 @@ def check_parent_dirs(path_to_check: str):
         mkdir(path)
 
 
-def get_paths(data_name: str, format_name='.dat', is_graph=False,
-              material: Material = None, parameters: dict = None):
+def get_paths(
+        data_name: str,
+        format_name='.dat',
+        is_graph=False,
+        material: Material = None,
+        parameters: dict = None,
+):
     """Returns path of the file that will be saved."""
     chdir(BASE_DIR)
     short_name = ''
@@ -56,7 +73,9 @@ def get_paths(data_name: str, format_name='.dat', is_graph=False,
     return result_path
 
 
-def remove_if_exists(path_to_check: str):
+def remove_if_exists(
+        path_to_check: str,
+):
     """Makes remove file, if it exists."""
     check_parent_dirs(path_to_check)
     if exists(path_to_check):

@@ -1,6 +1,13 @@
-"""The module contains some tabular data that used in this project."""
+"""
+The module contains some tabular data that used in this project.
+
+"""
+
+
 from fractions import Fraction
+
 from scripts.common.constants import Element
+
 
 F4 = 60
 BOHR_MAGNETON = 5.788382e-2  # meV/T
@@ -253,9 +260,13 @@ YTTERBIUM = Element(
 )
 
 RARE_EARTHS = (
-    CERIUM, PRASEODYMIUM, NEODYMIUM, PROMETHIUM, SAMARIUM, EUROPIUM, GADOLINIUM,
-    TERBIUM, DYSPROSIUM, HOLMIUM, ERBIUM, THULIUM, YTTERBIUM
+    CERIUM, PRASEODYMIUM, NEODYMIUM, PROMETHIUM, SAMARIUM, EUROPIUM,
+    GADOLINIUM, TERBIUM, DYSPROSIUM, HOLMIUM, ERBIUM, THULIUM, YTTERBIUM
 )
 
-ACCEPTABLE_RARE_EARTHS = tuple(element.name for element in RARE_EARTHS if element.f_6 != 0)
+ACCEPTABLE_RARE_EARTHS = tuple(
+    element.name
+    for element in RARE_EARTHS
+    if element.f_6 != 0
+)
 RARE_EARTHS_NAMES = [element.name for element in RARE_EARTHS]

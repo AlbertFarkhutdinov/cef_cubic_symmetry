@@ -1,6 +1,9 @@
 """The module contains Experiment class."""
+
+
 import os
 from copy import deepcopy
+
 from scripts.common.constants import DATA_PATHS, Material, Data, Scale
 from scripts.common.fitting_utils import get_data_from_file
 from scripts.common.utils import get_repr
@@ -18,7 +21,9 @@ class Experiment:
         """Initialization of class Experiment"""
         self.material = material
         self.experimental_energies = experimental_energies
-        self.experimental_ratio = experimental_energies[1] / experimental_energies[0]
+        self.experimental_ratio = (
+                experimental_energies[1] / experimental_energies[0]
+        )
         self.temperatures = temperatures
         self.cubic_object = Cubic(
             material=self.material,
@@ -45,9 +50,11 @@ class Experiment:
             ticks=ticks,
         )
 
-    def _get_spectrum_experiment(self,
-                                 spectrometer: str,
-                                 initial_energy: float):
+    def _get_spectrum_experiment(
+            self,
+            spectrometer: str,
+            initial_energy: float,
+    ):
         """Method returns data for experimental spectra"""
         data = []
         _temperatures = []
@@ -57,7 +64,8 @@ class Experiment:
                     get_data_from_file(
                         os.path.join(
                             DATA_PATHS['experiment'],
-                            f'{self.material.crystal}_{self.material.rare_earth}',
+                            f'{self.material.crystal}_'
+                            f'{self.material.rare_earth}',
                             '_'.join(
                                 [spectrometer,
                                  self.material.rare_earth,
@@ -116,17 +124,20 @@ class Experiment:
                     data[0]['y'][_index] - data[index + 1]['y'][_index]
                 )
                 result['errors'].append(
-                    data[0]['errors'][_index] + data[index + 1]['errors'][_index]
+                    data[0]['errors'][_index]
+                    + data[index + 1]['errors'][_index]
                 )
             differences.append(f'{_temperatures[0]} K - {_temperature}')
             diff_data.append(result)
         return diff_data, differences
 
-    def get_spectrum_differences(self,
-                                 limits: dict,
-                                 locators: dict,
-                                 spectrometer: str,
-                                 initial_energy: float):
+    def get_spectrum_differences(
+            self,
+            limits: dict,
+            locators: dict,
+            spectrometer: str,
+            initial_energy: float,
+    ):
         """Method saves the plot for experimental spectrum"""
         diff_data, differences = self._get_spectrum_differences(
             spectrometer=spectrometer,
@@ -152,23 +163,32 @@ class Experiment:
         )
         print('Cross points:')
         for point in crosses:
-            print(f'w = {point.w : 6.3f};\tx = {point.x : .3f}; Ratio: {point.ratio_name}')
+            print(
+                f'w = {point.w : 6.3f};\tx = {point.x : .3f}; '
+                f'Ratio: {point.ratio_name}'
+            )
         return crosses
 
     def get_intensity_on_temperature(self, crosses, y_max: float):
-        """Method saves the plot for dependence of transition intensities on temperature"""
+        """
+        Method saves the plot for dependence
+        of transition intensities on temperature.
+
+        """
         gg.get_intensity_on_temperature(
             material=self.material,
             crosses=crosses,
             y_max=y_max,
         )
 
-    def get_spectrum_theory(self,
-                            recalculated_crosses,
-                            limits: dict,
-                            locators: dict,
-                            gamma=0.16):
-        """Method saves the plot for theoretical spectrum"""
+    def get_spectrum_theory(
+            self,
+            recalculated_crosses,
+            limits: dict,
+            locators: dict,
+            gamma=0.16,
+    ):
+        """Method saves the plot for theoretical spectrum."""
         for point in recalculated_crosses:
             self.cubic_object.llw_parameters = {
                 'w': point.w,

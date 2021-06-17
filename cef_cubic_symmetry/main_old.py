@@ -1,4 +1,6 @@
 """The module contains the console manager for work with project."""
+
+
 from scripts.common.constants import BASE_DIR, Material
 from scripts.common.utils import check_input
 from scripts.cubic_cef_object import Cubic
@@ -52,10 +54,12 @@ def main():
             print(
                 '\nList of available commands:',
                 'get_object - prints CEF-object for values inputted by user.',
-                'get_one_dot - prints energy transfers for values inputted by user.',
+                'get_one_dot - prints energy transfers for values inputted '
+                'by user.',
                 'save_parameters - saves parameters of CEF to '
                 '.cgf-file for values inputted by user.',
-                'load_data - loads CEF-parameters from .cfg-file for values inputted by user.',
+                'load_data - loads CEF-parameters from .cfg-file for values '
+                'inputted by user.',
                 'save_peak_dat - saves dependence of energy transfer '
                 'on x-parameter of CEF to .dat-file for values '
                 'inputted by user.',
@@ -68,7 +72,10 @@ def main():
         elif command == 'exit':
             break
         else:
-            print("If you don't know, which commands can be inputted, enter 'help'")
+            print(
+                "If you don't know, which commands can be inputted, "
+                "enter 'help'"
+            )
 
 
 if __name__ == '__main__':

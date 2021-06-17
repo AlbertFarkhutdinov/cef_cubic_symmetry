@@ -6,3 +6,4 @@ datafiles/parameters
 datafiles/spectra
 datafiles/susceptibilities
 bugs
+venv/

@@ -1,24 +1,43 @@
-"""The module contains class for CEF with cubic symmetry."""
+"""
+The module contains class for CEF with cubic symmetry.
+
+"""
+
+
 import sys
+
 from numpy import linspace
+
 from scripts.cef_object import CEF
 from scripts.common.constants import CrossPoint, Material
 from scripts.common.tabular_information import F4
-from scripts.common.utils import get_time_of_execution, OpenedFile, write_row, get_ratios_names
+from scripts.common.utils import (
+    get_time_of_execution,
+    OpenedFile,
+    write_row,
+    get_ratios_names,
+)
 from scripts.common.utils import get_repr
 from scripts.common.path_utils import get_paths, remove_if_exists
 
 
 class Cubic(CEF):
-    """Class defining the trivalent rare earth compound in crystal with cubic symmetry,
+    """
+    Class defining the trivalent rare earth compound in crystal
+    with cubic symmetry,
     its crystal field parameters and the eigenvalues and eigenfunctions
-    of the CEF Hamiltonian, if it is already diagonalized."""
+    of the CEF Hamiltonian, if it is already diagonalized.
+
+    """
 
     def __init__(self, material: Material, llw_parameters: dict):
         """Initializes the Cubic object or read it from a file."""
         super().__init__(material=material)
         if self.material.rare_earth.name in ['Ce', 'Sm', 'Eu']:
-            print(f"The element '{self.material.rare_earth.name}' is not supported.")
+            print(
+                f"The element '{self.material.rare_earth.name}' "
+                f"is not supported."
+            )
             sys.exit(1)
         else:
             self.llw_parameters = llw_parameters
@@ -28,7 +47,9 @@ class Cubic(CEF):
         """CEF parameters"""
         parameters = super().parameters
         try:
-            parameters['B40'] = self.llw_parameters['w'] * self.llw_parameters['x'] / F4
+            parameters['B40'] = (
+                    self.llw_parameters['w'] * self.llw_parameters['x'] / F4
+            )
             parameters['B44'] = 5 * parameters['B40']
             parameters['B60'] = (self.llw_parameters['w'] *
                                  (1 - abs(self.llw_parameters['x'])) /
@@ -60,7 +81,11 @@ class Cubic(CEF):
 
     @get_time_of_execution
     def save_peak_dat(self, number_of_intervals: int, choice=0):
-        """Saves the dependence of transition energies or intensities on parameter x to file."""
+        """
+        Saves the dependence of transition energies
+        or intensities on parameter x to file.
+
+        """
         file_name = self.get_file_name(
             data_name='energies' if choice == 0 else 'intensities'
         )
@@ -70,12 +95,24 @@ class Cubic(CEF):
         with OpenedFile(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
-                row = self.get_energies() if choice == 0 else self.get_intensities()
+                row = (
+                    self.get_energies()
+                    if choice == 0
+                    else self.get_intensities()
+                )
                 write_row(file, (x_parameter, *row))
 
     @get_time_of_execution
-    def save_spectra_with_one_temperature(self, gamma: float, temperature: float):
-        """Saves inelastic neutron scattering spectra at specified temperature to file."""
+    def save_spectra_with_one_temperature(
+            self,
+            gamma: float,
+            temperature: float,
+    ):
+        """
+        Saves inelastic neutron scattering spectra
+        at specified temperature to file.
+
+        """
         energies = linspace(-5, 30, 10001)
         spectrum = self.get_spectrum(
             energies=energies,
@@ -95,11 +132,16 @@ class Cubic(CEF):
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
 
-    def save_spectra_with_many_temperatures(self,
-                                            gamma: float,
-                                            temperatures):
-        """Saves inelastic neutron scattering spectra
-        at several specified temperatures to file."""
+    def save_spectra_with_many_temperatures(
+            self,
+            gamma: float,
+            temperatures,
+    ):
+        """
+        Saves inelastic neutron scattering spectra
+        at several specified temperatures to file.
+
+        """
         lines = {}
         parameters = {
             **self.llw_parameters,
@@ -137,7 +179,10 @@ class Cubic(CEF):
 
     @get_time_of_execution
     def save_susceptibility(self):
-        """Saves temperature dependence of magnetic susceptibilities to file."""
+        """
+        Saves temperature dependence of magnetic susceptibilities to file.
+
+        """
         temperatures = linspace(0.1, 100.0, 300)
         common_file_name = self.get_file_name(
             data_name='susceptibilities',
@@ -177,7 +222,10 @@ class Cubic(CEF):
 
     @get_time_of_execution
     def get_ratios(self, choice=0):
-        """Saves the dependence of transition energies ratio on parameter x to file."""
+        """
+        Saves the dependence of transition energies ratio on parameter x to file.
+
+        """
         peak_data = 'energies' if choice == 0 else 'intensities'
         levels_number = 7
         parameters = {
@@ -208,9 +256,18 @@ class Cubic(CEF):
                                 ratios.append(peak_row[high] / peak_row[low])
                     write_row(ratio_file, ratios)
 
-    def check_ratios(self, numbers, experimental_value: float, points, accuracy: float):
-        """Checks the array of ratios
-        if one of them is approximately equal to the given value."""
+    def check_ratios(
+            self,
+            numbers,
+            experimental_value: float,
+            points,
+            accuracy: float,
+    ):
+        """
+        Checks the array of ratios
+        if one of them is approximately equal to the given value.
+
+        """
         ratios = numbers[1:]
         for index, ratio in enumerate(ratios):
             if abs(experimental_value - ratio) < accuracy:
@@ -235,20 +292,30 @@ class Cubic(CEF):
                                       previous.x * current.difference) /
                                      (previous.difference - current.difference)
                                      )
-                        points[-1] = CrossPoint(rare_earth=self.material.rare_earth.name,
-                                                w=self.llw_parameters['w'],
-                                                x=current_x,
-                                                difference=0,
-                                                ratio_name=get_ratios_names(0)[index])
+                        points[-1] = CrossPoint(
+                            rare_earth=self.material.rare_earth.name,
+                            w=self.llw_parameters['w'],
+                            x=current_x,
+                            difference=0,
+                            ratio_name=get_ratios_names(0)[index],
+                        )
                     else:
                         points.append(current)
         return points
 
-    def find_cross(self, experimental_value: float, experimental_energy: float, accuracy=0.005):
+    def find_cross(
+            self,
+            experimental_value: float,
+            experimental_energy: float,
+            accuracy=0.005,
+    ):
         """Returns points of cross experimental and calculated curves,
         recalculated with correct value of W."""
         points = []
-        for w_parameter in (abs(self.llw_parameters['w']), -abs(self.llw_parameters['w'])):
+        for w_parameter in (
+                abs(self.llw_parameters['w']),
+                -abs(self.llw_parameters['w']),
+        ):
             self.llw_parameters['w'] = w_parameter
             ratio_file_name = self.get_file_name(
                 data_name='ratios_energies',
@@ -258,7 +325,10 @@ class Cubic(CEF):
                 for line in ratio_file:
                     line = line.rstrip('\n')
                     numbers = [float(number) for number in line.split('\t')]
-                    if any(abs(experimental_value - value) < accuracy for value in numbers[1:]):
+                    if any(
+                            abs(experimental_value - value) < accuracy
+                            for value in numbers[1:]
+                    ):
                         points = self.check_ratios(
                             numbers=numbers,
                             points=points,
@@ -284,7 +354,10 @@ class Cubic(CEF):
 
     @get_time_of_execution
     def save_intensities(self):
-        """Saves temperature dependence of magnetic susceptibilities to file."""
+        """
+        Saves temperature dependence of magnetic susceptibilities to file.
+
+        """
         temperatures = linspace(0, 200, 1001)
         file_name = self.get_file_name(
             data_name='intensities_on_temperature',

@@ -1,15 +1,24 @@
-"""This module contains fitting Lorentz function to experimental data"""
+"""
+This module contains fitting Lorentz function to experimental data.
+
+"""
+
+
 import sys
+
 import numpy as np
 from numpy.random import rand
 from scipy.optimize import curve_fit
+
 from scripts.common.constants import PM, INFINITY, Data
 from scripts.common.physics import multi_lorentzian, multi_gaussian
 from scripts.common.utils import OpenedFile
 from scripts.plot_objects import CustomPlot
 
 
-def get_data_from_file(file_name: str):
+def get_data_from_file(
+        file_name: str,
+):
     """Returns three arrays (x, y, error) from file"""
     experimental_data = {
         'x': [],
@@ -24,7 +33,11 @@ def get_data_from_file(file_name: str):
     return experimental_data
 
 
-def filtered_data(data: dict, min_value=-INFINITY, max_value=INFINITY):
+def filtered_data(
+        data: dict,
+        min_value=-INFINITY,
+        max_value=INFINITY,
+):
     """Returns filtered data"""
     rows = [
         (i, j, k)
@@ -37,7 +50,11 @@ def filtered_data(data: dict, min_value=-INFINITY, max_value=INFINITY):
     return result
 
 
-def print_peak_parameters(function, values, errors=None):
+def print_peak_parameters(
+        function,
+        values,
+        errors=None,
+):
     """Prints parameters of peak"""
     result = f'Function name: {function.__name__}\n'
     for index, value in enumerate(values):
@@ -48,7 +65,13 @@ def print_peak_parameters(function, values, errors=None):
     print(result)
 
 
-def fitting(function, data: dict, parameters, min_value: float, max_value: float):
+def fitting(
+        function,
+        data: dict,
+        parameters,
+        min_value: float,
+        max_value: float,
+):
     """Returns parameters of function fitted to data with one peak"""
     data = filtered_data(data, min_value, max_value)
     p_opt, p_cov = curve_fit(
@@ -61,8 +84,13 @@ def fitting(function, data: dict, parameters, min_value: float, max_value: float
     return p_opt, p_err
 
 
-def multi_peak_fitting(function_name: str, data: dict, parameters,
-                       min_value: float, max_value: float):
+def multi_peak_fitting(
+        function_name: str,
+        data: dict,
+        parameters,
+        min_value: float,
+        max_value: float,
+):
     """Returns parameters of function fitted to data
     with several peaks (lorentzian or gaussian)"""
     function = (multi_lorentzian
@@ -78,7 +106,8 @@ def multi_peak_fitting(function_name: str, data: dict, parameters,
             data=data,
             parameters=parameters,
             min_value=min_value,
-            max_value=max_value)
+            max_value=max_value,
+        )
         return p_opt, p_err
 
 

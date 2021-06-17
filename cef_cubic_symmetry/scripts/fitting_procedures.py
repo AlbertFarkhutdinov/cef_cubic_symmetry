@@ -1,14 +1,22 @@
-"""This module contains fitting Lorentz function to experimental data"""
+"""This module contains fitting Lorentz function to experimental data."""
+
+
 from os.path import join
+
 from scripts.plot_objects import CustomPlot
 from scripts.common.constants import DATA_PATHS, Data
 from scripts.common.physics import gaussian, multi_lorentzian
 import scripts.common.fitting_utils as fu
 
 
-def multi_lorentzian_with_gauss(arg: float, center: float, width: float,
-                                amplitude: float, *parameters):
-    """Returns value of multi_peak function for lorentzian"""
+def multi_lorentzian_with_gauss(
+        arg: float,
+        center: float,
+        width: float,
+        amplitude: float,
+        *parameters,
+):
+    """Returns value of multi_peak function for lorentzian."""
     return (gaussian(arg, center, width, amplitude) +
             multi_lorentzian(arg, *parameters))
 

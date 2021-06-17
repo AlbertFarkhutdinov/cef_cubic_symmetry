@@ -1,7 +1,11 @@
 """The module contains functions for plotting graphs."""
+
+
 from collections import OrderedDict
+
 import matplotlib.pyplot as plt
 from cycler import cycler
+
 from scripts.common import constants as con
 from scripts.common import utils as ut
 from scripts.common.path_utils import get_paths
@@ -211,7 +215,9 @@ def get_llw_plot(material: con.Material,
         }
         for level in range(1, 7):
             data['y_set'][ut.get_label(level, choice)] = []
-            data['legend'][ut.get_label(level, choice)] = ut.get_label(level, choice)
+            data['legend'][ut.get_label(level, choice)] = ut.get_label(
+                level, choice
+            )
 
         parameters = {'w': w_parameter}
         peak_file_name = get_paths(
@@ -229,7 +235,9 @@ def get_llw_plot(material: con.Material,
                         data['y_set'][
                             ut.get_label(level, choice)
                         ].append(
-                            con.INFINITY if ((choice != 0) and (level == 1)) else array[level]
+                            con.INFINITY
+                            if ((choice != 0) and (level == 1))
+                            else array[level]
                         )
                     except IndexError:
                         data['y_set'][
@@ -395,10 +403,15 @@ def get_spectrum_experiment(material: con.Material,
         )
 
 
-def get_intensity_on_temperature(material: con.Material,
-                                 crosses: con.CrossPoint,
-                                 y_max: float):
-    """Returns graphs for dependence of transition intensities on temperature"""
+def get_intensity_on_temperature(
+        material: con.Material,
+        crosses: con.CrossPoint,
+        y_max: float,
+):
+    """
+    Returns graphs for dependence of transition intensities on temperature.
+
+    """
     data_kwargs = {
         'x': [],
         'y_set': OrderedDict(),

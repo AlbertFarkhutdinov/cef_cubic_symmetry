@@ -1,8 +1,15 @@
-"""The module contains some common functions that used in this project."""
+"""
+The module contains some common functions that used in this project.
+
+"""
+
+
+from datetime import datetime
 from json import load
 from os.path import join
-from datetime import datetime
+
 from numpy import zeros
+
 from scripts.common.tabular_information import ACCEPTABLE_RARE_EARTHS
 from scripts.common.constants import INFINITY, JSON_DIR
 
@@ -41,7 +48,10 @@ def check_input(choice: str):
     condition = False
     while not condition:
         if choice == 'rare':
-            request = f'Input the name of RE ion ({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
+            request = (
+                f'Input the name of RE ion '
+                f'({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
+            )
             result = input(request).capitalize()
             condition = (result in ACCEPTABLE_RARE_EARTHS)
         try:
