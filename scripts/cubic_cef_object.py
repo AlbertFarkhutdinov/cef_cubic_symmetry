@@ -51,9 +51,11 @@ class Cubic(CEF):
                     self.llw_parameters['w'] * self.llw_parameters['x'] / F4
             )
             parameters['B44'] = 5 * parameters['B40']
-            parameters['B60'] = (self.llw_parameters['w'] *
-                                 (1 - abs(self.llw_parameters['x'])) /
-                                 self.material.rare_earth.f_6)
+            parameters['B60'] = (
+                    self.llw_parameters['w']
+                    * (1 - abs(self.llw_parameters['x']))
+                    / self.material.rare_earth.f_6
+            )
             parameters['B64'] = -21 * parameters['B60']
         except KeyError:
             pass
@@ -90,8 +92,10 @@ class Cubic(CEF):
             data_name='energies' if choice == 0 else 'intensities'
         )
         remove_if_exists(file_name)
-        print(f'Saving of {"energies" if choice == 0 else "intensities"} '
-              f'datafiles will take some time...')
+        print(
+            f'Saving of {"energies" if choice == 0 else "intensities"} '
+            f'datafiles will take some time...'
+        )
         with OpenedFile(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
@@ -223,7 +227,8 @@ class Cubic(CEF):
     @get_time_of_execution
     def get_ratios(self, choice=0):
         """
-        Saves the dependence of transition energies ratio on parameter x to file.
+        Saves the dependence of transition energies ratio
+        on parameter x to file.
 
         """
         peak_data = 'energies' if choice == 0 else 'intensities'
