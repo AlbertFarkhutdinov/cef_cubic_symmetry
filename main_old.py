@@ -1,8 +1,8 @@
 """The module contains the console manager for work with project."""
 
 
-from scripts.common.constants import BASE_DIR, Material
-from scripts.common.utils import check_input
+from common.constants import BASE_DIR, Material
+from common.utils import check_input
 from scripts.cubic_cef_object import Cubic
 
 
@@ -22,7 +22,7 @@ def main():
             kwargs['material'] = Material(
                 crystal=crystal,
                 rare_earth=rare_earth
-            ),
+            )
             kwargs['llw_parameters'] = {
                 'w': check_input('w'),
             }

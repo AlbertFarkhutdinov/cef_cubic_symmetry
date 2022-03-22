@@ -5,8 +5,8 @@ with spectra saving.
 """
 
 
-from scripts.common.constants import Material
-from scripts.common.utils import get_time_of_execution, get_json_object
+from common.constants import Material
+from common.utils import get_time_of_execution, get_json_object
 from scripts.cubic_cef_object import Cubic
 from scripts.experiment_object import Experiment
 from scripts import plot_objects as gg

@@ -9,10 +9,10 @@ from os import chdir, mkdir, remove
 from os.path import join, exists, dirname
 
 
-from scripts.common.constants import (
+from common.constants import (
     BASE_DIR, Material, DATA_PATHS, GRAPHS_PATHS,
 )
-from scripts.common.utils import get_value_with_sign
+from common.utils import get_value_with_sign
 
 
 def check_parent_dirs(

@@ -6,9 +6,8 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 from cycler import cycler
 
-from scripts.common import constants as con
-from scripts.common import utils as ut
-from scripts.common.path_utils import get_paths
+from common import constants as con, utils as ut
+from common.path_utils import get_paths
 from scripts.cubic_cef_object import Cubic
 
 

@@ -9,9 +9,9 @@ from os.path import join, dirname, realpath
 from collections import namedtuple
 
 
-BASE_DIR = dirname(dirname(dirname(realpath(__file__))))
+BASE_DIR = dirname(dirname(realpath(__file__)))
 
-DATAFILES_DIR = join(BASE_DIR, 'datafiles')
+DATAFILES_DIR = join(BASE_DIR, 'data')
 GRAPHS_DIR = join(BASE_DIR, 'graphs')
 JSON_DIR = join(BASE_DIR, 'json')
 

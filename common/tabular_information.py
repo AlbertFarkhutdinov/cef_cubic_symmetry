@@ -6,7 +6,7 @@ The module contains some tabular data that used in this project.
 
 from fractions import Fraction
 
-from scripts.common.constants import Element
+from common.constants import Element
 
 
 F4 = 60

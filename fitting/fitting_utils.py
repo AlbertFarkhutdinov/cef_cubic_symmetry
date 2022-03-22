@@ -10,9 +10,9 @@ import numpy as np
 from numpy.random import rand
 from scipy.optimize import curve_fit
 
-from scripts.common.constants import PM, INFINITY, Data
-from scripts.common.physics import multi_lorentzian, multi_gaussian
-from scripts.common.utils import OpenedFile
+from common.constants import PM, INFINITY, Data
+from common.physics import multi_lorentzian, multi_gaussian
+from common.utils import OpenedFile
 from scripts.plot_objects import CustomPlot
 
 

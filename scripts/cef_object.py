@@ -6,16 +6,15 @@ from json import dump, load
 from numpy import linspace, sqrt
 from scipy.linalg import eigh
 
-from scripts.common import utils
-from scripts.common import physics
-from scripts.common.tabular_information import (
+from common import utils, physics
+from common.tabular_information import (
     BOHR_MAGNETON,
     RARE_EARTHS,
     RARE_EARTHS_NAMES,
 )
-from scripts.common.path_utils import get_paths
-from scripts.common.utils import OpenedFile, get_repr
-from scripts.common.constants import Material
+from common.path_utils import get_paths
+from common.utils import OpenedFile, get_repr
+from common.constants import Material
 
 
 class CEF:
@@ -90,8 +89,8 @@ class CEF:
             mqn_1 = [(row - j) ** i for i in range(5)]
             for key in ('20', '40', '60'):
                 hamiltonian[row, row] += (
-                    parameters[f'B{key}'] *
-                    physics.steven_operators(
+                        parameters[f'B{key}'] *
+                        physics.steven_operators(
                         f'o{key}',
                         squared_j,
                         mqn_1,
@@ -102,8 +101,8 @@ class CEF:
                 for key in ('22', '42', '62', '43', '63', '44', '64', '66'):
                     if key[-1] == str(degree):
                         hamiltonian[row, row + degree] += (
-                            parameters[f'B{key}'] *
-                            physics.steven_operators(
+                                parameters[f'B{key}'] *
+                                physics.steven_operators(
                                 f'o{key}',
                                 squared_j,
                                 mqn_1,
@@ -449,7 +448,8 @@ class CEF:
         for row in range(eigenvalues.size):
             for column in range(eigenvalues.size):
                 j_ops_square = {
-                    key: j_ops[key][row, column] ** 2 for key in j_ops
+                    key: val[row, column] ** 2
+                    for key, val in j_ops.items()
                 }
                 row_value = eigenvalues[row]
                 column_value = eigenvalues[column]

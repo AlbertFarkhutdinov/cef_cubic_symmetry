@@ -10,8 +10,8 @@ from os.path import join
 
 from numpy import zeros
 
-from scripts.common.tabular_information import ACCEPTABLE_RARE_EARTHS
-from scripts.common.constants import INFINITY, JSON_DIR
+from common.tabular_information import ACCEPTABLE_RARE_EARTHS
+from common.constants import INFINITY, JSON_DIR
 
 
 def get_sign(value: float):

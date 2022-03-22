@@ -4,9 +4,9 @@
 from os.path import join
 
 from scripts.plot_objects import CustomPlot
-from scripts.common.constants import DATA_PATHS, Data
-from scripts.common.physics import gaussian, multi_lorentzian
-import scripts.common.fitting_utils as fu
+from common.constants import DATA_PATHS, Data
+from common.physics import gaussian, multi_lorentzian
+import fitting.fitting_utils as fu
 
 
 def multi_lorentzian_with_gauss(
@@ -81,8 +81,8 @@ if __name__ == '__main__':
         #     y_max=5000,
         # )
         plot.set_labels(
-            x_label='x_test',
-            y_label='y_test',
+            xlabel='x_test',
+            ylabel='y_test',
             title='test',
         )
         # plot.set_locators()

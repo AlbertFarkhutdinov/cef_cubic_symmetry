@@ -1,5 +1,5 @@
-from scripts.common.tabular_information import Element
-from scripts.common.tabular_information import RARE_EARTHS, RARE_EARTHS_NAMES
+from common.tabular_information import Element
+from common.tabular_information import RARE_EARTHS, RARE_EARTHS_NAMES
 
 
 class Material:

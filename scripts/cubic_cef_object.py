@@ -9,16 +9,16 @@ import sys
 from numpy import linspace
 
 from scripts.cef_object import CEF
-from scripts.common.constants import CrossPoint, Material
-from scripts.common.tabular_information import F4
-from scripts.common.utils import (
+from common.constants import CrossPoint, Material
+from common.tabular_information import F4
+from common.utils import (
     get_time_of_execution,
     OpenedFile,
     write_row,
     get_ratios_names,
 )
-from scripts.common.utils import get_repr
-from scripts.common.path_utils import get_paths, remove_if_exists
+from common.utils import get_repr
+from common.path_utils import get_paths, remove_if_exists
 
 
 class Cubic(CEF):
@@ -178,7 +178,7 @@ class Cubic(CEF):
         remove_if_exists(file_name)
         with OpenedFile(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
-                write_row(file, row=[data[key][index] for key in data])
+                write_row(file, row=[val[index] for key, val in data.items()])
         return data
 
     @get_time_of_execution
