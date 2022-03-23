@@ -1,6 +1,8 @@
 """The module contains class for graphs plotting."""
 
 
+from typing import Optional
+
 import matplotlib.pyplot as plt
 from cycler import cycler
 
@@ -13,14 +15,13 @@ class CustomPlot:
     @staticmethod
     def _set_plot_parameters():
         """Setting of rcParams"""
-        custom_parameters = ut.get_json_object('plot_parameters.json')
-        custom_parameters['axes.prop_cycle'] = (
-                cycler(color=custom_parameters['axes.prop_cycle']['color'])
-                + cycler(linestyle=custom_parameters['axes.prop_cycle']['linestyle'])
+        plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
+        prop_cycle = 'axes.prop_cycle'
+        plt.rcParams[prop_cycle] = (
+                cycler(color=plt.rcParams[prop_cycle]['color'])
+                + cycler(linestyle=plt.rcParams[prop_cycle]['linestyle'])
         )
-        custom_parameters['figure.figsize'] = [i / 2.54 for i in (10, 10)]
-        for _key, _value in custom_parameters.items():
-            plt.rcParams[_key] = _value
+        plt.rcParams['figure.figsize'] = [i / 2.54 for i in (10, 10)]
         tick_parameters = {
             'direction': 'in',
             'major.pad': 3,
@@ -51,23 +52,21 @@ class CustomPlot:
 
     def set_labels(
             self,
-            xlabel='x',
-            ylabel='y',
-            title=None,
+            x_label: Optional[str] = None,
+            y_label: Optional[str] = None,
+            title: Optional[str] = None,
     ):
         """Sets labels of axis and plot"""
-        args = locals()
-        del args['self']
-        if self._ax:
-            for _key, _value in args.items():
-                self._ax.__getattribute__(f'set_{_key}')(_value)
+        self._ax.set_xlabel = x_label
+        self._ax.set_ylabel = y_label
+        self._ax.set_title = title
 
     def set_limits(
             self,
-            x_min=None,
-            x_max=None,
-            y_min=None,
-            y_max=None,
+            x_min: Optional[float] = None,
+            x_max: Optional[float] = None,
+            y_min: Optional[float] = None,
+            y_max: Optional[float] = None,
     ):
         """Sets limits of x and y intervals"""
         y_set = self.data.y_set.values()
@@ -78,7 +77,7 @@ class CustomPlot:
             'y_max': (y_max, max((max(value) for value in y_set))),
         }
         for _key, _value in _limits.items():
-            self.limits[_key] = ut.get_default(*_value)
+            self.limits[_key] = _value[0] or _value[1]
         if self._ax:
             for axis in ('x', 'y'):
                 axis_limits = {
@@ -96,19 +95,10 @@ class CustomPlot:
     ):
         """Sets major and minor ticks for plot"""
         majors = (
-            ut.get_default(
-                x_major,
-                (self.limits['x_max'] - self.limits['x_min']) // 5,
-            ),
-            ut.get_default(
-                y_major,
-                (self.limits['y_max'] - self.limits['y_min']) // 5,
-            )
+            x_major or (self.limits['x_max'] - self.limits['x_min']) // 5,
+            y_major or (self.limits['y_max'] - self.limits['y_min']) // 5,
         )
-        minors = (
-            ut.get_default(x_minor, majors[0] / 5),
-            ut.get_default(y_minor, majors[1] / 5)
-        )
+        minors = (x_minor or majors[0] / 5, y_minor or majors[1] / 5)
         if self._ax:
             for i, axis in enumerate((self._ax.xaxis, self._ax.yaxis)):
                 axis.set_major_locator(plt.MultipleLocator(majors[i]))

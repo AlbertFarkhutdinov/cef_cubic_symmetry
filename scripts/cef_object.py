@@ -237,7 +237,7 @@ class CEF:
             temperature=None,
     ):
         """Determines bolzmann_factor at specified temperature."""
-        temperature = utils.get_default(temperature, self.temperature)
+        temperature = utils.get_default(temperature or self.temperature)
         thermal = physics.thermodynamics(temperature, eigenvalues)
         bolzmann_factor = utils.get_empty_matrix(size, dimension=1)
         if thermal['temperature'] <= 0:
