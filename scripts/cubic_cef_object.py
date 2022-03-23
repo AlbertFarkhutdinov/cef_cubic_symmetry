@@ -18,7 +18,7 @@ from common.utils import (
     get_ratios_names,
 )
 from common.utils import get_repr
-from common.path_utils import get_paths, remove_if_exists
+from common.path_utils import get_paths, PathProcessor
 
 
 class Cubic(CEF):
@@ -91,7 +91,7 @@ class Cubic(CEF):
         file_name = self.get_file_name(
             data_name='energies' if choice == 0 else 'intensities'
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         print(
             f'Saving of {"energies" if choice == 0 else "intensities"} '
             f'datafiles will take some time...'
@@ -131,7 +131,7 @@ class Cubic(CEF):
                 'T': temperature,
             }
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
@@ -175,7 +175,7 @@ class Cubic(CEF):
             data_name='spectra',
             parameters=parameters,
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
                 write_row(file, row=[val[index] for key, val in data.items()])
@@ -194,7 +194,7 @@ class Cubic(CEF):
         chi_curie, chi_van_vleck, chi = self.get_chi_dependence(temperatures)
         for axis in ('z', 'x', 'total'):
             file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
-            remove_if_exists(file_name)
+            PathProcessor(file_name).remove_if_exists()
             with OpenedFile(file_name, mode='a') as file:
                 row = ['T(Kelvin)']
                 if axis in ('z', 'x'):
@@ -244,7 +244,7 @@ class Cubic(CEF):
             data_name=peak_data,
             parameters=parameters
         )
-        remove_if_exists(ratio_file_name)
+        PathProcessor(ratio_file_name).remove_if_exists()
         with OpenedFile(ratio_file_name, mode='a') as ratio_file:
             with OpenedFile(peak_file_name) as peak_file:
                 for line in peak_file:
@@ -367,7 +367,7 @@ class Cubic(CEF):
         file_name = self.get_file_name(
             data_name='intensities_on_temperature',
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for _, temperature in enumerate(temperatures):
                 peaks = self.get_peaks(temperature=temperature)

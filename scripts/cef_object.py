@@ -7,11 +7,7 @@ from numpy import linspace, sqrt
 from scipy.linalg import eigh
 
 from common import utils, physics
-from common.tabular_information import (
-    BOHR_MAGNETON,
-    RARE_EARTHS,
-    RARE_EARTHS_NAMES,
-)
+from common.tabular_information import BOHR_MAGNETON
 from common.path_utils import get_paths
 from common.utils import OpenedFile, get_repr
 from common.constants import Material
@@ -37,14 +33,6 @@ class CEF:
             material=self.material,
         )
         self.magnet_field = {'z': 0, 'x': 0}
-        self.material = Material(
-            crystal=self.material.crystal,
-            rare_earth=RARE_EARTHS[
-                RARE_EARTHS_NAMES.index(
-                    self.material.rare_earth
-                )
-            ]
-        )
         self.temperature = 0
 
     @property
