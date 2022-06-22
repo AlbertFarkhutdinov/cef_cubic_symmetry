@@ -9,9 +9,9 @@ from os.path import join, dirname, realpath
 from collections import namedtuple
 
 
-BASE_DIR = dirname(dirname(dirname(realpath(__file__))))
+BASE_DIR = dirname(dirname(realpath(__file__)))
 
-DATAFILES_DIR = join(BASE_DIR, 'datafiles')
+DATA_DIR = join(BASE_DIR, 'data')
 GRAPHS_DIR = join(BASE_DIR, 'graphs')
 JSON_DIR = join(BASE_DIR, 'json')
 
@@ -27,7 +27,7 @@ DATA_NAMES = (
     'intensities_on_temperature',
 )
 
-DATA_PATHS = {key: join(DATAFILES_DIR, key) for key in DATA_NAMES}
+DATA_PATHS = {key: join(DATA_DIR, key) for key in DATA_NAMES}
 GRAPHS_PATHS = {key: join(GRAPHS_DIR, key) for key in DATA_NAMES}
 
 X_PARAMETER = r'$x$'

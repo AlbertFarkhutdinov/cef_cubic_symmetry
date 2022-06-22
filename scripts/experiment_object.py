@@ -4,9 +4,9 @@
 import os
 from copy import deepcopy
 
-from scripts.common.constants import DATA_PATHS, Material, Data, Scale
-from scripts.common.fitting_utils import get_data_from_file
-from scripts.common.utils import get_repr
+from common.constants import DATA_PATHS, Material, Data, Scale
+from common.utils import get_repr
+from fitting.fitting_procedures import get_data_from_file
 from scripts.cubic_cef_object import Cubic
 from scripts import plot_objects as gg
 

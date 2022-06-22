@@ -5,30 +5,31 @@ in this project.
 """
 
 
-from os import chdir, mkdir, remove
-from os.path import join, exists, dirname
+import os
 
 
-from scripts.common.constants import (
-    BASE_DIR, Material, DATA_PATHS, GRAPHS_PATHS,
-)
-from scripts.common.utils import get_value_with_sign
+from common.constants import BASE_DIR, Material, DATA_PATHS, GRAPHS_PATHS
+from common.utils import get_value_with_sign
 
 
-def check_parent_dirs(
-        path_to_check: str,
-):
-    """Makes parent directories for argument, if they do not exist."""
-    condition = False
-    paths = []
-    while not condition:
-        if exists(path_to_check):
-            condition = True
-        else:
-            paths.append(path_to_check)
-            path_to_check = dirname(path_to_check)
-    for path in paths[:0:-1]:
-        mkdir(path)
+class PathProcessor:
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def create_parent_dirs(self) -> None:
+        """Create parent directories for the path, if they do not exist."""
+        paths = [self.path]
+        while not os.path.exists(paths[-1]):
+            paths.append(os.path.dirname(paths[-1]))
+        for path in paths[-2:0:-1]:
+            os.mkdir(path)
+
+    def remove_if_exists(self):
+        """Create parent dirs for the file and remove it, if it exists."""
+        self.create_parent_dirs()
+        if os.path.exists(self.path):
+            os.remove(self.path)
 
 
 def get_paths(
@@ -39,7 +40,7 @@ def get_paths(
         parameters: dict = None,
 ):
     """Returns path of the file that will be saved."""
-    chdir(BASE_DIR)
+    os.chdir(BASE_DIR)
     short_name = ''
     if material:
         if isinstance(material.rare_earth, str):
@@ -58,25 +59,16 @@ def get_paths(
             else:
                 full_name += f'_{key}{value:.3f}'
     if is_graph:
-        result_path = join(
+        result_path = os.path.join(
             GRAPHS_PATHS[data_name],
             short_name,
             f'{data_name}_{full_name}',
         )
     else:
-        result_path = join(
+        result_path = os.path.join(
             DATA_PATHS[data_name],
             short_name,
             f'{data_name}_{full_name}{format_name}',
         )
-    check_parent_dirs(result_path)
+    PathProcessor(result_path).create_parent_dirs()
     return result_path
-
-
-def remove_if_exists(
-        path_to_check: str,
-):
-    """Makes remove file, if it exists."""
-    check_parent_dirs(path_to_check)
-    if exists(path_to_check):
-        remove(path_to_check)

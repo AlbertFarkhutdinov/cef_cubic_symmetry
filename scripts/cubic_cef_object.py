@@ -9,16 +9,16 @@ import sys
 from numpy import linspace
 
 from scripts.cef_object import CEF
-from scripts.common.constants import CrossPoint, Material
-from scripts.common.tabular_information import F4
-from scripts.common.utils import (
+from common.constants import CrossPoint, Material
+from common.tabular_information import F4
+from common.utils import (
     get_time_of_execution,
     OpenedFile,
     write_row,
     get_ratios_names,
 )
-from scripts.common.utils import get_repr
-from scripts.common.path_utils import get_paths, remove_if_exists
+from common.utils import get_repr
+from common.path_utils import get_paths, PathProcessor
 
 
 class Cubic(CEF):
@@ -51,9 +51,11 @@ class Cubic(CEF):
                     self.llw_parameters['w'] * self.llw_parameters['x'] / F4
             )
             parameters['B44'] = 5 * parameters['B40']
-            parameters['B60'] = (self.llw_parameters['w'] *
-                                 (1 - abs(self.llw_parameters['x'])) /
-                                 self.material.rare_earth.f_6)
+            parameters['B60'] = (
+                    self.llw_parameters['w']
+                    * (1 - abs(self.llw_parameters['x']))
+                    / self.material.rare_earth.f_6
+            )
             parameters['B64'] = -21 * parameters['B60']
         except KeyError:
             pass
@@ -89,9 +91,11 @@ class Cubic(CEF):
         file_name = self.get_file_name(
             data_name='energies' if choice == 0 else 'intensities'
         )
-        remove_if_exists(file_name)
-        print(f'Saving of {"energies" if choice == 0 else "intensities"} '
-              f'datafiles will take some time...')
+        PathProcessor(file_name).remove_if_exists()
+        print(
+            f'Saving of {"energies" if choice == 0 else "intensities"} '
+            f'datafiles will take some time...'
+        )
         with OpenedFile(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
@@ -127,7 +131,7 @@ class Cubic(CEF):
                 'T': temperature,
             }
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
@@ -171,10 +175,10 @@ class Cubic(CEF):
             data_name='spectra',
             parameters=parameters,
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
-                write_row(file, row=[data[key][index] for key in data])
+                write_row(file, row=[val[index] for key, val in data.items()])
         return data
 
     @get_time_of_execution
@@ -190,7 +194,7 @@ class Cubic(CEF):
         chi_curie, chi_van_vleck, chi = self.get_chi_dependence(temperatures)
         for axis in ('z', 'x', 'total'):
             file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
-            remove_if_exists(file_name)
+            PathProcessor(file_name).remove_if_exists()
             with OpenedFile(file_name, mode='a') as file:
                 row = ['T(Kelvin)']
                 if axis in ('z', 'x'):
@@ -223,7 +227,8 @@ class Cubic(CEF):
     @get_time_of_execution
     def get_ratios(self, choice=0):
         """
-        Saves the dependence of transition energies ratio on parameter x to file.
+        Saves the dependence of transition energies ratio
+        on parameter x to file.
 
         """
         peak_data = 'energies' if choice == 0 else 'intensities'
@@ -239,7 +244,7 @@ class Cubic(CEF):
             data_name=peak_data,
             parameters=parameters
         )
-        remove_if_exists(ratio_file_name)
+        PathProcessor(ratio_file_name).remove_if_exists()
         with OpenedFile(ratio_file_name, mode='a') as ratio_file:
             with OpenedFile(peak_file_name) as peak_file:
                 for line in peak_file:
@@ -362,7 +367,7 @@ class Cubic(CEF):
         file_name = self.get_file_name(
             data_name='intensities_on_temperature',
         )
-        remove_if_exists(file_name)
+        PathProcessor(file_name).remove_if_exists()
         with OpenedFile(file_name, mode='a') as file:
             for _, temperature in enumerate(temperatures):
                 peaks = self.get_peaks(temperature=temperature)
