@@ -160,9 +160,11 @@ def lowering_operator(
     """
     result = 1
     for step in range(degree):
-        result *= (squared_j -
-                   (initial_number - step) *
-                   (initial_number - step - 1))
+        result *= (
+                squared_j
+                - (initial_number - step)
+                * (initial_number - step - 1)
+        )
     return sqrt(result)
 
 
