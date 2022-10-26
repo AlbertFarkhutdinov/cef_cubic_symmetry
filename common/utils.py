@@ -6,12 +6,10 @@ The module contains some common functions that used in this project.
 
 from datetime import datetime
 from json import load
-from os.path import join
 
 from numpy import zeros
 
-from common.tabular_information import ACCEPTABLE_RARE_EARTHS
-from common.constants import INFINITY, JSON_DIR
+from common.constants import DATA_DIR, INFINITY
 
 
 def get_sign(value: float):
@@ -50,10 +48,11 @@ def check_input(choice: str):
         if choice == 'rare':
             request = (
                 f'Input the name of RE ion '
-                f'({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
+                # f'({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
             )
             result = input(request).capitalize()
-            condition = (result in ACCEPTABLE_RARE_EARTHS)
+            # condition = (result in ACCEPTABLE_RARE_EARTHS)
+            condition = True
         try:
             if choice == 'w':
                 result = float(input('Input |W| > 0: '))
@@ -147,6 +146,6 @@ class UTF8File:
 
 def get_json_object(file_name: str):
     """Returns object from JSON file"""
-    with UTF8File(join(JSON_DIR, file_name)) as file:
+    with UTF8File(str(DATA_DIR / file_name)) as file:
         obj = load(file)
     return obj

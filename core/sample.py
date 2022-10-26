@@ -59,11 +59,11 @@ class REIon(RepresentableObject):
         return {'info'}
 
     @property
-    def matrix_size(self):
-        return 2 * self.info.total_momentum_ground + 1
+    def matrix_size(self) -> int:
+        return int(2 * self.info.total_momentum_ground + 1)
 
     @property
-    def squared_momentum(self):
+    def squared_momentum(self) -> float:
         __total_momentum_ground = self.info.total_momentum_ground
         return __total_momentum_ground * (__total_momentum_ground + 1)
 
@@ -111,3 +111,13 @@ class Sample(RepresentableObject):
             if isinstance(rare_earth, str)
             else rare_earth
         )
+
+    def __str__(self):
+        output = [
+            self.crystal.name,
+            f'Rare-earth ion: {self.rare_earth.info.symbol};',
+            f'Number of 4f-electrons = '
+            f'{self.rare_earth.info.number_of_f_electrons};',
+            f'J = {self.rare_earth.info.total_momentum_ground};',
+        ]
+        return '\n'.join(output)

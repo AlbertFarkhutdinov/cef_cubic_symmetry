@@ -4,12 +4,13 @@
 from typing import Optional
 
 import matplotlib.pyplot as plt
+from pretty_repr import RepresentableObject
 from cycler import cycler
 
 from common import constants as con, utils as ut
 
 
-class CustomPlot:
+class CustomPlot(RepresentableObject):
     """Description of Plot object"""
 
     @staticmethod
@@ -43,6 +44,10 @@ class CustomPlot:
         }
         self.fig = None
         self._ax = None
+
+    @property
+    def excluded_attributes_for_repr(self) -> set[str]:
+        return {'fig', '_ax', 'limits'}
 
     def __enter__(self):
         """Method for entrance to context manager"""
@@ -156,7 +161,3 @@ class CustomPlot:
         """Method for exit from context manager"""
         if self.fig and self._ax:
             plt.close('all')
-
-    def __repr__(self):
-        """Method returns string representation of the Plot object."""
-        return ut.get_repr(self, 'data', 'dpi')

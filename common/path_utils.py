@@ -45,10 +45,8 @@ def get_paths(
     os.chdir(BASE_DIR)
     short_name = ''
     if sample:
-        if isinstance(sample.rare_earth, str):
-            short_name = f'{sample.crystal}_{sample.rare_earth}'
-        else:
-            short_name = f'{sample.crystal}_{sample.rare_earth.name}'
+        short_name = f'{sample.crystal.name}_{sample.rare_earth.info.symbol}'
+
     full_name = short_name
     if parameters:
         for key, value in parameters.items():
