@@ -224,7 +224,7 @@ def get_llw_plot(material: con.Material,
             material=material,
             parameters=parameters,
         )
-        with ut.OpenedFile(peak_file_name) as file:
+        with ut.UTF8File(peak_file_name) as file:
             for line in file:
                 array = line.rstrip('\n').split('\t')
                 array = [float(value.strip()) for value in array]
@@ -306,7 +306,7 @@ def get_llw_ratios_plot(material: con.Material,
             material=material,
             parameters=parameters,
         )
-        with ut.OpenedFile(ratio_file_name) as file:
+        with ut.UTF8File(ratio_file_name) as file:
             for line in file:
                 array = line.rstrip('\n').split('\t')
                 array = [float(value.strip()) for value in array]
@@ -434,7 +434,7 @@ def get_intensity_on_temperature(
             material=material,
             parameters=llw,
         )
-        with ut.OpenedFile(file_name) as file:
+        with ut.UTF8File(file_name) as file:
             for line in file:
                 row = line.rstrip('\n').split('\t')
                 row = [float(value) for value in row]

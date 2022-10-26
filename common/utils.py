@@ -122,7 +122,7 @@ def get_repr(obj, *args):
     return f'{result.rstrip(", ")})'
 
 
-class OpenedFile:
+class UTF8File:
     """Context manager for file opening"""
     def __init__(self, name: str, mode='r'):
         """Initialization of class"""
@@ -147,6 +147,6 @@ class OpenedFile:
 
 def get_json_object(file_name: str):
     """Returns object from JSON file"""
-    with OpenedFile(join(JSON_DIR, file_name)) as file:
+    with UTF8File(join(JSON_DIR, file_name)) as file:
         obj = load(file)
     return obj

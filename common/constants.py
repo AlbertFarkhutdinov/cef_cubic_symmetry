@@ -5,15 +5,14 @@ in this project.
 """
 
 
-from os.path import join, dirname, realpath
 from collections import namedtuple
+from pathlib import Path
 
 
-BASE_DIR = dirname(dirname(realpath(__file__)))
+BASE_DIR = Path('.').resolve().parent
 
-DATA_DIR = join(BASE_DIR, 'data')
-GRAPHS_DIR = join(BASE_DIR, 'graphs')
-JSON_DIR = join(BASE_DIR, 'json')
+DATA_DIR = BASE_DIR / 'data'
+PLOTS_DIR = BASE_DIR / 'plots'
 
 DATA_NAMES = (
     'energies',
@@ -27,49 +26,26 @@ DATA_NAMES = (
     'intensities_on_temperature',
 )
 
-DATA_PATHS = {key: join(DATA_DIR, key) for key in DATA_NAMES}
-GRAPHS_PATHS = {key: join(GRAPHS_DIR, key) for key in DATA_NAMES}
+DATA_PATHS = {key: DATA_DIR / key for key in DATA_NAMES}
+PLOT_PATHS = {key: PLOTS_DIR / key for key in DATA_NAMES}
 
 X_PARAMETER = r'$x$'
-# ENERGY_TRANSFER = 'Energy Transfer, meV'
-ENERGY_TRANSFER = 'Передача энергии, мэВ'
-# TRANSITION_INTENSITY = 'Transition Intensity, arb.u.'
-TRANSITION_INTENSITY = 'Интенсивность перехода, отн.ед.'
-# ENERGY_TRANSFER_RATIO = 'Energy Transfer Ratio'
-ENERGY_TRANSFER_RATIO = 'Отношение передач энергии'
-# TRANSITION_INTENSITY_RATIO = 'Transition Intensity Ratio'
-TRANSITION_INTENSITY_RATIO = 'Отношение интенсивностей перехода'
-# SCATTERING = r'$S(\omega)$, arb.u.'
-SCATTERING = r'$S(\omega)$, отн.ед.'
+ENERGY_TRANSFER = 'Energy Transfer, meV'
+TRANSITION_INTENSITY = 'Transition Intensity, arb.u.'
+ENERGY_TRANSFER_RATIO = 'Energy Transfer Ratio'
+TRANSITION_INTENSITY_RATIO = 'Transition Intensity Ratio'
+SCATTERING = r'$S(\omega)$, arb.u.'
 
 SPECTRUM_LABELS = {
     'xlabel': ENERGY_TRANSFER,
     'ylabel': SCATTERING,
 }
 
+RESOLUTION = 1e-2
+THRESHOLD = 1e-4
 INFINITY = float('inf')
 PM = chr(177)
 
-Element = namedtuple(
-    typename='Element',
-    field_names=[
-        'number_of_f_electrons',
-        'name',
-        'total_momentum_ground',
-        'lande_factor',
-        'matrix_size',
-        'f_6',
-        'radial_integrals',
-        'stevens_factors',
-    ]
-)
-Material = namedtuple(
-    typename='Material',
-    field_names=[
-        'rare_earth',
-        'crystal',
-    ]
-)
 CrossPoint = namedtuple(
     typename='CrossPoint',
     field_names=[

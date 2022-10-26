@@ -13,7 +13,7 @@ from common.constants import CrossPoint, Material
 from common.tabular_information import F4
 from common.utils import (
     get_time_of_execution,
-    OpenedFile,
+    UTF8File,
     write_row,
     get_ratios_names,
 )
@@ -96,7 +96,7 @@ class Cubic(CEF):
             f'Saving of {"energies" if choice == 0 else "intensities"} '
             f'datafiles will take some time...'
         )
-        with OpenedFile(file_name, mode='a') as file:
+        with UTF8File(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
                 row = (
@@ -132,7 +132,7 @@ class Cubic(CEF):
             }
         )
         PathProcessor(file_name).remove_if_exists()
-        with OpenedFile(file_name, mode='a') as file:
+        with UTF8File(file_name, mode='a') as file:
             for index, energy in enumerate(energies):
                 write_row(file, (energy, spectrum[index]))
 
@@ -161,7 +161,7 @@ class Cubic(CEF):
                 data_name='spectra',
                 parameters=parameters,
             )
-            with OpenedFile(file_name) as file:
+            with UTF8File(file_name) as file:
                 lines[temperature] = list(file)
 
             for index, line in enumerate(lines[temperature]):
@@ -176,7 +176,7 @@ class Cubic(CEF):
             parameters=parameters,
         )
         PathProcessor(file_name).remove_if_exists()
-        with OpenedFile(file_name, mode='a') as file:
+        with UTF8File(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
                 write_row(file, row=[val[index] for key, val in data.items()])
         return data
@@ -195,7 +195,7 @@ class Cubic(CEF):
         for axis in ('z', 'x', 'total'):
             file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
             PathProcessor(file_name).remove_if_exists()
-            with OpenedFile(file_name, mode='a') as file:
+            with UTF8File(file_name, mode='a') as file:
                 row = ['T(Kelvin)']
                 if axis in ('z', 'x'):
                     row += [
@@ -245,8 +245,8 @@ class Cubic(CEF):
             parameters=parameters
         )
         PathProcessor(ratio_file_name).remove_if_exists()
-        with OpenedFile(ratio_file_name, mode='a') as ratio_file:
-            with OpenedFile(peak_file_name) as peak_file:
+        with UTF8File(ratio_file_name, mode='a') as ratio_file:
+            with UTF8File(peak_file_name) as peak_file:
                 for line in peak_file:
                     line = line.rstrip('\n')
                     peak_row = [float(energy) for energy in line.split('\t')]
@@ -326,7 +326,7 @@ class Cubic(CEF):
                 data_name='ratios_energies',
                 parameters={'w': w_parameter},
             )
-            with OpenedFile(ratio_file_name) as ratio_file:
+            with UTF8File(ratio_file_name) as ratio_file:
                 for line in ratio_file:
                     line = line.rstrip('\n')
                     numbers = [float(number) for number in line.split('\t')]
@@ -368,7 +368,7 @@ class Cubic(CEF):
             data_name='intensities_on_temperature',
         )
         PathProcessor(file_name).remove_if_exists()
-        with OpenedFile(file_name, mode='a') as file:
+        with UTF8File(file_name, mode='a') as file:
             for _, temperature in enumerate(temperatures):
                 peaks = self.get_peaks(temperature=temperature)
                 intensities = [peak[1] for peak in peaks if peak[0] >= 0]

@@ -1,16 +1,19 @@
 """The module contains CEF class."""
 
 
-from json import dump, load
-
 from numpy import linspace, sqrt
+from scipy.constants import physical_constants
 from scipy.linalg import eigh
 
 from common import utils, physics
-from common.tabular_information import BOHR_MAGNETON
-from common.path_utils import get_paths
-from common.utils import UTF8File, get_repr
-from common.constants import Material
+from common.constants import RESOLUTION, THRESHOLD
+from common.utils import get_repr
+from core.cef_parameters import BParameters
+from core.custom_datatypes import MagnetField
+from core.sample import Sample
+
+
+BOHR = physical_constants['Bohr magneton in eV/T'][0] * 1000
 
 
 class CEF:
@@ -21,78 +24,67 @@ class CEF:
 
     """
 
-    resolution = 1e-2
-    threshold = 1e-4
-
-    def __init__(self, material: Material):
+    def __init__(self, sample: Sample):
         """Initializes the CEF object or read it from a file."""
-        self.material = material
-        self.file_name = get_paths(
-            data_name='parameters',
-            format_name='.json',
-            material=self.material,
-        )
-        self.magnet_field = {'z': 0, 'x': 0}
+        self.sample = sample
+        # self.file_name = get_paths(
+        #     data_name='parameters',
+        #     format_name='.json',
+        #     sample=self.sample,
+        # )
+        self.magnet_field = MagnetField()
         self.temperature = 0
 
     @property
     def parameters(self):
         """CEF parameters"""
-        return {
-            param: 0 for param in (
-                'B20', 'B40', 'B60',
-                'B22', 'B42', 'B62',
-                'B43', 'B63',
-                'B44', 'B64',
-                'B66',
-            )
-        }
+        return BParameters()
 
-    def load_data(self):
-        """Loads CEF object from file"""
-        with UTF8File(self.file_name) as file:
-            self.__dict__.update(load(file))
+    # TODO update file saving and loading
+    # def load_data(self):
+    #     """Loads CEF object from file"""
+    #     with UTF8File(self.file_name) as file:
+    #         self.__dict__.update(load(file))
+    #
+    # def save_to_file(self):
+    #     """Saves parameters of the current object to file."""
+    #     saved_object = {
+    #         'crystal': self.sample.crystal,
+    #         'rare_earth': self.sample.rare_earth.name,
+    #         'parameters': self.parameters,
+    #         'magnet_field': self.magnet_field,
+    #     }
+    #     with UTF8File(self.file_name, mode='w') as file:
+    #         dump(saved_object, file, indent=4, sort_keys=True)
 
-    def save_to_file(self):
-        """Saves parameters of the current object to file."""
-        saved_object = {
-            'crystal': self.material.crystal,
-            'rare_earth': self.material.rare_earth.name,
-            'parameters': self.parameters,
-            'magnet_field': self.magnet_field,
-        }
-        with UTF8File(self.file_name, mode='w') as file:
-            dump(saved_object, file, indent=4, sort_keys=True)
-
-    def get_cef_hamiltonian(self,
-                            size: int,
-                            j: float,
-                            squared_j: float):
+    def get_cef_hamiltonian(self):
         """Determines the CEF Hamiltonian based on the input parameters."""
+        momentum = self.sample.rare_earth.info.total_momentum_ground
+        size = self.sample.rare_earth.matrix_size
+        squared_momentum = self.sample.rare_earth.momentum
         hamiltonian = utils.get_empty_matrix(size)
-        parameters = self.parameters
         for row in range(size):
             # row = 0...2J
             # mqn_1[1] = m = -J...J
-            mqn_1 = [(row - j) ** i for i in range(5)]
+            mqn_1 = [(row - momentum) ** i for i in range(5)]
             for key in ('20', '40', '60'):
                 hamiltonian[row, row] += (
-                        parameters[f'B{key}'] *
+                        self.parameters.__getattribute__(f'b{key}') *
                         physics.steven_operators(
                             f'o{key}',
-                            squared_j,
+                            squared_momentum,
                             mqn_1,
                         )
                 )
             for degree in range(2, size - row):
-                mqn_2 = [(row - j + degree) ** i for i in range(5)]
+                mqn_2 = [(row - momentum + degree) ** i for i in range(5)]
                 for key in ('22', '42', '62', '43', '63', '44', '64', '66'):
                     if key[-1] == str(degree):
                         hamiltonian[row, row + degree] += (
-                                parameters[f'B{key}'] *
+                                self.parameters.__getattribute__(f'b{key}') *
                                 physics.steven_operators(
                                     f'o{key}',
-                                    squared_j,
+                                    squared_momentum,
                                     mqn_1,
                                     mqn_2,
                                 )
@@ -100,43 +92,44 @@ class CEF:
                 hamiltonian[row + degree, row] = hamiltonian[row, row + degree]
         return hamiltonian
 
-    def get_zeeman_hamiltonian(self,
-                               size: int,
-                               j: float,
-                               squared_j: float,
-                               magnet_field: dict = None):
+    def get_zeeman_hamiltonian(
+            self,
+            magnet_field: MagnetField = None,
+    ):
         """Determines the Zeeman terms to the Hamiltonian."""
         if magnet_field is None:
             magnet_field = self.magnet_field
+        momentum = self.sample.rare_earth.info.total_momentum_ground
+        size = self.sample.rare_earth.matrix_size
+        squared_momentum = self.sample.rare_earth.momentum
         hamiltonian = utils.get_empty_matrix(size)
         for row in range(size):
             # mqn_1 =  m = -J...J
-            mqn_1 = row - j
+            mqn_1 = row - momentum
             hamiltonian[row, row] -= (
-                self.material.rare_earth.lande_factor *
-                BOHR_MAGNETON *
+                self.sample.rare_earth.lande_factor *
+                BOHR *
                 mqn_1 *
-                magnet_field['z']
+                magnet_field.z_
             )
             if row < (size - 1):
                 column = row + 1
                 mqn_2 = mqn_1 + 1
                 hamiltonian[row, column] -= (
-                    0.5 * self.material.rare_earth.lande_factor *
-                    BOHR_MAGNETON *
-                    sqrt((squared_j - mqn_1 * mqn_2)) *
-                    magnet_field['x']
+                    0.5 * self.sample.rare_earth.lande_factor *
+                    BOHR *
+                    sqrt((squared_momentum - mqn_1 * mqn_2)) *
+                    magnet_field.x_
                 )
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian
 
-    def get_total_hamiltonian(self, magnet_field: dict = None):
+    def get_total_hamiltonian(self, magnet_field: MagnetField = None):
         """Returns the total Hamiltonian including CEF and Zeeman terms."""
-        size = self.material.rare_earth.matrix_size
-        j = self.material.rare_earth.total_momentum_ground
-        squared_j = j * (j + 1)
-        return (self.get_cef_hamiltonian(size, j, squared_j) +
-                self.get_zeeman_hamiltonian(size, j, squared_j, magnet_field))
+        return (
+                self.get_cef_hamiltonian()
+                + self.get_zeeman_hamiltonian(magnet_field=magnet_field)
+        )
 
     def get_eigenvalues_and_eigenfunctions(
             self,
@@ -163,7 +156,7 @@ class CEF:
         between eigenfunctions of the total Hamiltonian.
 
         """
-        j = self.material.rare_earth.total_momentum_ground
+        j = self.sample.rare_earth.total_momentum_ground
         squared_j = j * (j + 1)
         size = int(2 * j + 1)
         j_ops = {
@@ -256,7 +249,7 @@ class CEF:
         from the total Hamiltonian.
 
         """
-        size = self.material.rare_earth.matrix_size
+        size = self.sample.rare_earth.matrix_size
         if magnet_field is None:
             magnet_field = self.magnet_field
         total_hamiltonian = self.get_total_hamiltonian(magnet_field)
@@ -297,19 +290,19 @@ class CEF:
                         other_peak is not peak and
                         (
                                 abs(peak['energy'] - other_peak['energy'])
-                                < self.__class__.resolution
+                                < RESOLUTION
                         )
                 ):
                     peak['intensity'] += other_peak['intensity']
                     sum_peaks += other_peak['energy'] * other_peak['intensity']
                     other_peak['intensity'] = 0
-            if peak['intensity'] > self.__class__.threshold:
+            if peak['intensity'] > THRESHOLD:
                 peak['energy'] = sum_peaks / peak['intensity']
                 result.append((peak['energy'], peak['intensity']))
         result.sort()
         intensity_sum = 2 * (
-                self.material.rare_earth.total_momentum_ground *
-                (self.material.rare_earth.total_momentum_ground + 1)
+                self.sample.rare_earth.total_momentum_ground *
+                (self.sample.rare_earth.total_momentum_ground + 1)
         ) / 3
         intensities = [item[1] for item in result]
         if sum(intensities) != intensity_sum:
@@ -374,7 +367,7 @@ class CEF:
                     gamma,
                 )
 
-        spectrum *= 72.65 * self.material.rare_earth.lande_factor ** 2
+        spectrum *= 72.65 * self.sample.rare_earth.lande_factor ** 2
 
         return spectrum
 
@@ -414,7 +407,7 @@ class CEF:
         magnetic_moment = {}
         for key, value in j_average.items():
             magnetic_moment[key] = (
-                    self.material.rare_earth.lande_factor
+                    self.sample.rare_earth.lande_factor
                     * value
             )
             # magnetic moments are given in units of Bohr magneton
@@ -465,7 +458,7 @@ class CEF:
                                                      j_ops_square['-']) *
                                               thermal['boltzmann'][row] /
                                               (column_value - row_value))
-        coefficient = self.material.rare_earth.lande_factor ** 2
+        coefficient = self.sample.rare_earth.lande_factor ** 2
         if thermal['temperature'] > 0:
             coefficient = coefficient / sum(thermal['boltzmann'])
         for key in ('z', 'x'):
@@ -544,19 +537,20 @@ class CEF:
         This includes the rare earth, the CEF parameters, and,
         if diagonalized, the eigenvalues and eigenfunctions."""
         output = [
-            self.material.crystal,
-            f'Rare-earth ion: {self.material.rare_earth.name};',
+            self.sample.crystal,
+            f'Rare-earth ion: {self.sample.rare_earth.name};',
             f'Number of 4f-electrons = '
-            f'{self.material.rare_earth.number_of_f_electrons};',
-            f'J = {self.material.rare_earth.total_momentum_ground};',
+            f'{self.sample.rare_earth.number_of_f_electrons};',
+            f'J = {self.sample.rare_earth.total_momentum_ground};',
         ]
 
         j_average, magnetic_moment = self.get_moments()
 
-        for key, value in self.parameters.items():
+        for key, value in self.parameters.__dict__.items():
             if value:
                 output.append(f'{key} = {value:.4f};')
-        for key, value in self.magnet_field.items():
+        for key in ('x', 'z'):
+            value = self.magnet_field.__getattribute__(f'{key}_')
             if value:
                 output.append(f'H{key} = {value:.4f};')
             if magnetic_moment[key] > 1e-9:
@@ -575,7 +569,7 @@ class CEF:
                     if abs(eigenfunctions[row, column]) > 0.0001:
                         j_z = (
                                 row
-                                - self.material.rare_earth.total_momentum_ground
+                                - self.sample.rare_earth.total_momentum_ground
                         )
                         line_to_append = (
                                 f'{utils.get_sign(eigenfunctions[row, column])}' +

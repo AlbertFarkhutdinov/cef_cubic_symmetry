@@ -132,8 +132,8 @@ dmypy.json
 .idea
 
 
-graphs/ratios
-graphs/spectra
+plots/ratios
+plots/spectra
 data/parameters
 data/spectra
 data/susceptibilities

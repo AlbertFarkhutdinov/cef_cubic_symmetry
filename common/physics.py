@@ -136,13 +136,13 @@ def thermodynamics(
 ):
     """
     Returns dictionary including value of temperature
-    in meV and Bolzmann factor.
+    in meV and Boltzmann factor.
 
     """
     thermal_dict = {'temperature': temperature / 11.6045}
     if energies is not None and thermal_dict['temperature'] > 0:
         zero_array = zeros(len(energies))
-        thermal_dict['bolzmann'] = exp(
+        thermal_dict['boltzmann'] = exp(
             zero_array - energies / thermal_dict['temperature']
         )
     return thermal_dict
