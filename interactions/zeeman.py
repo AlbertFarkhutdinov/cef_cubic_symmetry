@@ -1,16 +1,15 @@
 """The module contains CEF class."""
 
 
-from pretty_repr import RepresentableObject
 from numpy import sqrt
 from scipy.constants import physical_constants
 
 from common import utils
 from core.custom_datatypes import MagnetField
-from core.sample import Sample
+from interactions.base_interaction import BaseInteraction
 
 
-class Zeeman(RepresentableObject):
+class Zeeman(BaseInteraction):
     """
     Class defining the trivalent rare earth compound,
     its crystal field parameters and the eigenvalues and eigenfunctions
@@ -18,9 +17,9 @@ class Zeeman(RepresentableObject):
 
     """
 
-    def __init__(self, sample: Sample, magnet_field: MagnetField = None):
+    def __init__(self, magnet_field: MagnetField = None, **kwargs) -> None:
         """Initializes the CEF object or read it from a file."""
-        self.sample = sample
+        super().__init__(**kwargs)
         self.magnet_field = magnet_field or MagnetField()
 
     def get_hamiltonian(self):

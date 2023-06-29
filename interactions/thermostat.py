@@ -1,14 +1,13 @@
 """The module contains CEF class."""
 
 
-from pretty_repr import RepresentableObject
 import numpy as np
 
 from common import utils, physics
-from core.sample import Sample
+from base_interaction import BaseInteraction
 
 
-class Thermostat(RepresentableObject):
+class Thermostat(BaseInteraction):
     """
     Class defining the trivalent rare earth compound,
     its crystal field parameters and the eigenvalues and eigenfunctions
@@ -16,9 +15,9 @@ class Thermostat(RepresentableObject):
 
     """
 
-    def __init__(self, sample: Sample, temperature: float = 0):
+    def __init__(self, temperature: float = 0, **kwargs) -> None:
         """Initializes the CEF object or read it from a file."""
-        self.sample = sample
+        super().__init__(**kwargs)
         self.temperature = temperature
 
     def get_boltzmann_factor(self, eigenvalues: np.ndarray) -> np.ndarray:

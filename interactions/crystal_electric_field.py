@@ -1,14 +1,12 @@
 """The module contains CEF class."""
 
 
-from pretty_repr import RepresentableObject
-
 from common import utils, physics
 from core.cef_parameters import BParameters
-from core.sample import Sample
+from interactions.base_interaction import BaseInteraction
 
 
-class CrystalElectricField(RepresentableObject):
+class CrystalElectricField(BaseInteraction):
     """
     Class defining the trivalent rare earth compound,
     its crystal field parameters and the eigenvalues and eigenfunctions
@@ -16,9 +14,9 @@ class CrystalElectricField(RepresentableObject):
 
     """
 
-    def __init__(self, sample: Sample, parameters: BParameters):
+    def __init__(self, parameters: BParameters, **kwargs) -> None:
         """Initializes the CEF object or read it from a file."""
-        self.sample = sample
+        super().__init__(**kwargs)
         self.parameters = parameters
 
     def get_hamiltonian(self):
