@@ -4,10 +4,11 @@
 from typing import Optional
 
 import matplotlib.pyplot as plt
-from pretty_repr import RepresentableObject
 from cycler import cycler
+from pretty_repr import RepresentableObject
 
-from common import constants as con, utils as ut
+from common import constants as con
+from common import utils as ut
 
 
 class CustomPlot(RepresentableObject):

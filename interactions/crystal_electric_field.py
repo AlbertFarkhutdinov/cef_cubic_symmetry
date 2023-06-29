@@ -1,7 +1,7 @@
 """The module contains CEF class."""
 
 
-from common import utils, physics
+from common import physics, utils
 from core.cef_parameters import BParameters
 from interactions.base_interaction import BaseInteraction
 

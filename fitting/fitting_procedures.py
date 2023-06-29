@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
+from common.constants import DATA_PATHS, INFINITY, PM, Data
+from common.physics import gaussian, multi_gaussian, multi_lorentzian
 from scripts.plot_objects import CustomPlot
-from common.constants import PM, INFINITY, DATA_PATHS, Data
-from common.physics import gaussian, multi_lorentzian, multi_gaussian
 
 
 def get_data_from_file(file_name: str) -> pd.DataFrame:

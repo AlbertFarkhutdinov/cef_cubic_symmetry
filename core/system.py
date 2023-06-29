@@ -3,10 +3,10 @@
 
 import json
 
-from pretty_repr import RepresentableObject
 from numpy import linspace
+from pretty_repr import RepresentableObject
 
-from common import utils, physics
+from common import physics, utils
 from common.path_utils import get_paths
 from common.utils import UTF8File
 from core.cef_parameters import BParameters

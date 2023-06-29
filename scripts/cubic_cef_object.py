@@ -8,17 +8,12 @@ import sys
 
 from numpy import linspace
 
-from scripts.cef_object import CEF
 from common.constants import CrossPoint, Material
+from common.path_utils import PathProcessor, get_paths
 from common.tabular_information import F4
-from common.utils import (
-    get_time_of_execution,
-    UTF8File,
-    write_row,
-    get_ratios_names,
-)
-from common.utils import get_repr
-from common.path_utils import get_paths, PathProcessor
+from common.utils import (UTF8File, get_ratios_names, get_repr,
+                          get_time_of_execution, write_row)
+from scripts.cef_object import CEF
 
 
 class Cubic(CEF):

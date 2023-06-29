@@ -2,9 +2,9 @@
 
 
 import numpy as np
-
-from common import utils, physics
 from base_interaction import BaseInteraction
+
+from common import physics, utils
 
 
 class Thermostat(BaseInteraction):

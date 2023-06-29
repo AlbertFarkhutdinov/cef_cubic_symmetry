@@ -1,7 +1,7 @@
 """The module contains physics functions that used in this project."""
 
 
-from numpy import zeros, exp, sqrt, pi, log
+from numpy import exp, log, pi, sqrt, zeros
 
 
 def gaussian_normalized(

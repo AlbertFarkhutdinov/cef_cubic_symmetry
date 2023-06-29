@@ -8,7 +8,6 @@ in this project.
 from collections import namedtuple
 from pathlib import Path
 
-
 BASE_DIR = Path('.').resolve().parent
 
 DATA_DIR = BASE_DIR / 'data'

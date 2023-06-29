@@ -1,11 +1,11 @@
 """The module contains CEF class."""
 
 
-from pretty_repr import RepresentableObject
 import numpy as np
+from pretty_repr import RepresentableObject
 from scipy.linalg import eigh
 
-from common import utils, physics
+from common import physics, utils
 from common.constants import RESOLUTION, THRESHOLD
 from core.sample import Sample
 

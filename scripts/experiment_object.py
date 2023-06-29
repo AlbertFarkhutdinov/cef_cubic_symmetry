@@ -4,11 +4,11 @@
 import os
 from copy import deepcopy
 
-from common.constants import DATA_PATHS, Material, Data, Scale
+from common.constants import DATA_PATHS, Data, Material, Scale
 from common.utils import get_repr
 from fitting.fitting_procedures import get_data_from_file
-from scripts.cubic_cef_object import Cubic
 from scripts import plot_objects as gg
+from scripts.cubic_cef_object import Cubic
 
 
 class Experiment:
