@@ -47,7 +47,7 @@ def check_input(choice: str):
     while not condition:
         if choice == 'rare':
             request = (
-                f'Input the name of RE ion '
+                'Input the name of RE ion '
                 # f'({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
             )
             result = input(request).capitalize()
