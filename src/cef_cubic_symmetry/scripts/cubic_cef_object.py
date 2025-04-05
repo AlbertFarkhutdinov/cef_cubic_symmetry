@@ -8,12 +8,12 @@ import sys
 
 from numpy import linspace
 
-from common.constants import CrossPoint, Material
-from common.path_utils import PathProcessor, get_paths
-from common.tabular_information import F4
-from common.utils import (UTF8File, get_ratios_names, get_repr,
+from cef_cubic_symmetry.common.constants import CrossPoint, Material
+from cef_cubic_symmetry.common.path_utils import PathProcessor, get_paths
+from cef_cubic_symmetry.common.tabular_information import F4
+from cef_cubic_symmetry.common.utils import (UTF8File, get_ratios_names, get_repr,
                           get_time_of_execution, write_row)
-from scripts.cef_object import CEF
+from cef_cubic_symmetry.scripts.cef_object import CEF
 
 
 class Cubic(CEF):

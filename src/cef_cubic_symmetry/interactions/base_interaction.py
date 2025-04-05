@@ -3,7 +3,7 @@
 
 from pretty_repr import RepresentableObject
 
-from core.sample import Sample
+from cef_cubic_symmetry.core.sample import Sample
 
 
 class BaseInteraction(RepresentableObject):

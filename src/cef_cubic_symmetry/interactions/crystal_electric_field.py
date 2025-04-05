@@ -1,9 +1,9 @@
 """The module contains CEF class."""
 
 
-from common import physics, utils
-from core.cef_parameters import BParameters
-from interactions.base_interaction import BaseInteraction
+from cef_cubic_symmetry.common import physics, utils
+from cef_cubic_symmetry.core.cef_parameters import BParameters
+from cef_cubic_symmetry.interactions.base_interaction import BaseInteraction
 
 
 class CrystalElectricField(BaseInteraction):

@@ -9,7 +9,7 @@ from json import load
 
 from numpy import zeros
 
-from common.constants import DATA_DIR, INFINITY
+from cef_cubic_symmetry.common.constants import DATA_DIR, INFINITY
 
 
 def get_sign(value: float):

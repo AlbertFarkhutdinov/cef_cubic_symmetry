@@ -5,9 +5,9 @@ import numpy as np
 from pretty_repr import RepresentableObject
 from scipy.linalg import eigh
 
-from common import physics, utils
-from common.constants import RESOLUTION, THRESHOLD
-from core.sample import Sample
+from cef_cubic_symmetry.common import physics, utils
+from cef_cubic_symmetry.common.constants import RESOLUTION, THRESHOLD
+from cef_cubic_symmetry.core.sample import Sample
 
 
 class Transitions(RepresentableObject):

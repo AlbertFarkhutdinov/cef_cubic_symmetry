@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 from cycler import cycler
 from pretty_repr import RepresentableObject
 
-from common import constants as con
-from common import utils as ut
+from cef_cubic_symmetry.common import constants as con
+from cef_cubic_symmetry.common import utils as ut
 
 
 class CustomPlot(RepresentableObject):

@@ -6,10 +6,10 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 from cycler import cycler
 
-from common import constants as con
-from common import utils as ut
-from common.path_utils import get_paths
-from scripts.cubic_cef_object import Cubic
+from cef_cubic_symmetry.common import constants as con
+from cef_cubic_symmetry.common import utils as ut
+from cef_cubic_symmetry.common.path_utils import get_paths
+from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
 def _set_plot_parameters():

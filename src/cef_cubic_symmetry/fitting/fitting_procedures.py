@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-from common.constants import DATA_PATHS, INFINITY, PM, Data
-from common.physics import gaussian, multi_gaussian, multi_lorentzian
-from scripts.plot_objects import CustomPlot
+from cef_cubic_symmetry.common.constants import DATA_PATHS, INFINITY, PM, Data
+from cef_cubic_symmetry.common.physics import gaussian, multi_gaussian, multi_lorentzian
+from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 
 def get_data_from_file(file_name: str) -> pd.DataFrame:

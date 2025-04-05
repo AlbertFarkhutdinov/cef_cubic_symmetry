@@ -6,14 +6,14 @@ import json
 from numpy import linspace
 from pretty_repr import RepresentableObject
 
-from common import physics, utils
-from common.path_utils import get_paths
-from common.utils import UTF8File
-from core.cef_parameters import BParameters
-from core.custom_datatypes import MagnetField
-from core.sample import Sample
-from core.transitions import Transitions
-from interactions import CrystalElectricField, Thermostat, Zeeman
+from cef_cubic_symmetry.common import physics, utils
+from cef_cubic_symmetry.common.path_utils import get_paths
+from cef_cubic_symmetry.common.utils import UTF8File
+from cef_cubic_symmetry.core.cef_parameters import BParameters
+from cef_cubic_symmetry.core.custom_datatypes import MagnetField
+from cef_cubic_symmetry.core.sample import Sample
+from cef_cubic_symmetry.core.transitions import Transitions
+from cef_cubic_symmetry.interactions import CrystalElectricField, Thermostat, Zeeman
 
 
 class System(RepresentableObject):

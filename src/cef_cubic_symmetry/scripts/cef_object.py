@@ -6,11 +6,11 @@ from json import dump, load
 from numpy import linspace, sqrt
 from scipy.linalg import eigh
 
-from common import physics, utils
-from common.constants import Material
-from common.path_utils import get_paths
-from common.tabular_information import BOHR_MAGNETON
-from common.utils import UTF8File, get_repr
+from cef_cubic_symmetry.common import physics, utils
+from cef_cubic_symmetry.common.constants import Material
+from cef_cubic_symmetry.common.path_utils import get_paths
+from cef_cubic_symmetry.common.tabular_information import BOHR_MAGNETON
+from cef_cubic_symmetry.common.utils import UTF8File, get_repr
 
 
 class CEF:

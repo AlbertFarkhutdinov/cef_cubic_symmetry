@@ -5,11 +5,11 @@ with spectra saving.
 """
 
 
-from common.constants import Material
-from common.utils import get_json_object, get_time_of_execution
-from scripts import plot_objects as gg
-from scripts.cubic_cef_object import Cubic
-from scripts.experiment_object import Experiment
+from cef_cubic_symmetry.common.constants import Material
+from cef_cubic_symmetry.common.utils import get_json_object, get_time_of_execution
+from cef_cubic_symmetry.scripts import plot_objects as gg
+from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
+from cef_cubic_symmetry.scripts.experiment_object import Experiment
 
 
 @get_time_of_execution

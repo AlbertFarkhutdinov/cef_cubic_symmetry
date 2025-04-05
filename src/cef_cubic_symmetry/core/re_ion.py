@@ -6,7 +6,7 @@ from typing import Union
 import pandas as pd
 from pretty_repr import RepresentableObject
 
-from common.constants import DATA_DIR
+from cef_cubic_symmetry.common.constants import DATA_DIR
 
 
 class REIon(RepresentableObject):

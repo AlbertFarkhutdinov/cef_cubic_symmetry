@@ -4,9 +4,9 @@
 from numpy import sqrt
 from scipy.constants import physical_constants
 
-from common import utils
-from core.custom_datatypes import MagnetField
-from interactions.base_interaction import BaseInteraction
+from cef_cubic_symmetry.common import utils
+from cef_cubic_symmetry.core.custom_datatypes import MagnetField
+from cef_cubic_symmetry.interactions.base_interaction import BaseInteraction
 
 
 class Zeeman(BaseInteraction):

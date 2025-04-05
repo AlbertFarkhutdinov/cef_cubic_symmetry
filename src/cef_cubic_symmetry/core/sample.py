@@ -5,7 +5,7 @@ from typing import Union
 
 from pretty_repr import RepresentableObject
 
-from core.re_ion import REIon
+from cef_cubic_symmetry.core.re_ion import REIon
 
 
 class Crystal(RepresentableObject):

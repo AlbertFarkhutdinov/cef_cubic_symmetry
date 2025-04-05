@@ -1,9 +1,9 @@
 """The module contains the console manager for work with project."""
 
 
-from common.constants import BASE_DIR, Material
-from common.utils import check_input
-from scripts.cubic_cef_object import Cubic
+from cef_cubic_symmetry.common.constants import BASE_DIR, Material
+from cef_cubic_symmetry.common.utils import check_input
+from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
 def main():

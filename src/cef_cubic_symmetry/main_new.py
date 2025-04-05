@@ -1,4 +1,4 @@
-from core import Sample
+from cef_cubic_symmetry.core import Sample
 
 
 class CalculationRunner:
