@@ -4,13 +4,13 @@
 from json import dump, load
 
 from numpy import linspace, sqrt
+from scipy.constants import physical_constants
 from scipy.linalg import eigh
 
 from cef_cubic_symmetry.common import physics, utils
-from cef_cubic_symmetry.common.constants import Material
 from cef_cubic_symmetry.common.path_utils import get_paths
-from cef_cubic_symmetry.common.tabular_information import BOHR_MAGNETON
 from cef_cubic_symmetry.common.utils import UTF8File, get_repr
+from cef_cubic_symmetry.core.sample import Sample
 
 
 class CEF:
@@ -24,7 +24,7 @@ class CEF:
     resolution = 1e-2
     threshold = 1e-4
 
-    def __init__(self, material: Material):
+    def __init__(self, material: Sample):
         """Initializes the CEF object or read it from a file."""
         self.material = material
         self.file_name = get_paths(
@@ -38,15 +38,22 @@ class CEF:
     @property
     def parameters(self):
         """CEF parameters"""
-        return {
-            param: 0 for param in (
-                'B20', 'B40', 'B60',
-                'B22', 'B42', 'B62',
-                'B43', 'B63',
-                'B44', 'B64',
+        return dict.fromkeys(
+            (
+                'B20',
+                'B40',
+                'B60',
+                'B22',
+                'B42',
+                'B62',
+                'B43',
+                'B63',
+                'B44',
+                'B64',
                 'B66',
-            )
-        }
+            ),
+            0,
+        )
 
     def load_data(self):
         """Loads CEF object from file"""
@@ -114,7 +121,7 @@ class CEF:
             mqn_1 = row - j
             hamiltonian[row, row] -= (
                 self.material.rare_earth.lande_factor *
-                BOHR_MAGNETON *
+                physical_constants['Bohr magneton in eV/T'][0] * 1000 *
                 mqn_1 *
                 magnet_field['z']
             )
@@ -123,8 +130,8 @@ class CEF:
                 mqn_2 = mqn_1 + 1
                 hamiltonian[row, column] -= (
                     0.5 * self.material.rare_earth.lande_factor *
-                    BOHR_MAGNETON *
-                    sqrt((squared_j - mqn_1 * mqn_2)) *
+                    physical_constants['Bohr magneton in eV/T'][0] * 1000 *
+                    sqrt(squared_j - mqn_1 * mqn_2) *
                     magnet_field['x']
                 )
                 hamiltonian[column, row] = hamiltonian[row, column]
@@ -225,7 +232,7 @@ class CEF:
                 j_ops['-'][column, row] = j_ops['+'][row, column]
                 transition_probability[
                     column,
-                    row
+                    row,
                 ] = transition_probability[row, column]
 
         return j_ops, transition_probability
@@ -261,14 +268,14 @@ class CEF:
             magnet_field = self.magnet_field
         total_hamiltonian = self.get_total_hamiltonian(magnet_field)
         eigenvalues, eigenfunctions = self.get_eigenvalues_and_eigenfunctions(
-            total_hamiltonian
+            total_hamiltonian,
         )
         boltzmann_factor = self.get_boltzmann_factor(
-            size, eigenvalues, temperature
+            size, eigenvalues, temperature,
         )
         peaks = []
         _, transition_probabilities = self.get_transition_probabilities(
-            eigenfunctions
+            eigenfunctions,
         )
         for level_1 in range(size):
             for level_2 in range(size):
@@ -279,7 +286,7 @@ class CEF:
                 if intensity_of_transition > 0:
                     peaks.append({
                         'energy': eigenvalues[level_2] - eigenvalues[level_1],
-                        'intensity': intensity_of_transition
+                        'intensity': intensity_of_transition,
                     })
         return peaks
 
@@ -344,7 +351,7 @@ class CEF:
             energies = linspace(
                 -1.1 * eigenvalues[-1],
                 1.1 * eigenvalues[-1],
-                501
+                501,
             )
         if width_dict is None:
             width_dict = {'sigma': 0.01 * (max(energies) - min(energies))}
@@ -409,7 +416,7 @@ class CEF:
                                             eigenvalues == 0] +
                                  j_ops['-'][eigenvalues == 0,
                                             eigenvalues == 0])) /
-                      eigenvalues[eigenvalues == 0].size)
+                      eigenvalues[eigenvalues == 0].size),
             }
         magnetic_moment = {}
         for key, value in j_average.items():
@@ -487,7 +494,7 @@ class CEF:
         """
         temperatures = utils.get_default(
             temperatures,
-            linspace(1, 300, 300, dtype='float64')
+            linspace(1, 300, 300, dtype='float64'),
         )
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = (
@@ -495,7 +502,7 @@ class CEF:
             )
         temperatures = utils.get_default(
             temperatures,
-            linspace(1, 300, 300, dtype='float64')
+            linspace(1, 300, 300, dtype='float64'),
         )
         chi_curie = {
             'z': None,
@@ -540,9 +547,11 @@ class CEF:
         return get_repr(self, 'material')
 
     def __str__(self):
-        """Return a summary of the model parameters.
+        """
+        Return a summary of the model parameters.
         This includes the rare earth, the CEF parameters, and,
-        if diagonalized, the eigenvalues and eigenfunctions."""
+        if diagonalized, the eigenvalues and eigenfunctions.
+        """
         output = [
             self.material.crystal,
             f'Rare-earth ion: {self.material.rare_earth.name};',
@@ -590,7 +599,7 @@ class CEF:
             output.append(f'Temperature: {self.temperature} K')
             for peak in peaks:
                 output.append(
-                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}'
+                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}',
                 )
 
         return '\n'.join(output)

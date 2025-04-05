@@ -8,7 +8,7 @@ in this project.
 from collections import namedtuple
 from pathlib import Path
 
-BASE_DIR = Path('.').resolve().parent
+BASE_DIR = Path().resolve().parent
 
 DATA_DIR = BASE_DIR / 'data'
 PLOTS_DIR = BASE_DIR / 'plots'
@@ -53,7 +53,7 @@ CrossPoint = namedtuple(
         'x',
         'ratio_name',
         'difference',
-    ]
+    ],
 )
 Data = namedtuple(
     typename='Data',
@@ -62,7 +62,7 @@ Data = namedtuple(
         'y_set',
         'errors',
         'legend',
-    ]
+    ],
 )
 Text = namedtuple(
     typename='Text',
@@ -70,12 +70,12 @@ Text = namedtuple(
         'x',
         'y',
         'string',
-    ]
+    ],
 )
 Scale = namedtuple(
     typename='Scale',
     field_names=[
         'limits',
         'locators',
-    ]
+    ],
 )

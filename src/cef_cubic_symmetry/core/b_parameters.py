@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class BParameters:
     """CEF parameters in B-notation."""
+
     b20: float = 0
     b40: float = 0
     b60: float = 0

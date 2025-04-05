@@ -143,7 +143,7 @@ def thermodynamics(
     if energies is not None and thermal_dict['temperature'] > 0:
         zero_array = zeros(len(energies))
         thermal_dict['boltzmann'] = exp(
-            zero_array - energies / thermal_dict['temperature']
+            zero_array - energies / thermal_dict['temperature'],
         )
     return thermal_dict
 

@@ -117,7 +117,7 @@ class System(RepresentableObject):
                                             eigen_v == 0] +
                                  j_ops['-'][eigen_v == 0,
                                             eigen_v == 0])) /
-                      eigen_v[eigen_v == 0].size)
+                      eigen_v[eigen_v == 0].size),
             }
         magnetic_moment = {}
         for key, value in j_average.items():
@@ -186,11 +186,11 @@ class System(RepresentableObject):
         """
         temperatures = utils.get_default(
             temperatures,
-            linspace(1, 300, 300, dtype='float64')
+            linspace(1, 300, 300, dtype='float64'),
         )
         temperatures = utils.get_default(
             temperatures,
-            linspace(1, 300, 300, dtype='float64')
+            linspace(1, 300, 300, dtype='float64'),
         )
         chi_curie = {
             'z': None,
@@ -228,29 +228,31 @@ class System(RepresentableObject):
         return chi_curie, chi_van_vleck, chi
 
     def __str__(self):
-        """Return a summary of the model parameters.
+        """
+        Return a summary of the model parameters.
         This includes the rare earth, the CEF parameters, and,
-        if diagonalized, the eigenvalues and eigenfunctions."""
+        if diagonalized, the eigenvalues and eigenfunctions.
+        """
         output = [str(self.sample)]
         for interaction in self.interactions.values():
             output.append(str(interaction))
         transitions = Transitions(
             sample=self.sample,
-            hamiltonian=self.get_hamiltonian()
+            hamiltonian=self.get_hamiltonian(),
         )
         output.append(str(transitions))
         eigen_v, _ = transitions.get_eigenvalues_and_eigenfunctions()
         peaks = transitions.get_peaks(
             self.interactions['Temperature'].get_boltzmann_factor(
                 eigenvalues=eigen_v,
-            )
+            ),
         )
         if peaks:
             output.append('Crystal Field Transitions:')
             output.append(f'Temperature: {self.temperature} K')
             for peak in peaks:
                 output.append(
-                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}'
+                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}',
                 )
 
         return '\n'.join(output)

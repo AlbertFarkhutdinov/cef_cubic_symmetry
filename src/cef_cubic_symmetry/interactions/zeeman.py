@@ -41,7 +41,7 @@ class Zeeman(BaseInteraction):
                 mqn_2 = mqn_1 + 1
                 hamiltonian[row, column] -= (
                     0.5 * factor * self.magnet_field.x_
-                    * sqrt((squared_momentum - mqn_1 * mqn_2))
+                    * sqrt(squared_momentum - mqn_1 * mqn_2)
                 )
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian

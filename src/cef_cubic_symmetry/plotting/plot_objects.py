@@ -38,11 +38,7 @@ class CustomPlot(RepresentableObject):
 
     def __init__(self, dpi: int = 300):
         self.dpi = dpi
-        self.limits = {
-            _key: None
-            for _key
-            in ('x_min', 'x_max', 'y_min', 'y_max')
-        }
+        self.limits = dict.fromkeys(('x_min', 'x_max', 'y_min', 'y_max'))
         self.fig = None
         self._ax = None
 
@@ -79,8 +75,8 @@ class CustomPlot(RepresentableObject):
         _limits = {
             'x_min': (x_min, min(self.data.x)),
             'x_max': (x_max, max(self.data.x)),
-            'y_min': (y_min, min((min(value) for value in y_set))),
-            'y_max': (y_max, max((max(value) for value in y_set))),
+            'y_min': (y_min, min(min(value) for value in y_set)),
+            'y_max': (y_max, max(max(value) for value in y_set)),
         }
         for _key, _value in _limits.items():
             self.limits[_key] = _value[0] or _value[1]
@@ -124,7 +120,7 @@ class CustomPlot(RepresentableObject):
             for key, y_data in self.data.y_set.items():
                 args = (self.data.x, y_data)
                 kwargs = {
-                    'label': self.data.legend[key]
+                    'label': self.data.legend[key],
                 }
                 if mode == 'errorbar':
                     kwargs['yerr'] = self.data.errors[key]

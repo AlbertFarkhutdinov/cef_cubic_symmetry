@@ -58,7 +58,7 @@ class Transitions(RepresentableObject):
                     np.sqrt(
                         squared_momentum
                         - (row_j - momentum)
-                        * (row_j - momentum + 1)
+                        * (row_j - momentum + 1),
                     )
                 )
 
@@ -99,7 +99,7 @@ class Transitions(RepresentableObject):
                 j_ops['-'][column, row] = j_ops['+'][row, column]
                 transition_probability[
                     column,
-                    row
+                    row,
                 ] = transition_probability[row, column]
 
         return j_ops, transition_probability
@@ -114,7 +114,7 @@ class Transitions(RepresentableObject):
         eigen_v, eigen_f = self.get_eigenvalues_and_eigenfunctions()
         peaks = []
         _, transition_probabilities = self.get_transition_probabilities(
-            eigenfunctions=eigen_f
+            eigenfunctions=eigen_f,
         )
         for level_1 in range(size):
             for level_2 in range(size):
@@ -125,7 +125,7 @@ class Transitions(RepresentableObject):
                 if intensity_of_transition > 0:
                     peaks.append({
                         'energy': eigen_v[level_2] - eigen_v[level_1],
-                        'intensity': intensity_of_transition
+                        'intensity': intensity_of_transition,
                     })
         return peaks
 
@@ -181,7 +181,7 @@ class Transitions(RepresentableObject):
             energies = np.linspace(
                 -1.1 * eigenvalues[-1],
                 1.1 * eigenvalues[-1],
-                501
+                501,
             )
         if width_dict is None:
             width_dict = {'sigma': 0.01 * (max(energies) - min(energies))}

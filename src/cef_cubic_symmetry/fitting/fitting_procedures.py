@@ -63,7 +63,7 @@ def fitting(
         f=function,
         xdata=data['x'],
         ydata=data['y'],
-        p0=parameters
+        p0=parameters,
     )
     p_err = np.sqrt(np.diag(p_cov))
     return p_opt, p_err
@@ -76,8 +76,10 @@ def multi_peak_fitting(
         min_value: float,
         max_value: float,
 ):
-    """Returns parameters of function fitted to data
-    with several peaks (lorentzian or gaussian)"""
+    """
+    Returns parameters of function fitted to data
+    with several peaks (lorentzian or gaussian)
+    """
     function = (ph.multi_lorentzian
                 if function_name.lower() == 'lorentz'
                 else ph.multi_gaussian)
@@ -136,7 +138,7 @@ if __name__ == '__main__':
         os.path.join(
             DATA_PATHS['experiment'],
             'PSI_Tb_YNi2_3meV_1.6K.dat',
-        )
+        ),
     )
     EXPERIMENTAL_DATA = filtered_data(
         EXPERIMENTAL_DATA,
@@ -156,7 +158,7 @@ if __name__ == '__main__':
                     'fit': 'fit',
                 },
                 errors=None,
-            )
+            ),
     ) as plot:
         plot.set_labels(
             xlabel='x_test',
@@ -201,7 +203,7 @@ if __name__ == '__main__':
                     'exp': DATA['errors'],
                     'fit': None,
                 },
-            )
+            ),
     ) as test_plot:
         test_plot.set_labels(xlabel='x_test', ylabel='y_test', title='test')
         # test_plot.set_limits(x_min=0, x_max=5, y_min=0, y_max=100)

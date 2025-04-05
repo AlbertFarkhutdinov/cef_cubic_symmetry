@@ -6,6 +6,7 @@ from copy import deepcopy
 
 from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common.utils import get_repr
+from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.fitting.fitting_procedures import get_data_from_file
 from cef_cubic_symmetry.scripts import plot_objects as gg
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
@@ -15,7 +16,7 @@ class Experiment:
     """Class contains experimental parameters"""
 
     def __init__(self,
-                 material: con.Material,
+                 material: Sample,
                  experimental_energies: tuple,
                  temperatures: tuple):
         """Initialization of class Experiment"""
@@ -72,9 +73,9 @@ class Experiment:
                                  self.material.crystal,
                                  f'{initial_energy}meV',
                                  f'{_temperature}K.dat'],
-                            )
-                        )
-                    )
+                            ),
+                        ),
+                    ),
                 )
                 _temperatures.append(_temperature)
             except FileNotFoundError:
@@ -121,11 +122,11 @@ class Experiment:
             for _index, _ in enumerate(data[0]['x']):
                 result['x'].append(data[0]['x'][_index])
                 result['y'].append(
-                    data[0]['y'][_index] - data[index + 1]['y'][_index]
+                    data[0]['y'][_index] - data[index + 1]['y'][_index],
                 )
                 result['errors'].append(
                     data[0]['errors'][_index]
-                    + data[index + 1]['errors'][_index]
+                    + data[index + 1]['errors'][_index],
                 )
             differences.append(f'{_temperatures[0]} K - {_temperature}')
             diff_data.append(result)
@@ -164,8 +165,8 @@ class Experiment:
         print('Cross points:')
         for point in crosses:
             print(
-                f'w = {point.w : 6.3f};\tx = {point.x : .3f}; '
-                f'Ratio: {point.ratio_name}'
+                f'w = {point.w: 6.3f};\tx = {point.x: .3f}; '
+                f'Ratio: {point.ratio_name}',
             )
         return crosses
 
@@ -197,11 +198,11 @@ class Experiment:
             for temperature in self.temperatures:
                 self.cubic_object.save_spectra_with_one_temperature(
                     gamma=gamma,
-                    temperature=temperature
+                    temperature=temperature,
                 )
             spectra = self.cubic_object.save_spectra_with_many_temperatures(
                 gamma=gamma,
-                temperatures=self.temperatures
+                temperatures=self.temperatures,
             )
             intensities = deepcopy(spectra)
             del intensities['energies']
@@ -209,7 +210,7 @@ class Experiment:
                 material=self.material,
                 parameters={
                     'w': point.w,
-                    'x': point.x
+                    'x': point.x,
                 },
                 data=con.Data(
                     x=spectra['energies'],
@@ -218,7 +219,7 @@ class Experiment:
                     legend={
                         temperature: f'{temperature} K'
                         for temperature in self.temperatures
-                    }
+                    },
                 ),
                 scale=con.Scale(
                     limits=limits,

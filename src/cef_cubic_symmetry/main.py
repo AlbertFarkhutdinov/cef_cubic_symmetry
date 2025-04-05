@@ -6,7 +6,7 @@ with spectra saving.
 
 
 from cef_cubic_symmetry.common import utils as ut
-from cef_cubic_symmetry.common.constants import Material
+from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts import plot_objects as gg
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 from cef_cubic_symmetry.scripts.experiment_object import Experiment
@@ -20,9 +20,11 @@ def get_fixed_results(
         only_plots=True,
         choice=0,
 ):
-    """Saves the dependence of transition energies, their ratio
-    on parameter x to file and its graphs for specified RE ions"""
-    material = Material(
+    """
+    Saves the dependence of transition energies, their ratio
+    on parameter x to file and its graphs for specified RE ions
+    """
+    material = Sample(
         crystal=crystal,
         rare_earth=rare_earth,
     )
@@ -30,11 +32,11 @@ def get_fixed_results(
         for w_parameter in (1, -1):
             cubic_object = Cubic(
                 material,
-                llw_parameters={'w': w_parameter}
+                llw_parameters={'w': w_parameter},
             )
             cubic_object.save_peak_dat(
                 number_of_intervals=5000,
-                choice=choice
+                choice=choice,
             )
             cubic_object.get_ratios(choice=choice)
     y_max = (
@@ -60,9 +62,9 @@ def get_fixed_results(
 def main(rare_earth: str, properties: dict):
     """Procedure of CEF parameters defining with spectra saving"""
     experiment = Experiment(
-        material=Material(
+        material=Sample(
             crystal='YNi2',
-            rare_earth=rare_earth
+            rare_earth=rare_earth,
         ),
         experimental_energies=properties['experimental_energies'],
         temperatures=properties['temperatures'],
@@ -84,7 +86,7 @@ def main(rare_earth: str, properties: dict):
     recalculated_crosses = experiment.get_cross_points()
     experiment.get_spectrum_theory(
         recalculated_crosses,
-        **properties['theory']
+        **properties['theory'],
     )
     # experiment.get_intensity_on_temperature(
     #     crosses=recalculated_crosses,
@@ -102,17 +104,17 @@ def get_scheme():
         'Nd': {
             'w': 0.147,
             'x': -0.748,
-        }
+        },
     }
     for _key, _value in results.items():
         print(
             Cubic(
-                Material(
+                Sample(
                     rare_earth=_key,
-                    crystal='YNi2'
+                    crystal='YNi2',
                 ),
-                llw_parameters=_value
-            )
+                llw_parameters=_value,
+            ),
         )
 
 

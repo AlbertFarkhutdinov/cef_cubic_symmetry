@@ -1,8 +1,9 @@
 """The module contains the console manager for work with project."""
 
 
-from cef_cubic_symmetry.common.constants import BASE_DIR, Material
+from cef_cubic_symmetry.common.constants import BASE_DIR
 from cef_cubic_symmetry.common.utils import check_input
+from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
@@ -19,9 +20,9 @@ def main():
         if command not in ('help', 'exit'):
             crystal = input('Input the name of crystal (e.g. "YNi2"): ')
             rare_earth = check_input('rare')
-            kwargs['material'] = Material(
+            kwargs['material'] = Sample(
                 crystal=crystal,
-                rare_earth=rare_earth
+                rare_earth=rare_earth,
             )
             kwargs['llw_parameters'] = {
                 'w': check_input('w'),
@@ -67,14 +68,14 @@ def main():
                 'to .dat-file for values inputted by user.',
                 'save_sus - saves magnetic susceptibilities to '
                 '.dat-file for values inputted by user.',
-                sep='\n'
+                sep='\n',
             )
         elif command == 'exit':
             break
         else:
             print(
                 "If you don't know, which commands can be inputted, "
-                "enter 'help'"
+                "enter 'help'",
             )
 
 

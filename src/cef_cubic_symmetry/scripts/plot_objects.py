@@ -9,6 +9,7 @@ from cycler import cycler
 from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common import utils as ut
 from cef_cubic_symmetry.common.path_utils import get_paths
+from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
@@ -42,11 +43,7 @@ class CustomPlot:
         """Initialization of Plot object"""
         self.data = data
         self.dpi = dpi
-        self.limits = {
-            _key: None
-            for _key
-            in ('x_min', 'x_max', 'y_min', 'y_max')
-        }
+        self.limits = dict.fromkeys(('x_min', 'x_max', 'y_min', 'y_max'))
         self.fig = None
         self._ax = None
 
@@ -77,8 +74,8 @@ class CustomPlot:
         _limits = {
             'x_min': (x_min, min(self.data.x)),
             'x_max': (x_max, max(self.data.x)),
-            'y_min': (y_min, min((min(value) for value in y_set))),
-            'y_max': (y_max, max((max(value) for value in y_set))),
+            'y_min': (y_min, min(min(value) for value in y_set)),
+            'y_max': (y_max, max(max(value) for value in y_set)),
         }
         for _key, _value in _limits.items():
             self.limits[_key] = ut.get_default(*_value)
@@ -104,11 +101,11 @@ class CustomPlot:
             ut.get_default(
                 y_major,
                 (self.limits['y_max'] - self.limits['y_min']) // 5,
-            )
+            ),
         )
         minors = (
             ut.get_default(x_minor, majors[0] / 5),
-            ut.get_default(y_minor, majors[1] / 5)
+            ut.get_default(y_minor, majors[1] / 5),
         )
         if self._ax:
             for i, axis in enumerate((self._ax.xaxis, self._ax.yaxis)):
@@ -127,7 +124,7 @@ class CustomPlot:
             for key, y_data in self.data.y_set.items():
                 args = (self.data.x, y_data)
                 kwargs = {
-                    'label': self.data.legend[key]
+                    'label': self.data.legend[key],
                 }
                 if mode == 'errorbar':
                     kwargs['yerr'] = self.data.errors[key]
@@ -171,7 +168,7 @@ class CubicPlot(CustomPlot):
     def __init__(self,
                  data,
                  material:
-                 con.Material,
+                 Sample,
                  dpi=300):
         """Initialization of Plot object"""
         super().__init__(data=data, dpi=dpi)
@@ -199,24 +196,26 @@ class CubicPlot(CustomPlot):
 
 
 @ut.get_time_of_execution
-def get_llw_plot(material: con.Material,
+def get_llw_plot(material: Sample,
                  y_max,
                  y_major,
                  y_minor,
                  choice=0):
-    """Returns graphs for dependence of transition energies
-    or intensities on CEF parameters"""
+    """
+    Returns graphs for dependence of transition energies
+    or intensities on CEF parameters
+    """
     data_name = 'energies' if choice == 0 else 'intensities'
     for w_parameter in (1, -1):
         data = {
             'x': [],
             'y_set': OrderedDict(),
-            'legend': OrderedDict()
+            'legend': OrderedDict(),
         }
         for level in range(1, 7):
             data['y_set'][ut.get_label(level, choice)] = []
             data['legend'][ut.get_label(level, choice)] = ut.get_label(
-                level, choice
+                level, choice,
             )
 
         parameters = {'w': w_parameter}
@@ -237,7 +236,7 @@ def get_llw_plot(material: con.Material,
                         ].append(
                             con.INFINITY
                             if ((choice != 0) and (level == 1))
-                            else array[level]
+                            else array[level],
                         )
                     except IndexError:
                         data['y_set'][
@@ -279,24 +278,26 @@ def get_llw_plot(material: con.Material,
                 filename=plot.get_graph_file_name(
                     data_name=data_name,
                     parameters=parameters,
-                )
+                ),
             )
 
 
 @ut.get_time_of_execution
-def get_llw_ratios_plot(material: con.Material,
+def get_llw_ratios_plot(material: Sample,
                         experimental_value,
                         limits: dict,
                         ticks: dict,
                         choice=0):
-    """Returns graphs for dependence of transition energies or intensities
-     ratios on CEF parameters"""
+    """
+    Returns graphs for dependence of transition energies or intensities
+    ratios on CEF parameters
+    """
     data_name = 'ratios_energies' if choice == 0 else 'ratios_intensities'
     for w_parameter in (1, -1):
         data = {
             'x': [],
             'y_set': OrderedDict({'Experiment': []}),
-            'legend': OrderedDict({'Experiment': 'Experiment'})
+            'legend': OrderedDict({'Experiment': 'Experiment'}),
         }
         for name in ut.get_ratios_names(choice):
             data['y_set'][name] = []
@@ -324,7 +325,7 @@ def get_llw_ratios_plot(material: con.Material,
                 len(arg) == 0 or
                 min(arg) > experimental_value or
                 max(arg) < experimental_value
-            )
+            ),
         )
         parameters['exp'] = experimental_value
         data = con.Data(
@@ -350,16 +351,18 @@ def get_llw_ratios_plot(material: con.Material,
                 filename=plot.get_graph_file_name(
                     data_name=data_name,
                     parameters=parameters,
-                )
+                ),
             )
 
 
-def get_spectrum_theory(material: con.Material,
+def get_spectrum_theory(material: Sample,
                         parameters: dict,
                         data: con.Data = None,
                         scale: con.Scale = None):
-    """Returns inelastic neutron scattering spectrum
-    that calculated with specified parameters"""
+    """
+    Returns inelastic neutron scattering spectrum
+    that calculated with specified parameters
+    """
     with CubicPlot(data=data, material=material) as plot:
         plot.set_labels(**con.SPECTRUM_LABELS)
         plot.set_limits(**scale.limits)
@@ -369,11 +372,11 @@ def get_spectrum_theory(material: con.Material,
             filename=plot.get_graph_file_name(
                 data_name='spectra',
                 parameters=parameters,
-            )
+            ),
         )
 
 
-def get_spectrum_experiment(material: con.Material,
+def get_spectrum_experiment(material: Sample,
                             temperatures: tuple,
                             data: tuple,
                             parameters: dict,
@@ -399,12 +402,12 @@ def get_spectrum_experiment(material: con.Material,
             filename=plot.get_graph_file_name(
                 data_name='spectra',
                 parameters=parameters,
-            )
+            ),
         )
 
 
 def get_intensity_on_temperature(
-        material: con.Material,
+        material: Sample,
         crosses: con.CrossPoint,
         y_max: float,
 ):
@@ -456,7 +459,7 @@ def get_intensity_on_temperature(
         plot.save_in_two_forms(
             filename=plot.get_graph_file_name(
                 data_name=data_name,
-            )
+            ),
         )
 
 

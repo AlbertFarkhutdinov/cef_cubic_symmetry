@@ -13,8 +13,10 @@ from cef_cubic_symmetry.common.constants import DATA_DIR, INFINITY
 
 
 def get_sign(value: float):
-    """Returns minus, if argument is negative,
-    else it returns plus."""
+    """
+    Return minus, if argument is negative, else it return plus.
+
+    """
     return '-' if value < 0 else '+'
 
 
@@ -31,8 +33,10 @@ def get_default(value, default):
 
 
 def write_row(file, row):
-    """Writes to file the row of the float numbers
-    separated with tabulation symbol."""
+    """
+    Write the row of the float numbers separated with tabulation to the file.
+
+    """
     result = ''
     for value in row:
         result += f'{value:11.5f}\t'
@@ -40,8 +44,10 @@ def write_row(file, row):
 
 
 def check_input(choice: str):
-    """Checks a value inputted by user, returns it,
-    if it satisfies the condition, else requests input again."""
+    """
+    Checks a value inputted by user, returns it,
+    if it satisfies the condition, else requests input again.
+    """
     result = 0
     condition = False
     while not condition:
@@ -123,6 +129,7 @@ def get_repr(obj, *args):
 
 class UTF8File:
     """Context manager for file opening"""
+
     def __init__(self, name: str, mode='r'):
         """Initialization of class"""
         self.name = name

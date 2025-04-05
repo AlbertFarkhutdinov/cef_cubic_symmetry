@@ -9,9 +9,10 @@ import sys
 from numpy import linspace
 
 from cef_cubic_symmetry.common import utils as ut
-from cef_cubic_symmetry.common.constants import CrossPoint, Material
+from cef_cubic_symmetry.common.constants import CrossPoint
 from cef_cubic_symmetry.common.path_utils import PathProcessor, get_paths
-from cef_cubic_symmetry.common.tabular_information import F4
+from cef_cubic_symmetry.core.llw_parameters import F4
+from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cef_object import CEF
 
 
@@ -24,13 +25,13 @@ class Cubic(CEF):
 
     """
 
-    def __init__(self, material: Material, llw_parameters: dict):
+    def __init__(self, material: Sample, llw_parameters: dict):
         """Initializes the Cubic object or read it from a file."""
         super().__init__(material=material)
         if self.material.rare_earth.name in ['Ce', 'Sm', 'Eu']:
             print(
                 f"The element '{self.material.rare_earth.name}' "
-                f"is not supported."
+                f"is not supported.",
             )
             sys.exit(1)
         else:
@@ -83,12 +84,12 @@ class Cubic(CEF):
 
         """
         file_name = self.get_file_name(
-            data_name='energies' if choice == 0 else 'intensities'
+            data_name='energies' if choice == 0 else 'intensities',
         )
         PathProcessor(file_name).remove_if_exists()
         print(
             f'Saving of {"energies" if choice == 0 else "intensities"} '
-            f'datafiles will take some time...'
+            f'datafiles will take some time...',
         )
         with ut.UTF8File(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
@@ -123,7 +124,7 @@ class Cubic(CEF):
                 **self.llw_parameters,
                 'gamma': gamma,
                 'T': temperature,
-            }
+            },
         )
         PathProcessor(file_name).remove_if_exists()
         with ut.UTF8File(file_name, mode='a') as file:
@@ -232,11 +233,11 @@ class Cubic(CEF):
         }
         ratio_file_name = self.get_file_name(
             data_name=f'ratios_{peak_data}',
-            parameters=parameters
+            parameters=parameters,
         )
         peak_file_name = self.get_file_name(
             data_name=peak_data,
-            parameters=parameters
+            parameters=parameters,
         )
         PathProcessor(ratio_file_name).remove_if_exists()
         with ut.UTF8File(ratio_file_name, mode='a') as ratio_file:
@@ -308,8 +309,10 @@ class Cubic(CEF):
             experimental_energy: float,
             accuracy=0.005,
     ):
-        """Returns points of cross experimental and calculated curves,
-        recalculated with correct value of W."""
+        """
+        Returns points of cross experimental and calculated curves,
+        recalculated with correct value of W.
+        """
         points = []
         for w_parameter in (
                 abs(self.llw_parameters['w']),
@@ -332,7 +335,7 @@ class Cubic(CEF):
                             numbers=numbers,
                             points=points,
                             experimental_value=experimental_value,
-                            accuracy=accuracy
+                            accuracy=accuracy,
                         )
         for index, point in enumerate(points):
             self.llw_parameters['x'] = point.x
@@ -373,7 +376,7 @@ class Cubic(CEF):
 if __name__ == '__main__':
     print(
         Cubic(
-            material=Material(rare_earth='Pr', crystal='YNi2'),
+            material=Sample(rare_earth='Pr', crystal='YNi2'),
             llw_parameters={'w': -0.505, 'x': -0.107},
-        )
+        ),
     )
