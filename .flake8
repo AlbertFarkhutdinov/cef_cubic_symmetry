@@ -1,0 +1,5 @@
+[flake8]
+docstring-convention=numpy
+extend-ignore=WPS304,WPS305,WPS323,WPS348,WPS410,WPS412,WPS421
+per-file-ignores =
+    s_waves/core/__init__.py:F401
