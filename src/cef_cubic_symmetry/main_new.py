@@ -8,4 +8,5 @@ class CalculationRunner:
             rare_earth_ion: str,
             crystal: str,
     ) -> None:
+        """Initialize self. See help(type(self)) for accurate signature."""
         self.sample = Sample(crystal=crystal, rare_earth=rare_earth_ion)

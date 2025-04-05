@@ -1,8 +1,4 @@
-"""
-The module contains some common constants and named_tuples that used
-in this project.
-
-"""
+"""The module contains constants and named_tuples that used in this project."""
 
 
 from collections import namedtuple

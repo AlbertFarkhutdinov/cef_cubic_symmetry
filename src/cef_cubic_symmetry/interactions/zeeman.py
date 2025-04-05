@@ -10,20 +10,15 @@ from cef_cubic_symmetry.interactions.base_interaction import BaseInteraction
 
 
 class Zeeman(BaseInteraction):
-    """
-    Class defining the trivalent rare earth compound,
-    its crystal field parameters and the eigenvalues and eigenfunctions
-    of the CEF Hamiltonian, if it is already diagonalized.
-
-    """
+    """Class for interaction with Zeeman field."""
 
     def __init__(self, magnet_field: MagnetField = None, **kwargs) -> None:
-        """Initializes the CEF object or read it from a file."""
+        """Initialize the CEF object or read it from a file."""
         super().__init__(**kwargs)
         self.magnet_field = magnet_field or MagnetField()
 
     def get_hamiltonian(self):
-        """Determines the Zeeman terms to the Hamiltonian."""
+        """Determine the Zeeman terms to the Hamiltonian."""
         size = self.sample.rare_earth.matrix_size
         hamiltonian = utils.get_empty_matrix(size)
         momentum = self.sample.rare_earth.info.total_momentum_ground

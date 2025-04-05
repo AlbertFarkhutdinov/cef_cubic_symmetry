@@ -1,8 +1,4 @@
-"""
-The module contains the procedure of CEF parameters defining
-with spectra saving.
-
-"""
+"""The module contains the procedure of CEF parameters calculation."""
 
 
 from cef_cubic_symmetry.common import utils as ut
@@ -21,8 +17,11 @@ def get_fixed_results(
         choice=0,
 ):
     """
-    Saves the dependence of transition energies, their ratio
-    on parameter x to file and its graphs for specified RE ions
+    Calculate and save the fixed results.
+
+    This function saves the dependence of transition energies, their ratio
+    on parameter x to file and its graphs for specified RE ions.
+
     """
     material = Sample(
         crystal=crystal,
@@ -60,7 +59,7 @@ def get_fixed_results(
 
 @ut.get_time_of_execution
 def main(rare_earth: str, properties: dict):
-    """Procedure of CEF parameters defining with spectra saving"""
+    """Procedure of CEF parameters defining with spectra saving."""
     experiment = Experiment(
         material=Sample(
             crystal='YNi2',
@@ -95,7 +94,7 @@ def main(rare_earth: str, properties: dict):
 
 
 def get_scheme():
-    """Prints level scheme for specified parameters"""
+    """Print level scheme for specified parameters."""
     results = {
         'Pr': {
             'w': -0.105,

@@ -10,7 +10,8 @@ def gaussian_normalized(
         sigma: float,
 ):
     """
-    Returns value of normalized Gauss function.
+    Return value of normalized Gauss function.
+
     Integral with infinite limits equals 1.
     Full width at half-maximum (FWHM) is 2 * sqrt(2*ln(2)) * sigma.
     Value at the maximum is 1 / (sigma * sqrt(2 * pi)).
@@ -28,7 +29,8 @@ def lorentzian_normalized(
         gamma: float,
 ):
     """
-    Returns value of normalized Lorentz function.
+    Return value of normalized Lorentz function.
+
     Integral with infinite limits equals 1.
     Full width at half-maximum (FWHM) is 2 * gamma.
     Value at the maximum is 1 / (pi * gamma).
@@ -44,7 +46,8 @@ def gaussian(
         amplitude: float,
 ):
     """
-    Returns value of Gauss function.
+    Return value of Gauss function.
+
     Integral with infinite limits equals amplitude.
     Value at the maximum is amplitude / (sigma * sqrt(2 * pi)).
 
@@ -59,7 +62,8 @@ def lorentzian(
         amplitude: float,
 ):
     """
-    Returns value of Lorentz function.
+    Return value of Lorentz function.
+
     Integral with infinite limits equals amplitude.
     Value at the maximum is amplitude / (pi * gamma).
 
@@ -74,7 +78,8 @@ def pseudo_voigt_normalized(
         gamma: float,
 ):
     """
-    Returns value of normalized pseudo-Voigt function.
+    Return value of normalized pseudo-Voigt function.
+
     Integral with infinite limits equals 1.
     Full width at half-maximum (FWHM) is fwhm_total.
 
@@ -105,7 +110,7 @@ def multi_peak(
         arg: float,
         *parameters,
 ):
-    """Returns value of several peaks sum."""
+    """Return value of several peaks sum."""
     background = parameters[0]
     peaks_parameters = parameters[1:]
     peaks = []
@@ -118,7 +123,7 @@ def multi_lorentzian(
         arg: float,
         *parameters,
 ):
-    """Returns value of multi_peak function for lorentzian."""
+    """Return value of multi_peak function for lorentzian."""
     return multi_peak(lorentzian, arg, *parameters)
 
 
@@ -126,7 +131,7 @@ def multi_gaussian(
         arg: float,
         *parameters,
 ):
-    """Returns value of multi_peak function for gaussian."""
+    """Return value of multi_peak function for gaussian."""
     return multi_peak(gaussian, arg, *parameters)
 
 
@@ -134,11 +139,7 @@ def thermodynamics(
         temperature: float,
         energies=None,
 ):
-    """
-    Returns dictionary including value of temperature
-    in meV and Boltzmann factor.
-
-    """
+    """Return temperature value in meV and Boltzmann factor."""
     thermal_dict = {'temperature': temperature / 11.6045}
     if energies is not None and thermal_dict['temperature'] > 0:
         zero_array = zeros(len(energies))
@@ -153,11 +154,7 @@ def lowering_operator(
         squared_j: float,
         degree: int,
 ):
-    """
-    Returns the result of the lowering operator's action
-    on the wave function with quantum number initial_number.
-
-    """
+    """Return the result of the lowering operator's."""
     result = 1
     for step in range(degree):
         result *= (
@@ -174,11 +171,7 @@ def steven_operators(
         mqn_1,
         mqn_2=None,
 ):
-    """
-    Returns the result of the Stevens operators' action
-    on the wave function with quantum numbers m=mqn_1[1] and n=mqn_2[1].
-
-    """
+    """Return the result of the Stevens operators'."""
     result = {
         'o20': lambda: 3 * mqn_1[2] - squared_j,
         'o40': lambda: (

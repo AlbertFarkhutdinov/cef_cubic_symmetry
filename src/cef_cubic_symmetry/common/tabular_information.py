@@ -1,7 +1,4 @@
-"""
-The module contains some tabular data that used in this project.
-
-"""
+"""The module contains some tabular data that used in this project."""
 
 
 # RARE_EARTHS = (

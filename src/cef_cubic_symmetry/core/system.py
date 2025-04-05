@@ -17,12 +17,7 @@ from cef_cubic_symmetry.core.transitions import Transitions
 
 
 class System(RepresentableObject):
-    """
-    Class defining the trivalent rare earth compound,
-    its crystal field parameters and the eigenvalues and eigenfunctions
-    of the CEF Hamiltonian, if it is already diagonalized.
-
-    """
+    """Class for the studied system."""
 
     def __init__(
             self,
@@ -31,7 +26,7 @@ class System(RepresentableObject):
             temperature: float = 0,
             magnet_field: MagnetField = None,
     ):
-        """Initializes the CEF object or read it from a file."""
+        """Initialize the CEF object or read it from a file."""
         self.sample = sample
         self.file_name = get_paths(
             data_name='parameters',
@@ -61,7 +56,7 @@ class System(RepresentableObject):
         return {'file_name', 'interactions'}
 
     def save_to_file(self):
-        """Saves parameters of the current object to file."""
+        """Save parameters of the current object to file."""
         saved_object = {
             'crystal': self.sample.crystal.name,
             'rare_earth': self.sample.rare_earth.info.symbol,
@@ -73,7 +68,7 @@ class System(RepresentableObject):
             json.dump(saved_object, file, indent=4, sort_keys=True)
 
     def load_data(self):
-        """Loads CEF object from file"""
+        """Load CEF object from file."""
         with UTF8File(self.file_name) as file:
             properties = json.load(file)
         self.sample = Sample(
@@ -90,7 +85,7 @@ class System(RepresentableObject):
         return cef.get_hamiltonian() + zeeman.get_hamiltonian()
 
     def get_moments(self):
-        """Calculates the magnetic moments of the CEF model."""
+        """Calculate the magnetic moments of the CEF model."""
         transitions = Transitions(
             sample=self.sample,
             hamiltonian=self.get_hamiltonian(),
@@ -129,7 +124,7 @@ class System(RepresentableObject):
         return j_average, magnetic_moment
 
     def get_chi(self):
-        """Calculates the susceptibility at a specified temperature."""
+        """Calculate the susceptibility at a specified temperature."""
         transitions = Transitions(
             sample=self.sample,
             hamiltonian=self.get_hamiltonian(),
@@ -180,10 +175,7 @@ class System(RepresentableObject):
         return chi
 
     def get_chi_dependence(self, temperatures=None):
-        """
-        Calculates the susceptibility at a specified range of temperatures.
-
-        """
+        """Calculate the susceptibility at specified temperatures."""
         temperatures = utils.get_default(
             temperatures,
             linspace(1, 300, 300, dtype='float64'),
@@ -230,8 +222,10 @@ class System(RepresentableObject):
     def __str__(self):
         """
         Return a summary of the model parameters.
+
         This includes the rare earth, the CEF parameters, and,
         if diagonalized, the eigenvalues and eigenfunctions.
+
         """
         output = [str(self.sample)]
         for interaction in self.interactions.values():

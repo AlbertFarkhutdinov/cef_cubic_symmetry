@@ -13,13 +13,13 @@ from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
 class Experiment:
-    """Class contains experimental parameters"""
+    """Class contains experimental parameters."""
 
     def __init__(self,
                  material: Sample,
                  experimental_energies: tuple,
                  temperatures: tuple):
-        """Initialization of class Experiment"""
+        """Initialize class Experiment."""
         self.material = material
         self.experimental_energies = experimental_energies
         self.experimental_ratio = (
@@ -32,7 +32,7 @@ class Experiment:
         )
 
     def __repr__(self):
-        """Method returns string representation of the Experiment object."""
+        """Return string representation of the Experiment object."""
         return get_repr(
             self,
             'material',
@@ -43,7 +43,7 @@ class Experiment:
     def get_llw_ratios_plot(self,
                             limits: dict,
                             ticks: dict):
-        """Method saves the plot for LLW diagram of energies ratio"""
+        """Save the plot for LLW diagram of energies ratio."""
         gg.get_llw_ratios_plot(
             material=self.material,
             experimental_value=self.experimental_ratio,
@@ -56,7 +56,7 @@ class Experiment:
             spectrometer: str,
             initial_energy: float,
     ):
-        """Method returns data for experimental spectra"""
+        """Return data for experimental spectra."""
         data = []
         _temperatures = []
         for _temperature in self.temperatures:
@@ -87,7 +87,7 @@ class Experiment:
                                 locators: dict,
                                 spectrometer: str,
                                 initial_energy: float):
-        """Method saves the plot for experimental spectrum"""
+        """Save the plot for experimental spectrum."""
         data, _temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
             initial_energy=initial_energy,
@@ -106,7 +106,7 @@ class Experiment:
     def _get_spectrum_differences(self,
                                   spectrometer: str,
                                   initial_energy: float):
-        """Method returns data for experimental spectra differences"""
+        """Return data for experimental spectra differences."""
         data, _temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
             initial_energy=initial_energy,
@@ -139,7 +139,7 @@ class Experiment:
             spectrometer: str,
             initial_energy: float,
     ):
-        """Method saves the plot for experimental spectrum"""
+        """Save the plot for experimental spectrum."""
         diff_data, differences = self._get_spectrum_differences(
             spectrometer=spectrometer,
             initial_energy=initial_energy,
@@ -156,7 +156,7 @@ class Experiment:
         )
 
     def get_cross_points(self):
-        """Method returns cross points for experimental and theoretic curves"""
+        """Return cross points for experimental and theoretic curves."""
         self.cubic_object.llw_parameters = {'w': 1}
         crosses = self.cubic_object.find_cross(
             experimental_value=self.experimental_ratio,
@@ -172,8 +172,14 @@ class Experiment:
 
     def get_intensity_on_temperature(self, crosses, y_max: float):
         """
-        Method saves the plot for dependence
-        of transition intensities on temperature.
+        Save the plot for dependence of transition intensities on temperature.
+
+        Parameters
+        ----------
+        crosses
+            Cross points.
+        y_max : float
+            Max y value.
 
         """
         gg.get_intensity_on_temperature(
@@ -189,7 +195,7 @@ class Experiment:
             locators: dict,
             gamma=0.16,
     ):
-        """Method saves the plot for theoretical spectrum."""
+        """Save the plot for theoretical spectrum."""
         for point in recalculated_crosses:
             self.cubic_object.llw_parameters = {
                 'w': point.w,

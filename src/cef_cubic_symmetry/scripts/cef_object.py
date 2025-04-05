@@ -15,6 +15,8 @@ from cef_cubic_symmetry.core.sample import Sample
 
 class CEF:
     """
+    Class for cristal electric field.
+
     Class defining the trivalent rare earth compound,
     its crystal field parameters and the eigenvalues and eigenfunctions
     of the CEF Hamiltonian, if it is already diagonalized.
@@ -25,7 +27,7 @@ class CEF:
     threshold = 1e-4
 
     def __init__(self, material: Sample):
-        """Initializes the CEF object or read it from a file."""
+        """Initialize the CEF object or read it from a file."""
         self.material = material
         self.file_name = get_paths(
             data_name='parameters',
@@ -37,7 +39,7 @@ class CEF:
 
     @property
     def parameters(self):
-        """CEF parameters"""
+        """CEF parameters."""
         return dict.fromkeys(
             (
                 'B20',
@@ -56,12 +58,12 @@ class CEF:
         )
 
     def load_data(self):
-        """Loads CEF object from file"""
+        """Load CEF object from file."""
         with UTF8File(self.file_name) as file:
             self.__dict__.update(load(file))
 
     def save_to_file(self):
-        """Saves parameters of the current object to file."""
+        """Save parameters of the current object to file."""
         saved_object = {
             'crystal': self.material.crystal,
             'rare_earth': self.material.rare_earth.name,
@@ -75,7 +77,7 @@ class CEF:
                             size: int,
                             j: float,
                             squared_j: float):
-        """Determines the CEF Hamiltonian based on the input parameters."""
+        """Determine the CEF Hamiltonian based on the input parameters."""
         hamiltonian = utils.get_empty_matrix(size)
         parameters = self.parameters
         for row in range(size):
@@ -112,7 +114,7 @@ class CEF:
                                j: float,
                                squared_j: float,
                                magnet_field: dict = None):
-        """Determines the Zeeman terms to the Hamiltonian."""
+        """Determine the Zeeman terms to the Hamiltonian."""
         if magnet_field is None:
             magnet_field = self.magnet_field
         hamiltonian = utils.get_empty_matrix(size)
@@ -138,7 +140,7 @@ class CEF:
         return hamiltonian
 
     def get_total_hamiltonian(self, magnet_field: dict = None):
-        """Returns the total Hamiltonian including CEF and Zeeman terms."""
+        """Return the total Hamiltonian including CEF and Zeeman terms."""
         size = self.material.rare_earth.matrix_size
         j = self.material.rare_earth.total_momentum_ground
         squared_j = j * (j + 1)
@@ -150,10 +152,7 @@ class CEF:
             total_hamiltonian=None,
             ground_state_is_zero=True,
     ):
-        """
-        Calculates eigenvalues and eigenfunctions of the total Hamiltonian.
-
-        """
+        """Return eigenvalues and eigenfunctions of the total Hamiltonian."""
         if total_hamiltonian is None:
             total_hamiltonian = self.get_total_hamiltonian()
         eigenvalues, eigenfunctions = eigh(total_hamiltonian)
@@ -166,7 +165,9 @@ class CEF:
             eigenfunctions,
     ):
         """
-        Determines matrix elements for dipole transitions
+        Return transition probabilities.
+
+        Determine matrix elements for dipole transitions
         between eigenfunctions of the total Hamiltonian.
 
         """
@@ -243,7 +244,7 @@ class CEF:
             eigenvalues,
             temperature=None,
     ):
-        """Determines boltzmann_factor at specified temperature."""
+        """Determine boltzmann_factor at specified temperature."""
         temperature = utils.get_default(temperature, self.temperature)
         thermal = physics.thermodynamics(temperature, eigenvalues)
         boltzmann_factor = utils.get_empty_matrix(size, dimension=1)
@@ -258,11 +259,7 @@ class CEF:
             temperature=None,
             magnet_field: dict = None,
     ):
-        """
-        Determines the peak energies and intensities
-        from the total Hamiltonian.
-
-        """
+        """Determine the peak properties from the total Hamiltonian."""
         size = self.material.rare_earth.matrix_size
         if magnet_field is None:
             magnet_field = self.magnet_field
@@ -293,7 +290,7 @@ class CEF:
     def get_peaks(self,
                   temperature=None,
                   magnet_field: dict = None):
-        """Returns peaks for non-degenerate levels."""
+        """Return peaks for non-degenerate levels."""
         result = []
         peaks = self.get_all_peaks(temperature, magnet_field)
         for peak in peaks:
@@ -325,13 +322,13 @@ class CEF:
         return result
 
     def get_energies(self, peaks=None):
-        """Returns transition energies"""
+        """Return transition energies."""
         if peaks is None:
             peaks = self.get_peaks()
         return [peak[0] for peak in peaks]
 
     def get_intensities(self, peaks=None):
-        """Returns transition intensities"""
+        """Return transition intensities."""
         if peaks is None:
             peaks = self.get_peaks()
         return [peak[1] for peak in peaks]
@@ -341,7 +338,7 @@ class CEF:
                      temperature=None,
                      width_dict: dict = None,
                      magnet_field: dict = None):
-        """Calculates the neutron scattering cross-section."""
+        """Calculate the neutron scattering cross-section."""
         temperature = utils.get_default(temperature, self.temperature)
         peaks = self.get_peaks(temperature, magnet_field)
         eigenvalues, _ = self.get_eigenvalues_and_eigenfunctions()
@@ -389,7 +386,7 @@ class CEF:
                     temperature=None,
                     eigenvalues=None,
                     eigenfunctions=None):
-        """Calculates the magnetic moments of the CEF model."""
+        """Calculate the magnetic moments of the CEF model."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = (
                 self.get_eigenvalues_and_eigenfunctions()
@@ -431,7 +428,7 @@ class CEF:
                 temperature=None,
                 eigenvalues=None,
                 eigenfunctions=None):
-        """Calculates the susceptibility at a specified temperature."""
+        """Calculate the susceptibility at a specified temperature."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = (
                 self.get_eigenvalues_and_eigenfunctions()
@@ -488,10 +485,7 @@ class CEF:
             eigenvalues=None,
             eigenfunctions=None,
     ):
-        """
-        Calculates the susceptibility at a specified range of temperatures.
-
-        """
+        """Calculate the susceptibility at specified temperatures."""
         temperatures = utils.get_default(
             temperatures,
             linspace(1, 300, 300, dtype='float64'),
@@ -543,14 +537,16 @@ class CEF:
         return chi_curie, chi_van_vleck, chi
 
     def __repr__(self):
-        """Method returns string representation of the CEF object."""
+        """Return string representation of the CEF object."""
         return get_repr(self, 'material')
 
     def __str__(self):
         """
         Return a summary of the model parameters.
+
         This includes the rare earth, the CEF parameters, and,
         if diagonalized, the eigenvalues and eigenfunctions.
+
         """
         output = [
             self.material.crystal,

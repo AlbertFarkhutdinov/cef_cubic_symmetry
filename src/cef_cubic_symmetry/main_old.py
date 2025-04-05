@@ -8,7 +8,7 @@ from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
 def main():
-    """Main procedure"""
+    """Run main procedure."""
     print(f'Working directory: {BASE_DIR}\n')
     while True:
         command = input('\nInput command (e.g. "help"): ')

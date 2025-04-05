@@ -8,20 +8,15 @@ from cef_cubic_symmetry.common import physics, utils
 
 
 class Thermostat(BaseInteraction):
-    """
-    Class defining the trivalent rare earth compound,
-    its crystal field parameters and the eigenvalues and eigenfunctions
-    of the CEF Hamiltonian, if it is already diagonalized.
-
-    """
+    """Class for interaction with thermostat."""
 
     def __init__(self, temperature: float = 0, **kwargs) -> None:
-        """Initializes the CEF object or read it from a file."""
+        """Initialize the CEF object or read it from a file."""
         super().__init__(**kwargs)
         self.temperature = temperature
 
     def get_boltzmann_factor(self, eigenvalues: np.ndarray) -> np.ndarray:
-        """Determines boltzmann_factor at specified temperature."""
+        """Determine boltzmann_factor at specified temperature."""
         thermal = physics.thermodynamics(self.temperature, eigenvalues)
         boltzmann_factors = utils.get_empty_matrix(
             self.sample.rare_earth.matrix_size,

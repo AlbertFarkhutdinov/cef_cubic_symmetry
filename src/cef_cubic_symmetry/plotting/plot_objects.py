@@ -12,11 +12,11 @@ from cef_cubic_symmetry.common import utils as ut
 
 
 class CustomPlot(RepresentableObject):
-    """Description of Plot object"""
+    """Description of Plot object."""
 
     @staticmethod
     def _set_plot_parameters():
-        """Setting of rcParams"""
+        """Set rcParams."""
         plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
         prop_cycle = 'axes.prop_cycle'
         plt.rcParams[prop_cycle] = (
@@ -37,6 +37,7 @@ class CustomPlot(RepresentableObject):
                 plt.rcParams[f'{tick}.{_key}'] = _value
 
     def __init__(self, dpi: int = 300):
+        """Initialize self. See help(type(self)) for accurate signature."""
         self.dpi = dpi
         self.limits = dict.fromkeys(('x_min', 'x_max', 'y_min', 'y_max'))
         self.fig = None
@@ -47,7 +48,7 @@ class CustomPlot(RepresentableObject):
         return {'fig', '_ax', 'limits'}
 
     def __enter__(self):
-        """Method for entrance to context manager"""
+        """Execute entrance to context manager and return self."""
         self._set_plot_parameters()
         self.fig, self._ax = plt.subplots(dpi=self.dpi)
         return self
@@ -58,7 +59,7 @@ class CustomPlot(RepresentableObject):
             y_label: Optional[str] = None,
             title: Optional[str] = None,
     ):
-        """Sets labels of axis and plot"""
+        """Set labels of axis and plot."""
         self._ax.set_xlabel = x_label
         self._ax.set_ylabel = y_label
         self._ax.set_title = title
@@ -70,7 +71,7 @@ class CustomPlot(RepresentableObject):
             y_min: Optional[float] = None,
             y_max: Optional[float] = None,
     ):
-        """Sets limits of x and y intervals"""
+        """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
         _limits = {
             'x_min': (x_min, min(self.data.x)),
@@ -95,7 +96,7 @@ class CustomPlot(RepresentableObject):
             y_major=None,
             y_minor=None,
     ):
-        """Sets major and minor ticks for plot"""
+        """Set major and minor ticks for plot."""
         majors = (
             x_major or (self.limits['x_max'] - self.limits['x_min']) // 5,
             y_major or (self.limits['y_max'] - self.limits['y_min']) // 5,
@@ -111,7 +112,7 @@ class CustomPlot(RepresentableObject):
             mode='plot',
             text: con.Text = None,
     ):
-        """Draws the plot at specified mode"""
+        """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
                 key: self._ax.__getattribute__(key)
@@ -136,7 +137,7 @@ class CustomPlot(RepresentableObject):
             filename=None,
             form=None,
     ):
-        """Saves or shows the plot"""
+        """Save or show the plot."""
         if self.fig and self._ax:
             if form:
                 self.fig.savefig(f'{filename}.{form}')
@@ -150,11 +151,11 @@ class CustomPlot(RepresentableObject):
             form_1='png',
             form_2='eps',
     ):
-        """Saves or shows the plot"""
+        """Save or show the plot."""
         self.save_or_show(filename=filename, form=form_1)
         self.save_or_show(filename=filename, form=form_2)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Method for exit from context manager"""
+        """Execute exit from context manager."""
         if self.fig and self._ax:
             plt.close('all')

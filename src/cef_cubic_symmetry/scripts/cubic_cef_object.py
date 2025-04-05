@@ -1,7 +1,4 @@
-"""
-The module contains class for CEF with cubic symmetry.
-
-"""
+"""The module contains class for CEF with cubic symmetry."""
 
 
 import sys
@@ -18,6 +15,8 @@ from cef_cubic_symmetry.scripts.cef_object import CEF
 
 class Cubic(CEF):
     """
+    Class for cristal electric field with cubic symmetry.
+
     Class defining the trivalent rare earth compound in crystal
     with cubic symmetry,
     its crystal field parameters and the eigenvalues and eigenfunctions
@@ -26,7 +25,7 @@ class Cubic(CEF):
     """
 
     def __init__(self, material: Sample, llw_parameters: dict):
-        """Initializes the Cubic object or read it from a file."""
+        """Initialize the Cubic object or read it from a file."""
         super().__init__(material=material)
         if self.material.rare_earth.name in ['Ce', 'Sm', 'Eu']:
             print(
@@ -39,7 +38,7 @@ class Cubic(CEF):
 
     @property
     def parameters(self):
-        """CEF parameters"""
+        """CEF parameters."""
         parameters = super().parameters
         try:
             parameters['B40'] = (
@@ -57,18 +56,18 @@ class Cubic(CEF):
         return parameters
 
     def __repr__(self):
-        """Method returns string representation of the Cubic object."""
+        """Return string representation of the Cubic object."""
         return ut.get_repr(self, 'material', 'llw_parameters')
 
     def get_one_dot(self):
-        """Prints information about RE ion with specified parameters"""
+        """Print information about RE ion with specified parameters."""
         for key in 'wx':
             print(f'{key}:\t\t{self.llw_parameters[key]: 9.3f}')
         for i, energy in enumerate(self.get_energies()):
             print(f'E[{i + 1}]:\t{energy: 9.3f} meV')
 
     def get_file_name(self, data_name: str, parameters=None):
-        """Returns file_name for data saving"""
+        """Return file_name for data saving."""
         parameters = self.llw_parameters if parameters is None else parameters
         return get_paths(
             data_name=data_name,
@@ -78,11 +77,7 @@ class Cubic(CEF):
 
     @ut.get_time_of_execution
     def save_peak_dat(self, number_of_intervals: int, choice=0):
-        """
-        Saves the dependence of transition energies
-        or intensities on parameter x to file.
-
-        """
+        """Save the dependence of transition energies on parameter x."""
         file_name = self.get_file_name(
             data_name='energies' if choice == 0 else 'intensities',
         )
@@ -107,11 +102,7 @@ class Cubic(CEF):
             gamma: float,
             temperature: float,
     ):
-        """
-        Saves inelastic neutron scattering spectra
-        at specified temperature to file.
-
-        """
+        """Save inelastic neutron scattering spectra."""
         energies = linspace(-5, 30, 10001)
         spectrum = self.get_spectrum(
             energies=energies,
@@ -136,11 +127,7 @@ class Cubic(CEF):
             gamma: float,
             temperatures,
     ):
-        """
-        Saves inelastic neutron scattering spectra
-        at several specified temperatures to file.
-
-        """
+        """Save inelastic neutron scattering spectra."""
         lines = {}
         parameters = {
             **self.llw_parameters,
@@ -178,10 +165,7 @@ class Cubic(CEF):
 
     @ut.get_time_of_execution
     def save_susceptibility(self):
-        """
-        Saves temperature dependence of magnetic susceptibilities to file.
-
-        """
+        """Save temperature dependence of magnetic susceptibilities."""
         temperatures = linspace(0.1, 100.0, 300)
         common_file_name = self.get_file_name(
             data_name='susceptibilities',
@@ -221,11 +205,7 @@ class Cubic(CEF):
 
     @ut.get_time_of_execution
     def get_ratios(self, choice=0):
-        """
-        Saves the dependence of transition energies ratio
-        on parameter x to file.
-
-        """
+        """Save the dependence of transition energies ratio on parameter x."""
         peak_data = 'energies' if choice == 0 else 'intensities'
         levels_number = 7
         parameters = {
@@ -263,11 +243,7 @@ class Cubic(CEF):
             points,
             accuracy: float,
     ):
-        """
-        Checks the array of ratios
-        if one of them is approximately equal to the given value.
-
-        """
+        """Check if one of ratios is approximately equal to the given value."""
         ratios = numbers[1:]
         for index, ratio in enumerate(ratios):
             if abs(experimental_value - ratio) < accuracy:
@@ -310,8 +286,11 @@ class Cubic(CEF):
             accuracy=0.005,
     ):
         """
-        Returns points of cross experimental and calculated curves,
+        Return cross points.
+
+        The method returns points of cross experimental and calculated curves,
         recalculated with correct value of W.
+
         """
         points = []
         for w_parameter in (
@@ -356,10 +335,7 @@ class Cubic(CEF):
 
     @ut.get_time_of_execution
     def save_intensities(self):
-        """
-        Saves temperature dependence of magnetic susceptibilities to file.
-
-        """
+        """Save temperature dependence of magnetic susceptibilities to file."""
         temperatures = linspace(0, 200, 1001)
         file_name = self.get_file_name(
             data_name='intensities_on_temperature',

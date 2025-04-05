@@ -13,7 +13,7 @@ from cef_cubic_symmetry.core.sample import Sample
 class Transitions(RepresentableObject):
 
     def __init__(self, sample: Sample, hamiltonian: np.ndarray):
-        """Initializes the CEF object or read it from a file."""
+        """Initialize the CEF object or read it from a file."""
         self.sample = sample
         self.hamiltonian = hamiltonian
 
@@ -29,7 +29,9 @@ class Transitions(RepresentableObject):
 
     def get_transition_probabilities(self, eigenfunctions: np.ndarray):
         """
-        Determines matrix elements for dipole transitions
+        Return transition probabilities.
+
+        The method calculates matrix elements for dipole transitions
         between eigenfunctions of the total Hamiltonian.
 
         """
@@ -105,11 +107,7 @@ class Transitions(RepresentableObject):
         return j_ops, transition_probability
 
     def get_all_peaks(self, boltzmann_factors: np.ndarray):
-        """
-        Determines the peak energies and intensities
-        from the total Hamiltonian.
-
-        """
+        """Return the peak properties from the total Hamiltonian."""
         size = self.sample.rare_earth.matrix_size
         eigen_v, eigen_f = self.get_eigenvalues_and_eigenfunctions()
         peaks = []
@@ -130,7 +128,7 @@ class Transitions(RepresentableObject):
         return peaks
 
     def get_peaks(self, boltzmann_factors: np.ndarray):
-        """Returns peaks for non-degenerate levels."""
+        """Return peaks for non-degenerate levels."""
         result = []
         peaks = self.get_all_peaks(boltzmann_factors)
         for peak in peaks:
@@ -159,11 +157,11 @@ class Transitions(RepresentableObject):
         return result
 
     def get_energies(self, boltzmann_factors: np.ndarray):
-        """Returns transition energies"""
+        """Return transition energies."""
         return [peak[0] for peak in self.get_peaks(boltzmann_factors)]
 
     def get_intensities(self, boltzmann_factors: np.ndarray):
-        """Returns transition intensities"""
+        """Return transition intensities."""
         return [peak[1] for peak in self.get_peaks(boltzmann_factors)]
 
     def get_spectrum(
@@ -172,7 +170,7 @@ class Transitions(RepresentableObject):
             energies=None,
             width_dict: dict = None,
     ):
-        """Calculates the neutron scattering cross-section."""
+        """Calculate the neutron scattering cross-section."""
         peaks = self.get_peaks(boltzmann_factors)
         eigenvalues, _ = self.get_eigenvalues_and_eigenfunctions()
 

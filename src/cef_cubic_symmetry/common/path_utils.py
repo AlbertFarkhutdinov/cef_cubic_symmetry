@@ -1,8 +1,4 @@
-"""
-The module contains functions working with paths to directories used
-in this project.
-
-"""
+"""The module for work with paths to directories used in this project."""
 
 
 import os
@@ -16,6 +12,7 @@ from cef_cubic_symmetry.core import Sample
 class PathProcessor:
 
     def __init__(self, path: Path) -> None:
+        """Initialize self. See help(type(self)) for accurate signature."""
         self.path = path
 
     def create_parent_dirs(self) -> None:
@@ -40,7 +37,7 @@ def get_paths(
         sample: Sample = None,
         parameters: dict = None,
 ):
-    """Returns path of the file that will be saved."""
+    """Return path of the file that will be saved."""
     os.chdir(con.BASE_DIR)
     short_name = ''
     if sample:

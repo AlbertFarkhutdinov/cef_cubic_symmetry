@@ -1,4 +1,4 @@
-"""This module contains fitting Lorentz function to experimental data."""
+"""The module contains fitting Lorentz function to experimental data."""
 
 
 import os
@@ -14,7 +14,7 @@ from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 
 def get_data_from_file(file_name: str) -> pd.DataFrame:
-    """Returns three arrays (x, y, error) from file"""
+    """Return three arrays (x, y, error) from file."""
     return pd.read_csv(file_name, sep='\t', names=['x', 'y', 'errors'])
 
 
@@ -23,7 +23,7 @@ def filtered_data(
         min_value=-INFINITY,
         max_value=INFINITY,
 ):
-    """Returns filtered data"""
+    """Return filtered data."""
     rows = [
         (i, j, k)
         for (i, j, k) in zip(*data.values())
@@ -40,7 +40,7 @@ def print_peak_parameters(
         values,
         errors=None,
 ):
-    """Prints parameters of peak"""
+    """Print parameters of peak."""
     result = f'Function name: {function.__name__}\n'
     for index, value in enumerate(values):
         result += f'{index}: {value:.3f}'
@@ -57,7 +57,7 @@ def fitting(
         min_value: float,
         max_value: float,
 ):
-    """Returns parameters of function fitted to data with one peak"""
+    """Return parameters of function fitted to data with one peak."""
     data = filtered_data(data, min_value, max_value)
     p_opt, p_cov = curve_fit(
         f=function,
@@ -76,10 +76,7 @@ def multi_peak_fitting(
         min_value: float,
         max_value: float,
 ):
-    """
-    Returns parameters of function fitted to data
-    with several peaks (lorentzian or gaussian)
-    """
+    """Return parameters of function fitted to data with several peaks."""
     function = (ph.multi_lorentzian
                 if function_name.lower() == 'lorentz'
                 else ph.multi_gaussian)
@@ -105,13 +102,13 @@ def multi_lorentzian_with_gauss(
         amplitude: float,
         *parameters,
 ):
-    """Returns value of multi_peak function for lorentzian."""
+    """Return value of multi_peak function for lorentzian."""
     return (ph.gaussian(arg, center, width, amplitude) +
             ph.multi_lorentzian(arg, *parameters))
 
 
 def simple_fitting(data: dict):
-    """Simple fitting"""
+    """Run simple fitting."""
     data = filtered_data(data)
     start_width = 0.1
     peak_0 = (0, start_width, 130)
