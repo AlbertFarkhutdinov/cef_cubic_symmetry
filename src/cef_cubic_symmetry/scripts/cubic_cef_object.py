@@ -2,6 +2,7 @@
 
 
 import sys
+from pathlib import Path
 
 from numpy import linspace
 
@@ -24,7 +25,7 @@ class Cubic(CEF):
 
     """
 
-    def __init__(self, material: Sample, llw_parameters: dict):
+    def __init__(self, material: Sample, llw_parameters: dict) -> None:
         """Initialize the Cubic object or read it from a file."""
         super().__init__(material=material)
         if self.material.rare_earth.name in ['Ce', 'Sm', 'Eu']:
@@ -37,7 +38,7 @@ class Cubic(CEF):
             self.llw_parameters = llw_parameters
 
     @property
-    def parameters(self):
+    def parameters(self) -> dict[str, int]:
         """CEF parameters."""
         parameters = super().parameters
         try:
@@ -55,18 +56,18 @@ class Cubic(CEF):
             pass
         return parameters
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string representation of the Cubic object."""
         return ut.get_repr(self, 'material', 'llw_parameters')
 
-    def get_one_dot(self):
+    def get_one_dot(self) -> None:
         """Print information about RE ion with specified parameters."""
         for key in 'wx':
             print(f'{key}:\t\t{self.llw_parameters[key]: 9.3f}')
         for i, energy in enumerate(self.get_energies()):
             print(f'E[{i + 1}]:\t{energy: 9.3f} meV')
 
-    def get_file_name(self, data_name: str, parameters=None):
+    def get_file_name(self, data_name: str, parameters=None) -> Path:
         """Return file_name for data saving."""
         parameters = self.llw_parameters if parameters is None else parameters
         return get_paths(
@@ -76,7 +77,7 @@ class Cubic(CEF):
         )
 
     @ut.get_time_of_execution
-    def save_peak_dat(self, number_of_intervals: int, choice=0):
+    def save_peak_dat(self, number_of_intervals: int, choice=0) -> None:
         """Save the dependence of transition energies on parameter x."""
         file_name = self.get_file_name(
             data_name='energies' if choice == 0 else 'intensities',
@@ -101,7 +102,7 @@ class Cubic(CEF):
             self,
             gamma: float,
             temperature: float,
-    ):
+    ) -> None:
         """Save inelastic neutron scattering spectra."""
         energies = linspace(-5, 30, 10001)
         spectrum = self.get_spectrum(
@@ -126,7 +127,7 @@ class Cubic(CEF):
             self,
             gamma: float,
             temperatures,
-    ):
+    ) -> dict[str, list]:
         """Save inelastic neutron scattering spectra."""
         lines = {}
         parameters = {
@@ -164,7 +165,7 @@ class Cubic(CEF):
         return data
 
     @ut.get_time_of_execution
-    def save_susceptibility(self):
+    def save_susceptibility(self) -> None:
         """Save temperature dependence of magnetic susceptibilities."""
         temperatures = linspace(0.1, 100.0, 300)
         common_file_name = self.get_file_name(
@@ -204,7 +205,7 @@ class Cubic(CEF):
                     ut.write_row(file, row)
 
     @ut.get_time_of_execution
-    def get_ratios(self, choice=0):
+    def get_ratios(self, choice=0) -> None:
         """Save the dependence of transition energies ratio on parameter x."""
         peak_data = 'energies' if choice == 0 else 'intensities'
         levels_number = 7
@@ -242,7 +243,7 @@ class Cubic(CEF):
             experimental_value: float,
             points,
             accuracy: float,
-    ):
+    ) -> list[CrossPoint]:
         """Check if one of ratios is approximately equal to the given value."""
         ratios = numbers[1:]
         for index, ratio in enumerate(ratios):
@@ -284,7 +285,7 @@ class Cubic(CEF):
             experimental_value: float,
             experimental_energy: float,
             accuracy=0.005,
-    ):
+    ) -> list[CrossPoint]:
         """
         Return cross points.
 
@@ -334,7 +335,7 @@ class Cubic(CEF):
         return points
 
     @ut.get_time_of_execution
-    def save_intensities(self):
+    def save_intensities(self) -> None:
         """Save temperature dependence of magnetic susceptibilities to file."""
         temperatures = linspace(0, 200, 1001)
         file_name = self.get_file_name(

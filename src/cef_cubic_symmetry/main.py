@@ -15,7 +15,7 @@ def get_fixed_results(
         crystal: str,
         only_plots=True,
         choice=0,
-):
+) -> None:
     """
     Calculate and save the fixed results.
 
@@ -58,7 +58,7 @@ def get_fixed_results(
 
 
 @ut.get_time_of_execution
-def main(rare_earth: str, properties: dict):
+def main(rare_earth: str, properties: dict) -> None:
     """Procedure of CEF parameters defining with spectra saving."""
     experiment = Experiment(
         material=Sample(
@@ -93,7 +93,7 @@ def main(rare_earth: str, properties: dict):
     # )
 
 
-def get_scheme():
+def get_scheme() -> None:
     """Print level scheme for specified parameters."""
     results = {
         'Pr': {

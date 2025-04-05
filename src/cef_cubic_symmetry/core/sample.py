@@ -19,7 +19,7 @@ class Crystal(RepresentableObject):
 
     """
 
-    def __init__(self, name: str = '?'):
+    def __init__(self, name: str = '?') -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.name = name
 
@@ -41,7 +41,7 @@ class Sample(RepresentableObject):
             self,
             crystal: Union[str, Crystal],
             rare_earth: Union[str, REIon],
-    ):
+    ) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.crystal = (
             Crystal(name=crystal) if isinstance(crystal, str) else crystal
@@ -52,7 +52,7 @@ class Sample(RepresentableObject):
             else rare_earth
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         output = [
             self.crystal.name,
             f'Rare-earth ion: {self.rare_earth.info.symbol};',

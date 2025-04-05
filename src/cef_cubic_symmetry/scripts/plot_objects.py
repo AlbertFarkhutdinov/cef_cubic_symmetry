@@ -2,6 +2,7 @@
 
 
 from collections import OrderedDict
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from cycler import cycler
@@ -13,7 +14,7 @@ from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
-def _set_plot_parameters():
+def _set_plot_parameters() -> None:
     """Set rcParams."""
     custom_parameters = ut.get_json_object('plot_parameters.json')
     custom_parameters[
@@ -39,7 +40,7 @@ def _set_plot_parameters():
 class CustomPlot:
     """Description of Plot object."""
 
-    def __init__(self, data, dpi=300):
+    def __init__(self, data, dpi=300) -> None:
         """Initialize Plot object."""
         self.data = data
         self.dpi = dpi
@@ -56,7 +57,7 @@ class CustomPlot:
     def set_labels(self,
                    xlabel='x',
                    ylabel='y',
-                   title=None):
+                   title=None) -> None:
         """Set labels of axis and plot."""
         args = locals()
         del args['self']
@@ -68,7 +69,7 @@ class CustomPlot:
                    x_min=None,
                    x_max=None,
                    y_min=None,
-                   y_max=None):
+                   y_max=None) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
         _limits = {
@@ -91,7 +92,7 @@ class CustomPlot:
                      x_major=None,
                      x_minor=None,
                      y_major=None,
-                     y_minor=None):
+                     y_minor=None) -> None:
         """Set major and minor ticks for plot."""
         majors = (
             ut.get_default(
@@ -114,7 +115,7 @@ class CustomPlot:
 
     def make_plot(self,
                   mode='plot',
-                  text: con.Text = None):
+                  text: con.Text = None) -> None:
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
@@ -135,7 +136,7 @@ class CustomPlot:
             if text:
                 plt.text(x=text.x, y=text.y, s=text.string)
 
-    def save_or_show(self, filename=None, form=None):
+    def save_or_show(self, filename=None, form=None) -> None:
         """Save or show the plot."""
         if self.fig and self._ax:
             if form:
@@ -147,17 +148,17 @@ class CustomPlot:
     def save_in_two_forms(self,
                           filename: str,
                           form_1='png',
-                          form_2='eps'):
+                          form_2='eps') -> None:
         """Save or show the plot."""
         self.save_or_show(filename=filename, form=form_1)
         self.save_or_show(filename=filename, form=form_2)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Execute exit from context manager."""
         if self.fig and self._ax:
             plt.close('all')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string representation of the Plot object."""
         return ut.get_repr(self, 'data', 'dpi')
 
@@ -169,7 +170,7 @@ class CubicPlot(CustomPlot):
                  data,
                  material:
                  Sample,
-                 dpi=300):
+                 dpi=300) -> None:
         """Initialize Plot object."""
         super().__init__(data=data, dpi=dpi)
         self.material = material
@@ -181,7 +182,7 @@ class CubicPlot(CustomPlot):
 
     def get_graph_file_name(self,
                             data_name: str,
-                            parameters: dict = None):
+                            parameters: dict = None) -> Path:
         """Return path for plot saving."""
         return get_paths(
             data_name=data_name,
@@ -190,7 +191,7 @@ class CubicPlot(CustomPlot):
             is_graph=True,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string representation of the Plot object."""
         return ut.get_repr(self, 'data', 'material', 'dpi')
 
@@ -200,7 +201,7 @@ def get_llw_plot(material: Sample,
                  y_max,
                  y_major,
                  y_minor,
-                 choice=0):
+                 choice=0) -> None:
     """Return dependence of transition energies on CEF parameters."""
     data_name = 'energies' if choice == 0 else 'intensities'
     for w_parameter in (1, -1):
@@ -284,7 +285,7 @@ def get_llw_ratios_plot(material: Sample,
                         experimental_value,
                         limits: dict,
                         ticks: dict,
-                        choice=0):
+                        choice=0) -> None:
     """Return dependence of transition energies on CEF parameters."""
     data_name = 'ratios_energies' if choice == 0 else 'ratios_intensities'
     for w_parameter in (1, -1):
@@ -352,7 +353,7 @@ def get_llw_ratios_plot(material: Sample,
 def get_spectrum_theory(material: Sample,
                         parameters: dict,
                         data: con.Data = None,
-                        scale: con.Scale = None):
+                        scale: con.Scale = None) -> None:
     """Return inelastic neutron scattering spectrum."""
     with CubicPlot(data=data, material=material) as plot:
         plot.set_labels(**con.SPECTRUM_LABELS)
@@ -371,7 +372,7 @@ def get_spectrum_experiment(material: Sample,
                             temperatures: tuple,
                             data: tuple,
                             parameters: dict,
-                            scale=None):
+                            scale=None) -> None:
     """Return inelastic neutron scattering spectrum from experiment."""
     data_kwargs = {
         'x': data[0]['x'],
@@ -401,7 +402,7 @@ def get_intensity_on_temperature(
         material: Sample,
         crosses: con.CrossPoint,
         y_max: float,
-):
+) -> None:
     """Return dependence of transition intensities on temperature."""
     data_kwargs = {
         'x': [],

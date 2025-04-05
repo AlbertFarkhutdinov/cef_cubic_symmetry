@@ -3,6 +3,7 @@
 
 import json
 
+import numpy as np
 from numpy import linspace
 from pretty_repr import RepresentableObject
 
@@ -25,7 +26,7 @@ class System(RepresentableObject):
             parameters: BParameters = None,
             temperature: float = 0,
             magnet_field: MagnetField = None,
-    ):
+    ) -> None:
         """Initialize the CEF object or read it from a file."""
         self.sample = sample
         self.file_name = get_paths(
@@ -55,7 +56,7 @@ class System(RepresentableObject):
     def excluded_attributes_for_repr(self) -> set[str]:
         return {'file_name', 'interactions'}
 
-    def save_to_file(self):
+    def save_to_file(self) -> None:
         """Save parameters of the current object to file."""
         saved_object = {
             'crystal': self.sample.crystal.name,
@@ -67,7 +68,7 @@ class System(RepresentableObject):
         with UTF8File(self.file_name, mode='w') as file:
             json.dump(saved_object, file, indent=4, sort_keys=True)
 
-    def load_data(self):
+    def load_data(self) -> None:
         """Load CEF object from file."""
         with UTF8File(self.file_name) as file:
             properties = json.load(file)
@@ -79,12 +80,12 @@ class System(RepresentableObject):
         self.magnet_field = BParameters(**properties.get('magnet_field'))
         self.parameters = BParameters(**properties.get('parameters'))
 
-    def get_hamiltonian(self):
+    def get_hamiltonian(self) -> np.ndarray:
         cef = self.interactions['CEF']
         zeeman = self.interactions['MagnetField']
         return cef.get_hamiltonian() + zeeman.get_hamiltonian()
 
-    def get_moments(self):
+    def get_moments(self) -> tuple:
         """Calculate the magnetic moments of the CEF model."""
         transitions = Transitions(
             sample=self.sample,
@@ -123,7 +124,7 @@ class System(RepresentableObject):
             # magnetic moments are given in units of Bohr magneton
         return j_average, magnetic_moment
 
-    def get_chi(self):
+    def get_chi(self) -> dict:
         """Calculate the susceptibility at a specified temperature."""
         transitions = Transitions(
             sample=self.sample,
@@ -174,7 +175,7 @@ class System(RepresentableObject):
             chi['van_vleck'][key] = coefficient * chi['van_vleck'][key]
         return chi
 
-    def get_chi_dependence(self, temperatures=None):
+    def get_chi_dependence(self, temperatures=None) -> tuple:
         """Calculate the susceptibility at specified temperatures."""
         temperatures = utils.get_default(
             temperatures,
@@ -219,7 +220,7 @@ class System(RepresentableObject):
 
         return chi_curie, chi_van_vleck, chi
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a summary of the model parameters.
 

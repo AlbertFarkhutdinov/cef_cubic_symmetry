@@ -7,7 +7,7 @@ from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 
-def main():
+def main() -> None:
     """Run main procedure."""
     print(f'Working directory: {BASE_DIR}\n')
     while True:

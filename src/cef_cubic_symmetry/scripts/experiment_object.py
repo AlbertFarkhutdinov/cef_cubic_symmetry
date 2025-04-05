@@ -18,7 +18,7 @@ class Experiment:
     def __init__(self,
                  material: Sample,
                  experimental_energies: tuple,
-                 temperatures: tuple):
+                 temperatures: tuple) -> None:
         """Initialize class Experiment."""
         self.material = material
         self.experimental_energies = experimental_energies
@@ -31,7 +31,7 @@ class Experiment:
             llw_parameters={'w': 1},
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string representation of the Experiment object."""
         return get_repr(
             self,
@@ -42,7 +42,7 @@ class Experiment:
 
     def get_llw_ratios_plot(self,
                             limits: dict,
-                            ticks: dict):
+                            ticks: dict) -> None:
         """Save the plot for LLW diagram of energies ratio."""
         gg.get_llw_ratios_plot(
             material=self.material,
@@ -55,7 +55,7 @@ class Experiment:
             self,
             spectrometer: str,
             initial_energy: float,
-    ):
+    ) -> tuple:
         """Return data for experimental spectra."""
         data = []
         _temperatures = []
@@ -86,7 +86,7 @@ class Experiment:
                                 limits: dict,
                                 locators: dict,
                                 spectrometer: str,
-                                initial_energy: float):
+                                initial_energy: float) -> tuple:
         """Save the plot for experimental spectrum."""
         data, _temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
@@ -105,7 +105,7 @@ class Experiment:
 
     def _get_spectrum_differences(self,
                                   spectrometer: str,
-                                  initial_energy: float):
+                                  initial_energy: float) -> tuple:
         """Return data for experimental spectra differences."""
         data, _temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
@@ -138,7 +138,7 @@ class Experiment:
             locators: dict,
             spectrometer: str,
             initial_energy: float,
-    ):
+    ) -> None:
         """Save the plot for experimental spectrum."""
         diff_data, differences = self._get_spectrum_differences(
             spectrometer=spectrometer,
@@ -155,7 +155,7 @@ class Experiment:
             scale=con.Scale(limits=limits, locators=locators),
         )
 
-    def get_cross_points(self):
+    def get_cross_points(self) -> list:
         """Return cross points for experimental and theoretic curves."""
         self.cubic_object.llw_parameters = {'w': 1}
         crosses = self.cubic_object.find_cross(
@@ -170,7 +170,7 @@ class Experiment:
             )
         return crosses
 
-    def get_intensity_on_temperature(self, crosses, y_max: float):
+    def get_intensity_on_temperature(self, crosses, y_max: float) -> None:
         """
         Save the plot for dependence of transition intensities on temperature.
 
@@ -194,7 +194,7 @@ class Experiment:
             limits: dict,
             locators: dict,
             gamma=0.16,
-    ):
+    ) -> None:
         """Save the plot for theoretical spectrum."""
         for point in recalculated_crosses:
             self.cubic_object.llw_parameters = {

@@ -30,5 +30,5 @@ class Thermostat(BaseInteraction):
             )
         return boltzmann_factors
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Temperature: {self.temperature} K'

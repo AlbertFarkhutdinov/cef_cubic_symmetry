@@ -22,7 +22,7 @@ def filtered_data(
         data: dict,
         min_value=-INFINITY,
         max_value=INFINITY,
-):
+) -> np.ndarray:
     """Return filtered data."""
     rows = [
         (i, j, k)
@@ -39,7 +39,7 @@ def print_peak_parameters(
         function,
         values,
         errors=None,
-):
+) -> None:
     """Print parameters of peak."""
     result = f'Function name: {function.__name__}\n'
     for index, value in enumerate(values):
@@ -56,7 +56,7 @@ def fitting(
         parameters,
         min_value: float,
         max_value: float,
-):
+) -> tuple:
     """Return parameters of function fitted to data with one peak."""
     data = filtered_data(data, min_value, max_value)
     p_opt, p_cov = curve_fit(
@@ -75,7 +75,7 @@ def multi_peak_fitting(
         parameters,
         min_value: float,
         max_value: float,
-):
+) -> tuple:
     """Return parameters of function fitted to data with several peaks."""
     function = (ph.multi_lorentzian
                 if function_name.lower() == 'lorentz'
@@ -101,13 +101,13 @@ def multi_lorentzian_with_gauss(
         width: float,
         amplitude: float,
         *parameters,
-):
+) -> np.ndarray:
     """Return value of multi_peak function for lorentzian."""
     return (ph.gaussian(arg, center, width, amplitude) +
             ph.multi_lorentzian(arg, *parameters))
 
 
-def simple_fitting(data: dict):
+def simple_fitting(data: dict) -> np.ndarray:
     """Run simple fitting."""
     data = filtered_data(data)
     start_width = 0.1

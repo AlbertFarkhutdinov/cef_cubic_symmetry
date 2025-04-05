@@ -8,7 +8,7 @@ def gaussian_normalized(
         argument: float,
         center: float,
         sigma: float,
-):
+) -> float:
     """
     Return value of normalized Gauss function.
 
@@ -27,7 +27,7 @@ def lorentzian_normalized(
         argument: float,
         center: float,
         gamma: float,
-):
+) -> float:
     """
     Return value of normalized Lorentz function.
 
@@ -44,7 +44,7 @@ def gaussian(
         center: float,
         width: float,
         amplitude: float,
-):
+) -> float:
     """
     Return value of Gauss function.
 
@@ -60,7 +60,7 @@ def lorentzian(
         center: float,
         width: float,
         amplitude: float,
-):
+) -> float:
     """
     Return value of Lorentz function.
 
@@ -76,7 +76,7 @@ def pseudo_voigt_normalized(
         center: float,
         sigma: float,
         gamma: float,
-):
+) -> float:
     """
     Return value of normalized pseudo-Voigt function.
 
@@ -109,7 +109,7 @@ def multi_peak(
         function,
         arg: float,
         *parameters,
-):
+) -> float:
     """Return value of several peaks sum."""
     background = parameters[0]
     peaks_parameters = parameters[1:]
@@ -122,7 +122,7 @@ def multi_peak(
 def multi_lorentzian(
         arg: float,
         *parameters,
-):
+) -> float:
     """Return value of multi_peak function for lorentzian."""
     return multi_peak(lorentzian, arg, *parameters)
 
@@ -130,7 +130,7 @@ def multi_lorentzian(
 def multi_gaussian(
         arg: float,
         *parameters,
-):
+) -> float:
     """Return value of multi_peak function for gaussian."""
     return multi_peak(gaussian, arg, *parameters)
 
@@ -138,7 +138,7 @@ def multi_gaussian(
 def thermodynamics(
         temperature: float,
         energies=None,
-):
+) -> dict[str, float]:
     """Return temperature value in meV and Boltzmann factor."""
     thermal_dict = {'temperature': temperature / 11.6045}
     if energies is not None and thermal_dict['temperature'] > 0:
@@ -153,7 +153,7 @@ def lowering_operator(
         initial_number: float,
         squared_j: float,
         degree: int,
-):
+) -> float:
     """Return the result of the lowering operator's."""
     result = 1
     for step in range(degree):
@@ -170,7 +170,7 @@ def steven_operators(
         squared_j: float,
         mqn_1,
         mqn_2=None,
-):
+) -> float:
     """Return the result of the Stevens operators'."""
     result = {
         'o20': lambda: 3 * mqn_1[2] - squared_j,

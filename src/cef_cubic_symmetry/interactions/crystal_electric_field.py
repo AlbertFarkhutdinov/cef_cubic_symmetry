@@ -1,5 +1,5 @@
 """The module contains CEF class."""
-
+import numpy as np
 
 from cef_cubic_symmetry.common import physics, utils
 from cef_cubic_symmetry.core.llw_parameters import BParameters
@@ -14,7 +14,7 @@ class CrystalElectricField(BaseInteraction):
         super().__init__(**kwargs)
         self.parameters = parameters
 
-    def get_hamiltonian(self):
+    def get_hamiltonian(self) -> np.ndarray:
         """Determine the CEF Hamiltonian based on the input parameters."""
         momentum = self.sample.rare_earth.info.total_momentum_ground
         size = self.sample.rare_earth.matrix_size
@@ -49,7 +49,7 @@ class CrystalElectricField(BaseInteraction):
                 hamiltonian[row + degree, row] = hamiltonian[row, row + degree]
         return hamiltonian
 
-    def __str__(self):
+    def __str__(self) -> str:
         output = []
         for key, value in self.parameters.__dict__.items():
             if value:

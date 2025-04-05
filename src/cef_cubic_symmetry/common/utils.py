@@ -4,17 +4,18 @@
 from datetime import datetime
 from json import load
 
+import numpy as np
 from numpy import zeros
 
 from cef_cubic_symmetry.common.constants import DATA_DIR, INFINITY
 
 
-def get_sign(value: float):
+def get_sign(value: float) -> str:
     """Return minus, if argument is negative, otherwise return plus."""
     return '-' if value < 0 else '+'
 
 
-def get_value_with_sign(value: float):
+def get_value_with_sign(value: float) -> str | None:
     """Return float number as a string with sign plus or minus."""
     if value:
         return f'{get_sign(value)}{abs(value):.3f}'
@@ -26,7 +27,7 @@ def get_default(value, default):
     return default if (value is None) else value
 
 
-def write_row(file, row):
+def write_row(file, row) -> None:
     """Write the row of the float numbers to the file."""
     result = ''
     for value in row:
@@ -34,7 +35,7 @@ def write_row(file, row):
     file.write(f'{result.strip()}\n')
 
 
-def check_input(choice: str):
+def check_input(choice: str) -> float:
     """
     Check input.
 
@@ -68,13 +69,13 @@ def check_input(choice: str):
     return result
 
 
-def get_empty_matrix(size: int, dimension=2):
+def get_empty_matrix(size: int, dimension=2) -> np.ndarray:
     """Return 1D or 2D array filled by zeros."""
     sizes = size if dimension == 1 else (size, size)
     return zeros(sizes, dtype='float64')
 
 
-def data_popping(data: dict, condition):
+def data_popping(data: dict, condition) -> None:
     """Pop items from data, that satisfy condition."""
     popped_number = 0
     for key, array in data['y_set'].copy().items():
@@ -88,22 +89,22 @@ def data_popping(data: dict, condition):
         data['legend'].popitem()
 
 
-def get_time_of_execution(function):
+def get_time_of_execution(function) -> callable:
     """Print time of function's execution."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         start_time = datetime.now()
         function(*args, **kwargs)
         print(f'Saving time: {datetime.now() - start_time}\n')
     return wrapper
 
 
-def get_label(number: int, choice=0):
+def get_label(number: int, choice=0) -> str:
     """Return label for legend."""
     index = 1 if choice != 0 else choice
     return (fr'$E_{number}$', fr'$I_{number}$')[index]
 
 
-def get_ratios_names(choice=0):
+def get_ratios_names(choice=0) -> list:
     """Return list of ratios names."""
     letter = 'E' if choice == 0 else 'I'
     result = []
@@ -113,7 +114,7 @@ def get_ratios_names(choice=0):
     return result
 
 
-def get_repr(obj, *args):
+def get_repr(obj, *args) -> str:
     """Return string representation of the object."""
     result = f'{obj.__class__.__name__}('
     for arg in args:
@@ -124,7 +125,7 @@ def get_repr(obj, *args):
 class UTF8File:
     """Context manager for file opening."""
 
-    def __init__(self, name: str, mode='r'):
+    def __init__(self, name: str, mode='r') -> None:
         """Initialize class."""
         self.name = name
         self.file = None
@@ -137,7 +138,7 @@ class UTF8File:
         self.file = open(self.name, mode=self.mode, encoding='utf-8')
         return self.file
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Execute exit from context manager."""
         if self.file:
             self.file.close()

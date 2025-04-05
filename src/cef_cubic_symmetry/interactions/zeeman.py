@@ -1,6 +1,5 @@
 """The module contains CEF class."""
-
-
+import numpy as np
 from numpy import sqrt
 from scipy.constants import physical_constants
 
@@ -17,7 +16,7 @@ class Zeeman(BaseInteraction):
         super().__init__(**kwargs)
         self.magnet_field = magnet_field or MagnetField()
 
-    def get_hamiltonian(self):
+    def get_hamiltonian(self) -> np.ndarray:
         """Determine the Zeeman terms to the Hamiltonian."""
         size = self.sample.rare_earth.matrix_size
         hamiltonian = utils.get_empty_matrix(size)
@@ -41,7 +40,7 @@ class Zeeman(BaseInteraction):
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian
 
-    def __str__(self):
+    def __str__(self) -> str:
         output = []
         for key, value in self.magnet_field.__dict__.items():
             if value:

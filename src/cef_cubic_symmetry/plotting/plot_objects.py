@@ -15,7 +15,7 @@ class CustomPlot(RepresentableObject):
     """Description of Plot object."""
 
     @staticmethod
-    def _set_plot_parameters():
+    def _set_plot_parameters() -> None:
         """Set rcParams."""
         plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
         prop_cycle = 'axes.prop_cycle'
@@ -36,7 +36,7 @@ class CustomPlot(RepresentableObject):
             for _key, _value in tick_parameters.items():
                 plt.rcParams[f'{tick}.{_key}'] = _value
 
-    def __init__(self, dpi: int = 300):
+    def __init__(self, dpi: int = 300) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.dpi = dpi
         self.limits = dict.fromkeys(('x_min', 'x_max', 'y_min', 'y_max'))
@@ -58,7 +58,7 @@ class CustomPlot(RepresentableObject):
             x_label: Optional[str] = None,
             y_label: Optional[str] = None,
             title: Optional[str] = None,
-    ):
+    ) -> None:
         """Set labels of axis and plot."""
         self._ax.set_xlabel = x_label
         self._ax.set_ylabel = y_label
@@ -70,7 +70,7 @@ class CustomPlot(RepresentableObject):
             x_max: Optional[float] = None,
             y_min: Optional[float] = None,
             y_max: Optional[float] = None,
-    ):
+    ) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
         _limits = {
@@ -95,7 +95,7 @@ class CustomPlot(RepresentableObject):
             x_minor=None,
             y_major=None,
             y_minor=None,
-    ):
+    ) -> None:
         """Set major and minor ticks for plot."""
         majors = (
             x_major or (self.limits['x_max'] - self.limits['x_min']) // 5,
@@ -111,7 +111,7 @@ class CustomPlot(RepresentableObject):
             self,
             mode='plot',
             text: con.Text = None,
-    ):
+    ) -> None:
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
@@ -136,7 +136,7 @@ class CustomPlot(RepresentableObject):
             self,
             filename=None,
             form=None,
-    ):
+    ) -> None:
         """Save or show the plot."""
         if self.fig and self._ax:
             if form:
@@ -150,12 +150,12 @@ class CustomPlot(RepresentableObject):
             filename: str,
             form_1='png',
             form_2='eps',
-    ):
+    ) -> None:
         """Save or show the plot."""
         self.save_or_show(filename=filename, form=form_1)
         self.save_or_show(filename=filename, form=form_2)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Execute exit from context manager."""
         if self.fig and self._ax:
             plt.close('all')

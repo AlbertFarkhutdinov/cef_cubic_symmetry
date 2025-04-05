@@ -23,7 +23,7 @@ class PathProcessor:
         for path in paths[-2:0:-1]:
             path.mkdir()
 
-    def remove_if_exists(self):
+    def remove_if_exists(self) -> None:
         """Create parent dirs for the file and remove it, if it exists."""
         self.create_parent_dirs()
         if self.path.exists():
@@ -36,7 +36,7 @@ def get_paths(
         is_graph=False,
         sample: Sample = None,
         parameters: dict = None,
-):
+) -> Path:
     """Return path of the file that will be saved."""
     os.chdir(con.BASE_DIR)
     short_name = ''
