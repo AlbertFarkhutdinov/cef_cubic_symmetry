@@ -3,8 +3,8 @@
 
 from typing import Optional
 
-import matplotlib.pyplot as plt
 from cycler import cycler
+from matplotlib import pyplot as plt
 from pretty_repr import RepresentableObject
 
 from cef_cubic_symmetry.common import constants as con
@@ -14,28 +14,6 @@ from cef_cubic_symmetry.common import utils as ut
 class CustomPlot(RepresentableObject):
     """Description of Plot object."""
 
-    @staticmethod
-    def _set_plot_parameters() -> None:
-        """Set rcParams."""
-        plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
-        prop_cycle = 'axes.prop_cycle'
-        plt.rcParams[prop_cycle] = (
-                cycler(color=plt.rcParams[prop_cycle]['color'])
-                + cycler(linestyle=plt.rcParams[prop_cycle]['linestyle'])
-        )
-        plt.rcParams['figure.figsize'] = [i / 2.54 for i in (10, 10)]
-        tick_parameters = {
-            'direction': 'in',
-            'major.pad': 3,
-            'major.size': 6,
-            'major.width': 2,
-            'minor.size': 3,
-            'minor.width': 2,
-        }
-        for tick in ('xtick', 'ytick'):
-            for _key, _value in tick_parameters.items():
-                plt.rcParams[f'{tick}.{_key}'] = _value
-
     def __init__(self, dpi: int = 300) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.dpi = dpi
@@ -43,15 +21,20 @@ class CustomPlot(RepresentableObject):
         self.fig = None
         self._ax = None
 
-    @property
-    def excluded_attributes_for_repr(self) -> set[str]:
-        return {'fig', '_ax', 'limits'}
-
     def __enter__(self):
         """Execute entrance to context manager and return self."""
         self._set_plot_parameters()
         self.fig, self._ax = plt.subplots(dpi=self.dpi)
         return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Execute exit from context manager."""
+        if self.fig and self._ax:
+            plt.close('all')
+
+    @property
+    def excluded_attributes_for_repr(self) -> set[str]:
+        return {'fig', '_ax', 'limits'}
 
     def set_labels(
             self,
@@ -73,13 +56,13 @@ class CustomPlot(RepresentableObject):
     ) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
-        _limits = {
+        limits = {
             'x_min': (x_min, min(self.data.x)),
             'x_max': (x_max, max(self.data.x)),
             'y_min': (y_min, min(min(value) for value in y_set)),
             'y_max': (y_max, max(max(value) for value in y_set)),
         }
-        for _key, _value in _limits.items():
+        for _key, _value in limits.items():
             self.limits[_key] = _value[0] or _value[1]
         if self._ax:
             for axis in ('x', 'y'):
@@ -87,7 +70,7 @@ class CustomPlot(RepresentableObject):
                     f'{axis}{lim}': self.limits[f'{axis}_{lim}']
                     for lim in ('min', 'max')
                 }
-                self._ax.__getattribute__(f'set_{axis}lim')(**axis_limits)
+                getattr(self._ax, f'set_{axis}lim')(**axis_limits)
 
     def set_locators(
             self,
@@ -115,7 +98,7 @@ class CustomPlot(RepresentableObject):
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
-                key: self._ax.__getattribute__(key)
+                key: getattr(self._ax, key)
                 for key in ('plot', 'scatter', 'errorbar')
             }
             for key, y_data in self.data.y_set.items():
@@ -155,7 +138,24 @@ class CustomPlot(RepresentableObject):
         self.save_or_show(filename=filename, form=form_1)
         self.save_or_show(filename=filename, form=form_2)
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        """Execute exit from context manager."""
-        if self.fig and self._ax:
-            plt.close('all')
+    @classmethod
+    def _set_plot_parameters(cls) -> None:
+        """Set rcParams."""
+        plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
+        prop_cycle = 'axes.prop_cycle'
+        plt.rcParams[prop_cycle] = (
+                cycler(color=plt.rcParams[prop_cycle]['color'])
+                + cycler(linestyle=plt.rcParams[prop_cycle]['linestyle'])
+        )
+        plt.rcParams['figure.figsize'] = [i / 2.54 for i in (10, 10)]
+        tick_parameters = {
+            'direction': 'in',
+            'major.pad': 3,
+            'major.size': 6,
+            'major.width': 2,
+            'minor.size': 3,
+            'minor.width': 2,
+        }
+        for tick in ('xtick', 'ytick'):
+            for _key, _value in tick_parameters.items():
+                plt.rcParams[f'{tick}.{_key}'] = _value

@@ -1,8 +1,8 @@
 """The module contains fitting Lorentz function to experimental data."""
 
 
-import os
 import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ from cef_cubic_symmetry.common.constants import DATA_PATHS, INFINITY, PM, Data
 from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 
-def get_data_from_file(file_name: str) -> pd.DataFrame:
+def get_data_from_file(file_name: Path) -> pd.DataFrame:
     """Return three arrays (x, y, error) from file."""
     return pd.read_csv(file_name, sep='\t', names=['x', 'y', 'errors'])
 
@@ -41,13 +41,13 @@ def print_peak_parameters(
         errors=None,
 ) -> None:
     """Print parameters of peak."""
-    result = f'Function name: {function.__name__}\n'
+    parts = [f'Function name: {function.__name__}\n']
     for index, value in enumerate(values):
-        result += f'{index}: {value:.3f}'
+        parts.append(f'{index}: {value:.3f}')
         if errors.any() and len(errors) == len(values):
-            result += f' {PM} {errors[index]:.3f}'
-        result += ';\n'
-    print(result)
+            parts.append(f' {PM} {errors[index]:.3f}')
+        parts.append(';\n')
+    print(''.join(parts))
 
 
 def fitting(
@@ -126,16 +126,12 @@ def simple_fitting(data: dict) -> np.ndarray:
         p_opt,
         p_err,
     )
-    fitted = multi_lorentzian_with_gauss(data['x'], *p_opt)
-    return fitted
+    return multi_lorentzian_with_gauss(data['x'], *p_opt)
 
 
 if __name__ == '__main__':
     EXPERIMENTAL_DATA = get_data_from_file(
-        os.path.join(
-            DATA_PATHS['experiment'],
-            'PSI_Tb_YNi2_3meV_1.6K.dat',
-        ),
+        Path(DATA_PATHS['experiment']) / 'PSI_Tb_YNi2_3meV_1.6K.dat',
     )
     EXPERIMENTAL_DATA = filtered_data(
         EXPERIMENTAL_DATA,
@@ -162,7 +158,7 @@ if __name__ == '__main__':
             ylabel='y_test',
             title='test',
         )
-        # plot.set_locators()
+        plot.set_locators()
         plot.make_plot()
 
 
@@ -203,6 +199,6 @@ if __name__ == '__main__':
             ),
     ) as test_plot:
         test_plot.set_labels(xlabel='x_test', ylabel='y_test', title='test')
-        # test_plot.set_limits(x_min=0, x_max=5, y_min=0, y_max=100)
-        # test_plot.set_locators()
+        test_plot.set_limits(x_min=0, x_max=5, y_min=0, y_max=100)
+        test_plot.set_locators()
         test_plot.make_plot(mode='plot')

@@ -17,7 +17,7 @@ def main() -> None:
             'material': None,
             'llw_parameters': {},
         }
-        if command not in ('help', 'exit'):
+        if command not in {'help', 'exit'}:
             crystal = input('Input the name of crystal (e.g. "YNi2"): ')
             rare_earth = check_input('rare')
             kwargs['material'] = Sample(
@@ -48,8 +48,8 @@ def main() -> None:
                 kwargs['gamma'] = 0.16
                 kwargs['temperature'] = 3
             if command is not None:
-                cef_object.__getattribute__(command)(**kwargs)
-            if command in ('get_object', 'load_data'):
+                getattr(cef_object, command)(**kwargs)
+            if command in {'get_object', 'load_data'}:
                 print(cef_object)
         elif command == 'help':
             print(

@@ -28,7 +28,7 @@ class Cubic(CEF):
     def __init__(self, material: Sample, llw_parameters: dict) -> None:
         """Initialize the Cubic object or read it from a file."""
         super().__init__(material=material)
-        if self.material.rare_earth.name in ['Ce', 'Sm', 'Eu']:
+        if self.material.rare_earth.name in {'Ce', 'Sm', 'Eu'}:
             print(
                 f"The element '{self.material.rare_earth.name}' "
                 f"is not supported.",
@@ -147,7 +147,7 @@ class Cubic(CEF):
             with ut.UTF8File(file_name) as file:
                 lines[temperature] = list(file)
 
-            for index, line in enumerate(lines[temperature]):
+            for _, line in enumerate(lines[temperature]):
                 row = line.split('\t')
                 if t_number == 0:
                     data['energies'].append(float(row[0]))
@@ -161,7 +161,10 @@ class Cubic(CEF):
         PathProcessor(file_name).remove_if_exists()
         with ut.UTF8File(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
-                ut.write_row(file, row=[val[index] for key, val in data.items()])
+                ut.write_row(
+                    file,
+                    row=[val[index] for key, val in data.items()],
+                )
         return data
 
     @ut.get_time_of_execution
@@ -177,7 +180,7 @@ class Cubic(CEF):
             PathProcessor(file_name).remove_if_exists()
             with ut.UTF8File(file_name, mode='a') as file:
                 row = ['T(Kelvin)']
-                if axis in ('z', 'x'):
+                if axis in {'z', 'x'}:
                     row += [
                         f'chi_curie_{axis}',
                         f'chi_van_vleck_{axis}',
@@ -191,7 +194,7 @@ class Cubic(CEF):
                 ut.write_row(file, row)
                 for i, temperature in enumerate(temperatures):
                     row = [temperature]
-                    if axis in ('z', 'x'):
+                    if axis in {'z', 'x'}:
                         row += [
                             chi_curie[axis][i],
                             chi_van_vleck[axis][i],
@@ -226,8 +229,9 @@ class Cubic(CEF):
                 for line in peak_file:
                     line = line.rstrip('\n')
                     peak_row = [float(energy) for energy in line.split('\t')]
-                    for _ in range(len(peak_row), levels_number):
-                        peak_row.append(0)
+                    peak_row.extend(
+                        0 for _ in range(len(peak_row), levels_number)
+                    )
                     ratios = [peak_row[0]]
                     for low in range(1, levels_number):
                         for high in range(low + 1, levels_number):
@@ -255,9 +259,7 @@ class Cubic(CEF):
                     ratio_name=ut.get_ratios_names(0)[index],
                     difference=experimental_value - ratio,
                 )
-                if not points:
-                    points.append(current)
-                else:
+                if points:
                     previous = points[-1]
                     if (
                             current.rare_earth == previous.rare_earth and
@@ -278,6 +280,8 @@ class Cubic(CEF):
                         )
                     else:
                         points.append(current)
+                else:
+                    points.append(current)
         return points
 
     def find_cross(
@@ -343,10 +347,10 @@ class Cubic(CEF):
         )
         PathProcessor(file_name).remove_if_exists()
         with ut.UTF8File(file_name, mode='a') as file:
-            for _, temperature in enumerate(temperatures):
+            for temperature in temperatures:
                 peaks = self.get_peaks(temperature=temperature)
                 intensities = [peak[1] for peak in peaks if peak[0] >= 0]
-                row = [temperature] + intensities
+                row = [temperature, *intensities]
                 ut.write_row(file, row)
 
 

@@ -1,7 +1,7 @@
 """The module contains CEF class."""
 
 
-from json import dump, load
+import json
 
 import numpy as np
 from numpy import linspace, sqrt
@@ -61,7 +61,7 @@ class CEF:
     def load_data(self) -> None:
         """Load CEF object from file."""
         with UTF8File(self.file_name) as file:
-            self.__dict__.update(load(file))
+            self.__dict__.update(json.load(file))
 
     def save_to_file(self) -> None:
         """Save parameters of the current object to file."""
@@ -72,7 +72,7 @@ class CEF:
             'magnet_field': self.magnet_field,
         }
         with UTF8File(self.file_name, mode='w') as file:
-            dump(saved_object, file, indent=4, sort_keys=True)
+            json.dump(saved_object, file, indent=4, sort_keys=True)
 
     def get_cef_hamiltonian(self,
                             size: int,
@@ -114,7 +114,7 @@ class CEF:
                                size: int,
                                j: float,
                                squared_j: float,
-                               magnet_field: dict = None) -> np.ndarray:
+                               magnet_field: dict | None = None) -> np.ndarray:
         """Determine the Zeeman terms to the Hamiltonian."""
         if magnet_field is None:
             magnet_field = self.magnet_field
@@ -140,7 +140,10 @@ class CEF:
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian
 
-    def get_total_hamiltonian(self, magnet_field: dict = None) -> np.ndarray:
+    def get_total_hamiltonian(
+        self,
+        magnet_field: dict | None = None,
+    ) -> np.ndarray:
         """Return the total Hamiltonian including CEF and Zeeman terms."""
         size = self.material.rare_earth.matrix_size
         j = self.material.rare_earth.total_momentum_ground
@@ -151,16 +154,17 @@ class CEF:
         )
 
     def get_eigenvalues_and_eigenfunctions(
-            self,
-            total_hamiltonian=None,
-            ground_state_is_zero=True,
+        self,
+        total_hamiltonian: np.ndarray = None,
+        *,
+        ground_state_is_zero: bool = True,
     ) -> tuple:
         """Return eigenvalues and eigenfunctions of the total Hamiltonian."""
         if total_hamiltonian is None:
             total_hamiltonian = self.get_total_hamiltonian()
         eigenvalues, eigenfunctions = eigh(total_hamiltonian)
         if ground_state_is_zero:
-            eigenvalues = eigenvalues - min(eigenvalues)
+            eigenvalues -= min(eigenvalues)
         return eigenvalues, eigenfunctions
 
     def get_transition_probabilities(
@@ -260,7 +264,7 @@ class CEF:
     def get_all_peaks(
             self,
             temperature=None,
-            magnet_field: dict = None,
+            magnet_field: dict | None = None,
     ) -> list:
         """Determine the peak properties from the total Hamiltonian."""
         size = self.material.rare_earth.matrix_size
@@ -292,7 +296,7 @@ class CEF:
 
     def get_peaks(self,
                   temperature=None,
-                  magnet_field: dict = None) -> list:
+                  magnet_field: dict | None = None) -> list:
         """Return peaks for non-degenerate levels."""
         result = []
         peaks = self.get_all_peaks(temperature, magnet_field)
@@ -339,8 +343,8 @@ class CEF:
     def get_spectrum(self,
                      energies=None,
                      temperature=None,
-                     width_dict: dict = None,
-                     magnet_field: dict = None) -> np.ndarray:
+                     width_dict: dict | None = None,
+                     magnet_field: dict | None = None) -> np.ndarray:
         """Calculate the neutron scattering cross-section."""
         temperature = utils.get_default(temperature, self.temperature)
         peaks = self.get_peaks(temperature, magnet_field)
@@ -474,7 +478,7 @@ class CEF:
                                               (column_value - row_value))
         coefficient = self.material.rare_earth.lande_factor ** 2
         if thermal['temperature'] > 0:
-            coefficient = coefficient / sum(thermal['boltzmann'])
+            coefficient /= sum(thermal['boltzmann'])
         for key in ('z', 'x'):
             chi['curie'][key] = (
                     coefficient / thermal['temperature'] * chi['curie'][key]
@@ -524,7 +528,7 @@ class CEF:
             'total': utils.get_empty_matrix(temperatures.shape),
             'inverse': utils.get_empty_matrix(temperatures.shape),
         }
-        for _, temperature in enumerate(temperatures):
+        for temperature in temperatures:
             current_chi = self.get_chi(
                 temperature,
                 eigenvalues,
@@ -564,41 +568,51 @@ class CEF:
         for key, value in self.parameters.items():
             if value:
                 output.append(f'{key} = {value:.4f};')
+        threshold = 1e-9
         for key, value in self.magnet_field.items():
             if value:
                 output.append(f'H{key} = {value:.4f};')
-            if magnetic_moment[key] > 1e-9:
-                line_to_append = (
-                        f'<J{key}> = {j_average[key]:7.3f}; ' +
-                        f'<mu_{key}> = {magnetic_moment[key]:7.3f} mu_Bohr;'
+            if magnetic_moment[key] > threshold:
+                line_to_append = '; '.join(
+                    [
+                        f'<J{key}> = {j_average[key]:7.3f}',
+                        f'<mu_{key}> = {magnetic_moment[key]:7.3f} mu_Bohr',
+                    ],
                 )
                 output.append(line_to_append)
 
         eigenvalues, eigenfunctions = self.get_eigenvalues_and_eigenfunctions()
         if eigenvalues.any():
             output.append('Crystal Field Eigenvalues and Eigenfunctions:')
+            threshold = 1e-4
             for column in range(eigenvalues.size):
                 line = [f'{eigenvalues[column]:8.3f}: ']
                 for row in range(eigenvalues.size):
-                    if abs(eigenfunctions[row, column]) > 0.0001:
-                        j_z = (
-                                row
-                                - self.material.rare_earth.total_momentum_ground
+                    if abs(eigenfunctions[row, column]) > threshold:
+                        tmg = self.material.rare_earth.total_momentum_ground
+                        j_z = row - tmg
+                        eigen_function = eigenfunctions[row, column]
+                        line_to_append = ''.join(
+                            [
+                                f'{utils.get_sign(eigen_function)}',
+                                f'{abs(eigen_function):7.4f}',
+                                f'|{utils.get_sign(j_z)}{abs(j_z)}>',
+                            ],
                         )
-                        line_to_append = (
-                                f'{utils.get_sign(eigenfunctions[row, column])}' +
-                                f'{abs(eigenfunctions[row, column]):7.4f}' +
-                                f'|{utils.get_sign(j_z)}{abs(j_z)}>')
                         line.append(line_to_append)
                 output.append(' '.join(line))
 
         peaks = self.get_peaks()
         if peaks:
-            output.append('Crystal Field Transitions:')
-            output.append(f'Temperature: {self.temperature} K')
-            for peak in peaks:
-                output.append(
-                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}',
-                )
+            output.extend(
+                (
+                    'Crystal Field Transitions:',
+                    f'Temperature: {self.temperature} K',
+                ),
+            )
+            output.extend(
+                f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}'
+                for peak in peaks
+            )
 
         return '\n'.join(output)

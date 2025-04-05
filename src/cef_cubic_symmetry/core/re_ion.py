@@ -64,5 +64,5 @@ class REIon(RepresentableObject):
 
     @property
     def squared_momentum(self) -> float:
-        __total_momentum_ground = self.info.total_momentum_ground
-        return __total_momentum_ground * (__total_momentum_ground + 1)
+        total_momentum_ground = self.info.total_momentum_ground
+        return total_momentum_ground * (total_momentum_ground + 1)

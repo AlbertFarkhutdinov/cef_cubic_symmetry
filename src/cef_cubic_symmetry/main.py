@@ -10,11 +10,12 @@ from cef_cubic_symmetry.scripts.experiment_object import Experiment
 
 @ut.get_time_of_execution
 def get_fixed_results(
-        rare_earth: str,
-        properties: dict,
-        crystal: str,
-        only_plots=True,
-        choice=0,
+    rare_earth: str,
+    properties: dict,
+    crystal: str,
+    choice: int = 0,
+    *,
+    only_plots: bool = True,
 ) -> None:
     """
     Calculate and save the fixed results.
@@ -87,10 +88,10 @@ def main(rare_earth: str, properties: dict) -> None:
         recalculated_crosses,
         **properties['theory'],
     )
-    # experiment.get_intensity_on_temperature(
-    #     crosses=recalculated_crosses,
-    #     **properties['intensities']
-    # )
+    experiment.get_intensity_on_temperature(
+        crosses=recalculated_crosses,
+        **properties['intensities'],
+    )
 
 
 def get_scheme() -> None:
@@ -98,7 +99,7 @@ def get_scheme() -> None:
     results = {
         'Pr': {
             'w': -0.105,
-            'x': -0.460,
+            'x': -0.46,
         },
         'Nd': {
             'w': 0.147,
@@ -118,19 +119,22 @@ def get_scheme() -> None:
 
 
 if __name__ == '__main__':
-    # FIXED_PROPS = get_json_object('fixed.json')
-    # for key, value in FIXED_PROPS.items():
-    #     get_fixed_results(
-    #         rare_earth=key,
-    #         properties=value,
-    #         crystal='YNi2',
-    #         only_plots=True,
-    #         choice=0,
-    #     )
+    is_recalculated = False
+    if is_recalculated:
+        FIXED_PROPS = ut.get_json_object('fixed.json')
+        for key, value in FIXED_PROPS.items():
+            get_fixed_results(
+                rare_earth=key,
+                properties=value,
+                crystal='YNi2',
+                only_plots=True,
+                choice=0,
+            )
 
     PROPS = ut.get_json_object('properties.json')
 
     for key, value in PROPS.items():
         main(rare_earth=key, properties=value)
 
-    # get_scheme()
+    if is_recalculated:
+        get_scheme()

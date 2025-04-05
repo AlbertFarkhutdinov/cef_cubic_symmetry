@@ -4,8 +4,8 @@
 from collections import OrderedDict
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 from cycler import cycler
+from matplotlib import pyplot as plt
 
 from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common import utils as ut
@@ -63,7 +63,7 @@ class CustomPlot:
         del args['self']
         if self._ax:
             for _key, _value in args.items():
-                self._ax.__getattribute__(f'set_{_key}')(_value)
+                getattr(self._ax, f'set_{_key}')(_value)
 
     def set_limits(self,
                    x_min=None,
@@ -72,13 +72,13 @@ class CustomPlot:
                    y_max=None) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
-        _limits = {
+        limits = {
             'x_min': (x_min, min(self.data.x)),
             'x_max': (x_max, max(self.data.x)),
             'y_min': (y_min, min(min(value) for value in y_set)),
             'y_max': (y_max, max(max(value) for value in y_set)),
         }
-        for _key, _value in _limits.items():
+        for _key, _value in limits.items():
             self.limits[_key] = ut.get_default(*_value)
         if self._ax:
             for axis in ('x', 'y'):
@@ -86,7 +86,7 @@ class CustomPlot:
                     f'{axis}{lim}': self.limits[f'{axis}_{lim}']
                     for lim in ('min', 'max')
                 }
-                self._ax.__getattribute__(f'set_{axis}lim')(**axis_limits)
+                getattr(self._ax, f'set_{axis}lim')(**axis_limits)
 
     def set_locators(self,
                      x_major=None,
@@ -119,7 +119,7 @@ class CustomPlot:
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
-                key: self._ax.__getattribute__(key)
+                key: getattr(self._ax, key)
                 for key in ('plot', 'scatter', 'errorbar')
             }
             for key, y_data in self.data.y_set.items():
@@ -182,7 +182,7 @@ class CubicPlot(CustomPlot):
 
     def get_graph_file_name(self,
                             data_name: str,
-                            parameters: dict = None) -> Path:
+                            parameters: dict | None = None) -> Path:
         """Return path for plot saving."""
         return get_paths(
             data_name=data_name,
@@ -458,7 +458,7 @@ if __name__ == '__main__':
         '4': [x ** 4 for x in X_ARRAY],
         '3': [x ** 3 for x in X_ARRAY],
         '2': [x ** 2 for x in X_ARRAY],
-        '1': [x ** 1 for x in X_ARRAY],
+        '1': X_ARRAY,
     }
     LEGEND = {
         '4': '$x^4$',

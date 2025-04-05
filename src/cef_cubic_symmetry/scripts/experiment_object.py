@@ -1,8 +1,8 @@
 """The module contains Experiment class."""
 
 
-import os
 from copy import deepcopy
+from pathlib import Path
 
 from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common.utils import get_repr
@@ -51,86 +51,26 @@ class Experiment:
             ticks=ticks,
         )
 
-    def _get_spectrum_experiment(
-            self,
-            spectrometer: str,
-            initial_energy: float,
-    ) -> tuple:
-        """Return data for experimental spectra."""
-        data = []
-        _temperatures = []
-        for _temperature in self.temperatures:
-            try:
-                data.append(
-                    get_data_from_file(
-                        os.path.join(
-                            con.DATA_PATHS['experiment'],
-                            f'{self.material.crystal}_'
-                            f'{self.material.rare_earth}',
-                            '_'.join(
-                                [spectrometer,
-                                 self.material.rare_earth,
-                                 self.material.crystal,
-                                 f'{initial_energy}meV',
-                                 f'{_temperature}K.dat'],
-                            ),
-                        ),
-                    ),
-                )
-                _temperatures.append(_temperature)
-            except FileNotFoundError:
-                pass
-        return data, _temperatures
-
     def get_spectrum_experiment(self,
                                 limits: dict,
                                 locators: dict,
                                 spectrometer: str,
                                 initial_energy: float) -> tuple:
         """Save the plot for experimental spectrum."""
-        data, _temperatures = self._get_spectrum_experiment(
+        data, temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
             initial_energy=initial_energy,
         )
         gg.get_spectrum_experiment(
             material=self.material,
-            temperatures=tuple(_temperatures),
+            temperatures=tuple(temperatures),
             data=tuple(data),
             parameters={
                 'setup': spectrometer,
             },
             scale=con.Scale(limits=limits, locators=locators),
         )
-        return data, _temperatures
-
-    def _get_spectrum_differences(self,
-                                  spectrometer: str,
-                                  initial_energy: float) -> tuple:
-        """Return data for experimental spectra differences."""
-        data, _temperatures = self._get_spectrum_experiment(
-            spectrometer=spectrometer,
-            initial_energy=initial_energy,
-        )
-        diff_data = []
-        differences = []
-        for index, _temperature in enumerate(_temperatures[1:]):
-            result = {
-                'x': [],
-                'y': [],
-                'errors': [],
-            }
-            for _index, _ in enumerate(data[0]['x']):
-                result['x'].append(data[0]['x'][_index])
-                result['y'].append(
-                    data[0]['y'][_index] - data[index + 1]['y'][_index],
-                )
-                result['errors'].append(
-                    data[0]['errors'][_index]
-                    + data[index + 1]['errors'][_index],
-                )
-            differences.append(f'{_temperatures[0]} K - {_temperature}')
-            diff_data.append(result)
-        return diff_data, differences
+        return data, temperatures
 
     def get_spectrum_differences(
             self,
@@ -232,3 +172,62 @@ class Experiment:
                     locators=locators,
                 ),
             )
+
+    def _get_spectrum_experiment(
+            self,
+            spectrometer: str,
+            initial_energy: float,
+    ) -> tuple:
+        """Return data for experimental spectra."""
+        data = []
+        temperatures = []
+        for _temperature in self.temperatures:
+            try:
+                data.append(
+                    get_data_from_file(
+                        Path(con.DATA_PATHS['experiment']).joinpath(
+                            f'{self.material.crystal}_'
+                            f'{self.material.rare_earth}',
+                            '_'.join(
+                                [spectrometer,
+                                 self.material.rare_earth,
+                                 self.material.crystal,
+                                 f'{initial_energy}meV',
+                                 f'{_temperature}K.dat'],
+                            ),
+                        ),
+                    ),
+                )
+                temperatures.append(_temperature)
+            except FileNotFoundError:
+                pass
+        return data, temperatures
+
+    def _get_spectrum_differences(self,
+                                  spectrometer: str,
+                                  initial_energy: float) -> tuple:
+        """Return data for experimental spectra differences."""
+        data, temperatures = self._get_spectrum_experiment(
+            spectrometer=spectrometer,
+            initial_energy=initial_energy,
+        )
+        diff_data = []
+        differences = []
+        for index, _temperature in enumerate(temperatures[1:]):
+            result = {
+                'x': [],
+                'y': [],
+                'errors': [],
+            }
+            for _index, _ in enumerate(data[0]['x']):
+                result['x'].append(data[0]['x'][_index])
+                result['y'].append(
+                    data[0]['y'][_index] - data[index + 1]['y'][_index],
+                )
+                result['errors'].append(
+                    data[0]['errors'][_index]
+                    + data[index + 1]['errors'][_index],
+                )
+            differences.append(f'{temperatures[0]} K - {_temperature}')
+            diff_data.append(result)
+        return diff_data, differences

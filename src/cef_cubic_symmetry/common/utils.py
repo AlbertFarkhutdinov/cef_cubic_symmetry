@@ -1,8 +1,9 @@
 """The module contains some common functions that used in this project."""
 
 
-from datetime import datetime
-from json import load
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 from numpy import zeros
@@ -29,9 +30,10 @@ def get_default(value, default):
 
 def write_row(file, row) -> None:
     """Write the row of the float numbers to the file."""
-    result = ''
-    for value in row:
-        result += f'{value:11.5f}\t'
+    result = ''.join(
+        f'{value:11.5f}\t'
+        for value in row
+    )
     file.write(f'{result.strip()}\n')
 
 
@@ -47,12 +49,8 @@ def check_input(choice: str) -> float:
     condition = False
     while not condition:
         if choice == 'rare':
-            request = (
-                'Input the name of RE ion '
-                # f'({", ". join(ACCEPTABLE_RARE_EARTHS)}): '
-            )
+            request = 'Input the name of RE ion'
             result = input(request).capitalize()
-            # condition = (result in ACCEPTABLE_RARE_EARTHS)
             condition = True
         try:
             if choice == 'w':
@@ -92,15 +90,16 @@ def data_popping(data: dict, condition) -> None:
 def get_time_of_execution(function) -> callable:
     """Print time of function's execution."""
     def wrapper(*args, **kwargs) -> None:
-        start_time = datetime.now()
+        start_time = datetime.now(tz=timezone.utc)
         function(*args, **kwargs)
-        print(f'Saving time: {datetime.now() - start_time}\n')
+        finish_time = datetime.now(tz=timezone.utc) - start_time
+        print(f'Saving time: {finish_time}\n')
     return wrapper
 
 
 def get_label(number: int, choice=0) -> str:
     """Return label for legend."""
-    index = 1 if choice != 0 else choice
+    index = int(choice != 0)
     return (fr'$E_{number}$', fr'$I_{number}$')[index]
 
 
@@ -109,16 +108,21 @@ def get_ratios_names(choice=0) -> list:
     letter = 'E' if choice == 0 else 'I'
     result = []
     for low in range(1, 7):
-        for high in range(low + 1, 7):
-            result.append(f'${letter}_{high}/{letter}_{low}$')
+        result.extend(
+            f'${letter}_{high}/{letter}_{low}$'
+            for high in range(low + 1, 7)
+        )
     return result
 
 
 def get_repr(obj, *args) -> str:
     """Return string representation of the object."""
-    result = f'{obj.__class__.__name__}('
-    for arg in args:
-        result += f'{arg}={obj.__getattribute__(arg)!r}, '
+    repr_parts = [f'{obj.__class__.__name__}(']
+    repr_parts.extend(
+        f'{arg}={getattr(obj, arg)!r}, '
+        for arg in args
+    )
+    result = ''.join(repr_parts)
     return f'{result.rstrip(", ")})'
 
 
@@ -135,7 +139,7 @@ class UTF8File:
         """Execute entrance to context manager and return self."""
         if self.mode != 'r':
             print(f'Saving file "{self.name}"...')
-        self.file = open(self.name, mode=self.mode, encoding='utf-8')
+        self.file = Path(self.name).open(mode=self.mode, encoding='utf-8')
         return self.file
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
@@ -149,5 +153,4 @@ class UTF8File:
 def get_json_object(file_name: str):
     """Return object from JSON file."""
     with UTF8File(str(DATA_DIR / file_name)) as file:
-        obj = load(file)
-    return obj
+        return json.load(file)

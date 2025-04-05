@@ -31,11 +31,12 @@ class PathProcessor:
 
 
 def get_paths(
-        data_name: str,
-        format_name='.dat',
-        is_graph=False,
-        sample: Sample = None,
-        parameters: dict = None,
+    data_name: str,
+    format_name: str = '.dat',
+    sample: Sample = None,
+    parameters: dict | None = None,
+    *,
+    is_graph: bool = False,
 ) -> Path:
     """Return path of the file that will be saved."""
     os.chdir(con.BASE_DIR)
@@ -43,17 +44,18 @@ def get_paths(
     if sample:
         short_name = f'{sample.crystal.name}_{sample.rare_earth.info.symbol}'
 
-    full_name = short_name
+    full_name_parts = [short_name]
     if parameters:
         for key, value in parameters.items():
-            if key in ('w', 'x') and value is not None:
-                full_name += f'_{key}{get_value_with_sign(value)}'
+            if key in {'w', 'x'} and value is not None:
+                full_name_parts.append(f'_{key}{get_value_with_sign(value)}')
             elif key == 'T':
-                full_name += f'_{key}{value}'
+                full_name_parts.append(f'_{key}{value}')
             elif key == 'setup':
-                full_name += f'_{key}_{value}'
+                full_name_parts.append(f'_{key}_{value}')
             else:
-                full_name += f'_{key}{value:.3f}'
+                full_name_parts.append(f'_{key}{value:.3f}')
+    full_name = ''.join(full_name_parts)
     if is_graph:
         result_path = (
             con.PLOT_PATHS[data_name] / short_name / f'{data_name}_{full_name}'

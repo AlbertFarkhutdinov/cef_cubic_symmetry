@@ -18,13 +18,14 @@ class Transitions(RepresentableObject):
         self.hamiltonian = hamiltonian
 
     def get_eigenvalues_and_eigenfunctions(
-            self,
-            is_ground_state_zero: bool = True,
+        self,
+        *,
+        is_ground_state_zero: bool = True,
     ) -> tuple:
         """Return eigenvalues and eigenfunctions of the hamiltonian."""
         eigenvalues, eigenfunctions = eigh(self.hamiltonian)
         if is_ground_state_zero:
-            eigenvalues = eigenvalues - min(eigenvalues)
+            eigenvalues -= min(eigenvalues)
         return eigenvalues, eigenfunctions
 
     def get_transition_probabilities(
@@ -171,7 +172,7 @@ class Transitions(RepresentableObject):
             self,
             boltzmann_factors: np.ndarray,
             energies=None,
-            width_dict: dict = None,
+            width_dict: dict | None = None,
     ) -> np.ndarray:
         """Calculate the neutron scattering cross-section."""
         peaks = self.get_peaks(boltzmann_factors)
@@ -222,15 +223,18 @@ class Transitions(RepresentableObject):
         eigen_v, eigen_f = self.get_eigenvalues_and_eigenfunctions()
         if eigen_v.any():
             output.append('Crystal Field Eigenvalues and Eigenfunctions:')
+            threshold = 1e-4
             for column in range(eigen_v.size):
                 line = [f'{eigen_v[column]:8.3f}: ']
                 for row in range(eigen_v.size):
-                    if abs(eigen_f[row, column]) > 0.0001:
+                    if abs(eigen_f[row, column]) > threshold:
                         j_z = row - momentum
-                        line_to_append = (
-                                f'{utils.get_sign(eigen_f[row, column])}' +
-                                f'{abs(eigen_f[row, column]):7.4f}' +
-                                f'|{utils.get_sign(j_z)}{abs(j_z)}>'
+                        line_to_append = ''.join(
+                            [
+                                f'{utils.get_sign(eigen_f[row, column])}',
+                                f'{abs(eigen_f[row, column]):7.4f}',
+                                f'|{utils.get_sign(j_z)}{abs(j_z)}>',
+                            ],
                         )
                         line.append(line_to_append)
                 output.append(' '.join(line))

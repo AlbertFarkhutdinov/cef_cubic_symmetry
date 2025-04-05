@@ -4,7 +4,7 @@
 from collections import namedtuple
 from pathlib import Path
 
-BASE_DIR = Path().resolve().parent
+BASE_DIR = Path.cwd().parent
 
 DATA_DIR = BASE_DIR / 'data'
 PLOTS_DIR = BASE_DIR / 'plots'

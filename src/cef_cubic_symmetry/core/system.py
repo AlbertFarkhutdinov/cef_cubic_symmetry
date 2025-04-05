@@ -167,7 +167,7 @@ class System(RepresentableObject):
                                               (column_value - row_value))
         coefficient = self.sample.rare_earth.lande_factor ** 2
         if thermal['temperature'] > 0:
-            coefficient = coefficient / sum(thermal['boltzmann'])
+            coefficient /= sum(thermal['boltzmann'])
         for key in ('z', 'x'):
             chi['curie'][key] = (
                     coefficient / thermal['temperature'] * chi['curie'][key]
@@ -208,7 +208,7 @@ class System(RepresentableObject):
             'total': utils.get_empty_matrix(temperatures.shape),
             'inverse': utils.get_empty_matrix(temperatures.shape),
         }
-        for _, temperature in enumerate(temperatures):
+        for temperature in temperatures:
             self.temperature = temperature
             current_chi = self.get_chi()
             for key in ('z', 'x'):
@@ -229,8 +229,10 @@ class System(RepresentableObject):
 
         """
         output = [str(self.sample)]
-        for interaction in self.interactions.values():
-            output.append(str(interaction))
+        output.extend(
+            str(interaction)
+            for interaction in self.interactions.values()
+        )
         transitions = Transitions(
             sample=self.sample,
             hamiltonian=self.get_hamiltonian(),
@@ -243,11 +245,14 @@ class System(RepresentableObject):
             ),
         )
         if peaks:
-            output.append('Crystal Field Transitions:')
-            output.append(f'Temperature: {self.temperature} K')
-            for peak in peaks:
-                output.append(
-                    f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}',
-                )
-
+            output.extend(
+                (
+                    'Crystal Field Transitions:',
+                    f'Temperature: {self.temperature} K',
+                ),
+            )
+            output.extend(
+                f'Energy: {peak[0]:8.3f} meV  Intensity: {peak[1]:8.4f}'
+                for peak in peaks
+            )
         return '\n'.join(output)
