@@ -1,6 +1,5 @@
 """The module contains fitting Lorentz function to experimental data."""
 
-
 import sys
 from pathlib import Path
 
@@ -19,9 +18,9 @@ def get_data_from_file(file_name: Path) -> pd.DataFrame:
 
 
 def filtered_data(
-        data: dict,
-        min_value=-INFINITY,
-        max_value=INFINITY,
+    data: dict,
+    min_value=-INFINITY,
+    max_value=INFINITY,
 ) -> np.ndarray:
     """Return filtered data."""
     rows = [
@@ -36,9 +35,9 @@ def filtered_data(
 
 
 def print_peak_parameters(
-        function,
-        values,
-        errors=None,
+    function,
+    values,
+    errors=None,
 ) -> None:
     """Print parameters of peak."""
     parts = [f'Function name: {function.__name__}\n']
@@ -51,11 +50,11 @@ def print_peak_parameters(
 
 
 def fitting(
-        function,
-        data: dict,
-        parameters,
-        min_value: float,
-        max_value: float,
+    function,
+    data: dict,
+    parameters,
+    min_value: float,
+    max_value: float,
 ) -> tuple:
     """Return parameters of function fitted to data with one peak."""
     data = filtered_data(data, min_value, max_value)
@@ -70,11 +69,11 @@ def fitting(
 
 
 def multi_peak_fitting(
-        function_name: str,
-        data: dict,
-        parameters,
-        min_value: float,
-        max_value: float,
+    function_name: str,
+    data: dict,
+    parameters,
+    min_value: float,
+    max_value: float,
 ) -> tuple:
     """Return parameters of function fitted to data with several peaks."""
     function = (ph.multi_lorentzian
@@ -96,11 +95,11 @@ def multi_peak_fitting(
 
 
 def multi_lorentzian_with_gauss(
-        arg: float,
-        center: float,
-        width: float,
-        amplitude: float,
-        *parameters,
+    arg: float,
+    center: float,
+    width: float,
+    amplitude: float,
+    *parameters,
 ) -> np.ndarray:
     """Return value of multi_peak function for lorentzian."""
     return (ph.gaussian(arg, center, width, amplitude) +
@@ -140,18 +139,18 @@ if __name__ == '__main__':
     )
     FITTED_DATA = simple_fitting(EXPERIMENTAL_DATA)
     with CustomPlot(
-            data=Data(
-                x=EXPERIMENTAL_DATA['x'],
-                y_set={
-                    'exp': EXPERIMENTAL_DATA['y'],
-                    'fit': FITTED_DATA,
-                },
-                legend={
-                    'exp': 'exp',
-                    'fit': 'fit',
-                },
-                errors=None,
-            ),
+        data=Data(
+            x=EXPERIMENTAL_DATA['x'],
+            y_set={
+                'exp': EXPERIMENTAL_DATA['y'],
+                'fit': FITTED_DATA,
+            },
+            legend={
+                'exp': 'exp',
+                'fit': 'fit',
+            },
+            errors=None,
+        ),
     ) as plot:
         plot.set_labels(
             xlabel='x_test',
@@ -160,7 +159,6 @@ if __name__ == '__main__':
         )
         plot.set_locators()
         plot.make_plot()
-
 
 if __name__ == '__main__':
     DATA = {
@@ -182,21 +180,21 @@ if __name__ == '__main__':
     )
     print_peak_parameters(ph.multi_lorentzian, P_OPT, P_ERR)
     with CustomPlot(
-            data=Data(
-                x=DATA['x'],
-                y_set={
-                    'exp': DATA['y'],
-                    'fit': ph.multi_lorentzian(DATA['x'], *P_OPT),
-                },
-                legend={
-                    'exp': 'experiment',
-                    'fit': 'fit',
-                },
-                errors={
-                    'exp': DATA['errors'],
-                    'fit': None,
-                },
-            ),
+        data=Data(
+            x=DATA['x'],
+            y_set={
+                'exp': DATA['y'],
+                'fit': ph.multi_lorentzian(DATA['x'], *P_OPT),
+            },
+            legend={
+                'exp': 'experiment',
+                'fit': 'fit',
+            },
+            errors={
+                'exp': DATA['errors'],
+                'fit': None,
+            },
+        ),
     ) as test_plot:
         test_plot.set_labels(xlabel='x_test', ylabel='y_test', title='test')
         test_plot.set_limits(x_min=0, x_max=5, y_min=0, y_max=100)

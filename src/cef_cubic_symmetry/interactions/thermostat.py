@@ -1,6 +1,5 @@
 """The module contains CEF class."""
 
-
 import numpy as np
 from base_interaction import BaseInteraction
 
@@ -26,7 +25,7 @@ class Thermostat(BaseInteraction):
             boltzmann_factors[0] = 1
         else:
             boltzmann_factors = (
-                    thermal['boltzmann'] / sum(thermal['boltzmann'])
+                thermal['boltzmann'] / sum(thermal['boltzmann'])
             )
         return boltzmann_factors
 

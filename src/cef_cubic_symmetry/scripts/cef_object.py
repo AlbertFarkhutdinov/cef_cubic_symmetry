@@ -1,6 +1,5 @@
 """The module contains CEF class."""
 
-
 import json
 
 import numpy as np
@@ -74,10 +73,12 @@ class CEF:
         with UTF8File(self.file_name, mode='w') as file:
             json.dump(saved_object, file, indent=4, sort_keys=True)
 
-    def get_cef_hamiltonian(self,
-                            size: int,
-                            j: float,
-                            squared_j: float) -> np.ndarray:
+    def get_cef_hamiltonian(
+        self,
+        size: int,
+        j: float,
+        squared_j: float,
+    ) -> np.ndarray:
         """Determine the CEF Hamiltonian based on the input parameters."""
         hamiltonian = utils.get_empty_matrix(size)
         parameters = self.parameters
@@ -87,25 +88,25 @@ class CEF:
             mqn_1 = [(row - j) ** i for i in range(5)]
             for key in ('20', '40', '60'):
                 hamiltonian[row, row] += (
-                        parameters[f'B{key}'] *
-                        physics.steven_operators(
-                            f'o{key}',
-                            squared_j,
-                            mqn_1,
-                        )
+                    parameters[f'B{key}'] *
+                    physics.steven_operators(
+                        f'o{key}',
+                        squared_j,
+                        mqn_1,
+                    )
                 )
             for degree in range(2, size - row):
                 mqn_2 = [(row - j + degree) ** i for i in range(5)]
                 for key in ('22', '42', '62', '43', '63', '44', '64', '66'):
                     if key[-1] == str(degree):
                         hamiltonian[row, row + degree] += (
-                                parameters[f'B{key}'] *
-                                physics.steven_operators(
-                                    f'o{key}',
-                                    squared_j,
-                                    mqn_1,
-                                    mqn_2,
-                                )
+                            parameters[f'B{key}'] *
+                            physics.steven_operators(
+                                f'o{key}',
+                                squared_j,
+                                mqn_1,
+                                mqn_2,
+                            )
                         )
                 hamiltonian[row + degree, row] = hamiltonian[row, row + degree]
         return hamiltonian
@@ -168,8 +169,8 @@ class CEF:
         return eigenvalues, eigenfunctions
 
     def get_transition_probabilities(
-            self,
-            eigenfunctions,
+        self,
+        eigenfunctions,
     ) -> tuple:
         """
         Return transition probabilities.
@@ -246,10 +247,10 @@ class CEF:
         return j_ops, transition_probability
 
     def get_boltzmann_factor(
-            self,
-            size: int,
-            eigenvalues,
-            temperature=None,
+        self,
+        size: int,
+        eigenvalues,
+        temperature=None,
     ) -> float:
         """Determine boltzmann_factor at specified temperature."""
         temperature = utils.get_default(temperature, self.temperature)
@@ -262,9 +263,9 @@ class CEF:
         return boltzmann_factor
 
     def get_all_peaks(
-            self,
-            temperature=None,
-            magnet_field: dict | None = None,
+        self,
+        temperature=None,
+        magnet_field: dict | None = None,
     ) -> list:
         """Determine the peak properties from the total Hamiltonian."""
         size = self.material.rare_earth.matrix_size
@@ -294,9 +295,11 @@ class CEF:
                     })
         return peaks
 
-    def get_peaks(self,
-                  temperature=None,
-                  magnet_field: dict | None = None) -> list:
+    def get_peaks(
+        self,
+        temperature=None,
+        magnet_field: dict | None = None,
+    ) -> list:
         """Return peaks for non-degenerate levels."""
         result = []
         peaks = self.get_all_peaks(temperature, magnet_field)
@@ -304,12 +307,12 @@ class CEF:
             sum_peaks = peak['energy'] * peak['intensity']
             for other_peak in peaks:
                 if (
-                        peak['intensity'] > 0 and
-                        other_peak is not peak and
-                        (
-                                abs(peak['energy'] - other_peak['energy'])
-                                < self.__class__.resolution
-                        )
+                    peak['intensity'] > 0 and
+                    other_peak is not peak and
+                    (
+                        abs(peak['energy'] - other_peak['energy'])
+                        < self.__class__.resolution
+                    )
                 ):
                     peak['intensity'] += other_peak['intensity']
                     sum_peaks += other_peak['energy'] * other_peak['intensity']
@@ -319,8 +322,8 @@ class CEF:
                 result.append((peak['energy'], peak['intensity']))
         result.sort()
         intensity_sum = 2 * (
-                self.material.rare_earth.total_momentum_ground *
-                (self.material.rare_earth.total_momentum_ground + 1)
+            self.material.rare_earth.total_momentum_ground *
+            (self.material.rare_earth.total_momentum_ground + 1)
         ) / 3
         intensities = [item[1] for item in result]
         if sum(intensities) != intensity_sum:
@@ -340,11 +343,13 @@ class CEF:
             peaks = self.get_peaks()
         return [peak[1] for peak in peaks]
 
-    def get_spectrum(self,
-                     energies=None,
-                     temperature=None,
-                     width_dict: dict | None = None,
-                     magnet_field: dict | None = None) -> np.ndarray:
+    def get_spectrum(
+        self,
+        energies=None,
+        temperature=None,
+        width_dict: dict | None = None,
+        magnet_field: dict | None = None,
+    ) -> np.ndarray:
         """Calculate the neutron scattering cross-section."""
         temperature = utils.get_default(temperature, self.temperature)
         peaks = self.get_peaks(temperature, magnet_field)
@@ -389,10 +394,12 @@ class CEF:
 
         return spectrum
 
-    def get_moments(self,
-                    temperature=None,
-                    eigenvalues=None,
-                    eigenfunctions=None) -> tuple:
+    def get_moments(
+        self,
+        temperature=None,
+        eigenvalues=None,
+        eigenfunctions=None,
+    ) -> tuple:
         """Calculate the magnetic moments of the CEF model."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = (
@@ -425,16 +432,18 @@ class CEF:
         magnetic_moment = {}
         for key, value in j_average.items():
             magnetic_moment[key] = (
-                    self.material.rare_earth.lande_factor
-                    * value
+                self.material.rare_earth.lande_factor
+                * value
             )
             # magnetic moments are given in units of Bohr magneton
         return j_average, magnetic_moment
 
-    def get_chi(self,
-                temperature=None,
-                eigenvalues=None,
-                eigenfunctions=None) -> dict:
+    def get_chi(
+        self,
+        temperature=None,
+        eigenvalues=None,
+        eigenfunctions=None,
+    ) -> dict:
         """Calculate the susceptibility at a specified temperature."""
         if eigenvalues is None and eigenfunctions is None:
             eigenvalues, eigenfunctions = (
@@ -457,16 +466,16 @@ class CEF:
                 row_value = eigenvalues[row]
                 column_value = eigenvalues[column]
                 if (
-                        abs(column_value - row_value)
-                        < 0.00001 * thermal['temperature']
+                    abs(column_value - row_value)
+                    < 0.00001 * thermal['temperature']
                 ):
                     chi['curie']['z'] += (
-                            j_ops_square['z']
-                            * thermal['boltzmann'][row]
+                        j_ops_square['z']
+                        * thermal['boltzmann'][row]
                     )
                     chi['curie']['x'] += (
-                            0.25 * (j_ops_square['+'] + j_ops_square['-']) *
-                            thermal['boltzmann'][row]
+                        0.25 * (j_ops_square['+'] + j_ops_square['-']) *
+                        thermal['boltzmann'][row]
                     )
                 else:
                     chi['van_vleck']['z'] += (2 * j_ops_square['z'] *
@@ -481,16 +490,16 @@ class CEF:
             coefficient /= sum(thermal['boltzmann'])
         for key in ('z', 'x'):
             chi['curie'][key] = (
-                    coefficient / thermal['temperature'] * chi['curie'][key]
+                coefficient / thermal['temperature'] * chi['curie'][key]
             )
             chi['van_vleck'][key] = coefficient * chi['van_vleck'][key]
         return chi
 
     def get_chi_dependence(
-            self,
-            temperatures=None,
-            eigenvalues=None,
-            eigenfunctions=None,
+        self,
+        temperatures=None,
+        eigenvalues=None,
+        eigenfunctions=None,
     ) -> tuple:
         """Calculate the susceptibility at specified temperatures."""
         temperatures = utils.get_default(

@@ -1,6 +1,5 @@
 """The module contains CEF class."""
 
-
 from pretty_repr import RepresentableObject
 
 from cef_cubic_symmetry.core.sample import Sample

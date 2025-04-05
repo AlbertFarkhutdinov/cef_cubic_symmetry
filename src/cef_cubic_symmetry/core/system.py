@@ -1,6 +1,5 @@
 """The module contains CEF class."""
 
-
 import json
 
 import numpy as np
@@ -21,11 +20,11 @@ class System(RepresentableObject):
     """Class for the studied system."""
 
     def __init__(
-            self,
-            sample: Sample,
-            parameters: BParameters = None,
-            temperature: float = 0,
-            magnet_field: MagnetField = None,
+        self,
+        sample: Sample,
+        parameters: BParameters = None,
+        temperature: float = 0,
+        magnet_field: MagnetField = None,
     ) -> None:
         """Initialize the CEF object or read it from a file."""
         self.sample = sample
@@ -118,8 +117,8 @@ class System(RepresentableObject):
         magnetic_moment = {}
         for key, value in j_average.items():
             magnetic_moment[key] = (
-                    float(self.sample.rare_earth.info.lande_factor)
-                    * value
+                float(self.sample.rare_earth.info.lande_factor)
+                * value
             )
             # magnetic moments are given in units of Bohr magneton
         return j_average, magnetic_moment
@@ -146,16 +145,16 @@ class System(RepresentableObject):
                 row_value = eigen_v[row]
                 column_value = eigen_v[column]
                 if (
-                        abs(column_value - row_value)
-                        < 0.00001 * thermal['temperature']
+                    abs(column_value - row_value)
+                    < 0.00001 * thermal['temperature']
                 ):
                     chi['curie']['z'] += (
-                            j_ops_square['z']
-                            * thermal['boltzmann'][row]
+                        j_ops_square['z']
+                        * thermal['boltzmann'][row]
                     )
                     chi['curie']['x'] += (
-                            0.25 * (j_ops_square['+'] + j_ops_square['-']) *
-                            thermal['boltzmann'][row]
+                        0.25 * (j_ops_square['+'] + j_ops_square['-'])
+                        * thermal['boltzmann'][row]
                     )
                 else:
                     chi['van_vleck']['z'] += (2 * j_ops_square['z'] *
@@ -170,7 +169,7 @@ class System(RepresentableObject):
             coefficient /= sum(thermal['boltzmann'])
         for key in ('z', 'x'):
             chi['curie'][key] = (
-                    coefficient / thermal['temperature'] * chi['curie'][key]
+                coefficient / thermal['temperature'] * chi['curie'][key]
             )
             chi['van_vleck'][key] = coefficient * chi['van_vleck'][key]
         return chi

@@ -1,6 +1,5 @@
 """The module contains class for CEF with cubic symmetry."""
 
-
 import sys
 from pathlib import Path
 
@@ -43,13 +42,13 @@ class Cubic(CEF):
         parameters = super().parameters
         try:
             parameters['B40'] = (
-                    self.llw_parameters['w'] * self.llw_parameters['x'] / F4
+                self.llw_parameters['w'] * self.llw_parameters['x'] / F4
             )
             parameters['B44'] = 5 * parameters['B40']
             parameters['B60'] = (
-                    self.llw_parameters['w']
-                    * (1 - abs(self.llw_parameters['x']))
-                    / self.material.rare_earth.f_6
+                self.llw_parameters['w']
+                * (1 - abs(self.llw_parameters['x']))
+                / self.material.rare_earth.f_6
             )
             parameters['B64'] = -21 * parameters['B60']
         except KeyError:
@@ -99,9 +98,9 @@ class Cubic(CEF):
 
     @ut.get_time_of_execution
     def save_spectra_with_one_temperature(
-            self,
-            gamma: float,
-            temperature: float,
+        self,
+        gamma: float,
+        temperature: float,
     ) -> None:
         """Save inelastic neutron scattering spectra."""
         energies = linspace(-5, 30, 10001)
@@ -124,9 +123,9 @@ class Cubic(CEF):
                 ut.write_row(file, (energy, spectrum[index]))
 
     def save_spectra_with_many_temperatures(
-            self,
-            gamma: float,
-            temperatures,
+        self,
+        gamma: float,
+        temperatures,
     ) -> dict[str, list]:
         """Save inelastic neutron scattering spectra."""
         lines = {}
@@ -242,11 +241,11 @@ class Cubic(CEF):
                     ut.write_row(ratio_file, ratios)
 
     def check_ratios(
-            self,
-            numbers,
-            experimental_value: float,
-            points,
-            accuracy: float,
+        self,
+        numbers,
+        experimental_value: float,
+        points,
+        accuracy: float,
     ) -> list[CrossPoint]:
         """Check if one of ratios is approximately equal to the given value."""
         ratios = numbers[1:]
@@ -262,10 +261,10 @@ class Cubic(CEF):
                 if points:
                     previous = points[-1]
                     if (
-                            current.rare_earth == previous.rare_earth and
-                            current.ratio_name == previous.ratio_name and
-                            abs(current.w - previous.w) < accuracy and
-                            abs(current.x - previous.x) < accuracy
+                        current.rare_earth == previous.rare_earth and
+                        current.ratio_name == previous.ratio_name and
+                        abs(current.w - previous.w) < accuracy and
+                        abs(current.x - previous.x) < accuracy
                     ):
                         current_x = ((current.x * previous.difference -
                                       previous.x * current.difference) /
@@ -285,10 +284,10 @@ class Cubic(CEF):
         return points
 
     def find_cross(
-            self,
-            experimental_value: float,
-            experimental_energy: float,
-            accuracy=0.005,
+        self,
+        experimental_value: float,
+        experimental_energy: float,
+        accuracy=0.005,
     ) -> list[CrossPoint]:
         """
         Return cross points.
@@ -299,8 +298,8 @@ class Cubic(CEF):
         """
         points = []
         for w_parameter in (
-                abs(self.llw_parameters['w']),
-                -abs(self.llw_parameters['w']),
+            abs(self.llw_parameters['w']),
+            -abs(self.llw_parameters['w']),
         ):
             self.llw_parameters['w'] = w_parameter
             ratio_file_name = self.get_file_name(
@@ -312,8 +311,8 @@ class Cubic(CEF):
                     line = line.rstrip('\n')
                     numbers = [float(number) for number in line.split('\t')]
                     if any(
-                            abs(experimental_value - value) < accuracy
-                            for value in numbers[1:]
+                        abs(experimental_value - value) < accuracy
+                        for value in numbers[1:]
                     ):
                         points = self.check_ratios(
                             numbers=numbers,

@@ -1,6 +1,5 @@
 """The module contains Experiment class."""
 
-
 from copy import deepcopy
 from pathlib import Path
 
@@ -15,15 +14,17 @@ from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 class Experiment:
     """Class contains experimental parameters."""
 
-    def __init__(self,
-                 material: Sample,
-                 experimental_energies: tuple,
-                 temperatures: tuple) -> None:
+    def __init__(
+        self,
+        material: Sample,
+        experimental_energies: tuple,
+        temperatures: tuple,
+    ) -> None:
         """Initialize class Experiment."""
         self.material = material
         self.experimental_energies = experimental_energies
         self.experimental_ratio = (
-                experimental_energies[1] / experimental_energies[0]
+            experimental_energies[1] / experimental_energies[0]
         )
         self.temperatures = temperatures
         self.cubic_object = Cubic(
@@ -40,9 +41,11 @@ class Experiment:
             'temperatures',
         )
 
-    def get_llw_ratios_plot(self,
-                            limits: dict,
-                            ticks: dict) -> None:
+    def get_llw_ratios_plot(
+        self,
+        limits: dict,
+        ticks: dict,
+    ) -> None:
         """Save the plot for LLW diagram of energies ratio."""
         gg.get_llw_ratios_plot(
             material=self.material,
@@ -51,11 +54,13 @@ class Experiment:
             ticks=ticks,
         )
 
-    def get_spectrum_experiment(self,
-                                limits: dict,
-                                locators: dict,
-                                spectrometer: str,
-                                initial_energy: float) -> tuple:
+    def get_spectrum_experiment(
+        self,
+        limits: dict,
+        locators: dict,
+        spectrometer: str,
+        initial_energy: float,
+    ) -> tuple:
         """Save the plot for experimental spectrum."""
         data, temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,
@@ -73,11 +78,11 @@ class Experiment:
         return data, temperatures
 
     def get_spectrum_differences(
-            self,
-            limits: dict,
-            locators: dict,
-            spectrometer: str,
-            initial_energy: float,
+        self,
+        limits: dict,
+        locators: dict,
+        spectrometer: str,
+        initial_energy: float,
     ) -> None:
         """Save the plot for experimental spectrum."""
         diff_data, differences = self._get_spectrum_differences(
@@ -129,11 +134,11 @@ class Experiment:
         )
 
     def get_spectrum_theory(
-            self,
-            recalculated_crosses,
-            limits: dict,
-            locators: dict,
-            gamma=0.16,
+        self,
+        recalculated_crosses,
+        limits: dict,
+        locators: dict,
+        gamma=0.16,
     ) -> None:
         """Save the plot for theoretical spectrum."""
         for point in recalculated_crosses:
@@ -174,9 +179,9 @@ class Experiment:
             )
 
     def _get_spectrum_experiment(
-            self,
-            spectrometer: str,
-            initial_energy: float,
+        self,
+        spectrometer: str,
+        initial_energy: float,
     ) -> tuple:
         """Return data for experimental spectra."""
         data = []
@@ -203,9 +208,11 @@ class Experiment:
                 pass
         return data, temperatures
 
-    def _get_spectrum_differences(self,
-                                  spectrometer: str,
-                                  initial_energy: float) -> tuple:
+    def _get_spectrum_differences(
+        self,
+        spectrometer: str,
+        initial_energy: float,
+    ) -> tuple:
         """Return data for experimental spectra differences."""
         data, temperatures = self._get_spectrum_experiment(
             spectrometer=spectrometer,

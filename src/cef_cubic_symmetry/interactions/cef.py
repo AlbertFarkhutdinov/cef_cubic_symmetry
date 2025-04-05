@@ -26,25 +26,25 @@ class CrystalElectricField(BaseInteraction):
             mqn_1 = [(row - momentum) ** i for i in range(5)]
             for key in ('20', '40', '60'):
                 hamiltonian[row, row] += (
-                        getattr(self.parameters, f'b{key}') *
-                        physics.steven_operators(
-                            f'o{key}',
-                            squared_momentum,
-                            mqn_1,
-                        )
+                    getattr(self.parameters, f'b{key}')
+                    * physics.steven_operators(
+                        f'o{key}',
+                        squared_momentum,
+                        mqn_1,
+                    )
                 )
             for degree in range(2, size - row):
                 mqn_2 = [(row - momentum + degree) ** i for i in range(5)]
                 for key in ('22', '42', '62', '43', '63', '44', '64', '66'):
                     if key[-1] == str(degree):
                         hamiltonian[row, row + degree] += (
-                                getattr(self.parameters, f'b{key}') *
-                                physics.steven_operators(
-                                    f'o{key}',
-                                    squared_momentum,
-                                    mqn_1,
-                                    mqn_2,
-                                )
+                            getattr(self.parameters, f'b{key}')
+                            * physics.steven_operators(
+                                f'o{key}',
+                                squared_momentum,
+                                mqn_1,
+                                mqn_2,
+                            )
                         )
                 hamiltonian[row + degree, row] = hamiltonian[row, row + degree]
         return hamiltonian

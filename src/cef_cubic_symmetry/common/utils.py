@@ -1,6 +1,5 @@
 """The module contains some common functions that used in this project."""
 
-
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -89,11 +88,13 @@ def data_popping(data: dict, condition) -> None:
 
 def get_time_of_execution(function) -> callable:
     """Print time of function's execution."""
+
     def wrapper(*args, **kwargs) -> None:
         start_time = datetime.now(tz=timezone.utc)
         function(*args, **kwargs)
         finish_time = datetime.now(tz=timezone.utc) - start_time
         print(f'Saving time: {finish_time}\n')
+
     return wrapper
 
 

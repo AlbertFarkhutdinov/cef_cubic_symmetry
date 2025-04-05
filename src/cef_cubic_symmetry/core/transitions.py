@@ -1,6 +1,5 @@
 """The module contains CEF class."""
 
-
 import numpy as np
 from pretty_repr import RepresentableObject
 from scipy.linalg import eigh
@@ -139,9 +138,9 @@ class Transitions(RepresentableObject):
             sum_peaks = peak['energy'] * peak['intensity']
             for other_peak in peaks:
                 if (
-                        peak['intensity'] > 0 and
-                        other_peak is not peak and
-                        abs(peak['energy'] - other_peak['energy']) < RESOLUTION
+                    peak['intensity'] > 0 and
+                    other_peak is not peak and
+                    abs(peak['energy'] - other_peak['energy']) < RESOLUTION
                 ):
                     peak['intensity'] += other_peak['intensity']
                     sum_peaks += other_peak['energy'] * other_peak['intensity']
@@ -151,8 +150,8 @@ class Transitions(RepresentableObject):
                 result.append((peak['energy'], peak['intensity']))
         result.sort()
         intensity_sum = 2 * (
-                self.sample.rare_earth.info.total_momentum_ground *
-                (self.sample.rare_earth.info.total_momentum_ground + 1)
+            self.sample.rare_earth.info.total_momentum_ground *
+            (self.sample.rare_earth.info.total_momentum_ground + 1)
         ) / 3
         intensities = [item[1] for item in result]
         if sum(intensities) != intensity_sum:
@@ -169,10 +168,10 @@ class Transitions(RepresentableObject):
         return [peak[1] for peak in self.get_peaks(boltzmann_factors)]
 
     def get_spectrum(
-            self,
-            boltzmann_factors: np.ndarray,
-            energies=None,
-            width_dict: dict | None = None,
+        self,
+        boltzmann_factors: np.ndarray,
+        energies=None,
+        width_dict: dict | None = None,
     ) -> np.ndarray:
         """Calculate the neutron scattering cross-section."""
         peaks = self.get_peaks(boltzmann_factors)

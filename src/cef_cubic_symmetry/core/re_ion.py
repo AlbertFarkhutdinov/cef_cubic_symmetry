@@ -1,6 +1,5 @@
 """The module contains class for RE ion."""
 
-
 from typing import Union
 
 import pandas as pd
@@ -42,8 +41,8 @@ class REIon(RepresentableObject):
     """
 
     def __init__(
-            self,
-            identifier: Union[str, int],
+        self,
+        identifier: Union[str, int],
     ) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.identifier = identifier

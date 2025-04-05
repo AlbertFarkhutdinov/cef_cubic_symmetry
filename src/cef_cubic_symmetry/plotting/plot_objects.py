@@ -1,6 +1,5 @@
 """The module contains class for graphs plotting."""
 
-
 from typing import Optional
 
 from cycler import cycler
@@ -37,10 +36,10 @@ class CustomPlot(RepresentableObject):
         return {'fig', '_ax', 'limits'}
 
     def set_labels(
-            self,
-            x_label: Optional[str] = None,
-            y_label: Optional[str] = None,
-            title: Optional[str] = None,
+        self,
+        x_label: Optional[str] = None,
+        y_label: Optional[str] = None,
+        title: Optional[str] = None,
     ) -> None:
         """Set labels of axis and plot."""
         self._ax.set_xlabel = x_label
@@ -48,11 +47,11 @@ class CustomPlot(RepresentableObject):
         self._ax.set_title = title
 
     def set_limits(
-            self,
-            x_min: Optional[float] = None,
-            x_max: Optional[float] = None,
-            y_min: Optional[float] = None,
-            y_max: Optional[float] = None,
+        self,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
     ) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
@@ -73,11 +72,11 @@ class CustomPlot(RepresentableObject):
                 getattr(self._ax, f'set_{axis}lim')(**axis_limits)
 
     def set_locators(
-            self,
-            x_major=None,
-            x_minor=None,
-            y_major=None,
-            y_minor=None,
+        self,
+        x_major=None,
+        x_minor=None,
+        y_major=None,
+        y_minor=None,
     ) -> None:
         """Set major and minor ticks for plot."""
         majors = (
@@ -91,9 +90,9 @@ class CustomPlot(RepresentableObject):
                 axis.set_minor_locator(plt.MultipleLocator(minors[i]))
 
     def make_plot(
-            self,
-            mode='plot',
-            text: con.Text = None,
+        self,
+        mode='plot',
+        text: con.Text = None,
     ) -> None:
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
@@ -116,9 +115,9 @@ class CustomPlot(RepresentableObject):
                 plt.text(x=text.x, y=text.y, s=text.string)
 
     def save_or_show(
-            self,
-            filename=None,
-            form=None,
+        self,
+        filename=None,
+        form=None,
     ) -> None:
         """Save or show the plot."""
         if self.fig and self._ax:
@@ -129,10 +128,10 @@ class CustomPlot(RepresentableObject):
                 plt.show()
 
     def save_in_two_forms(
-            self,
-            filename: str,
-            form_1='png',
-            form_2='eps',
+        self,
+        filename: str,
+        form_1='png',
+        form_2='eps',
     ) -> None:
         """Save or show the plot."""
         self.save_or_show(filename=filename, form=form_1)
@@ -144,8 +143,8 @@ class CustomPlot(RepresentableObject):
         plt.rcParams.update(ut.get_json_object('plot_parameters.json'))
         prop_cycle = 'axes.prop_cycle'
         plt.rcParams[prop_cycle] = (
-                cycler(color=plt.rcParams[prop_cycle]['color'])
-                + cycler(linestyle=plt.rcParams[prop_cycle]['linestyle'])
+            cycler(color=plt.rcParams[prop_cycle]['color'])
+            + cycler(linestyle=plt.rcParams[prop_cycle]['linestyle'])
         )
         plt.rcParams['figure.figsize'] = [i / 2.54 for i in (10, 10)]
         tick_parameters = {

@@ -4,9 +4,9 @@ from cef_cubic_symmetry.core import Sample
 class CalculationRunner:
 
     def __init__(
-            self,
-            rare_earth_ion: str,
-            crystal: str,
+        self,
+        rare_earth_ion: str,
+        crystal: str,
     ) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.sample = Sample(crystal=crystal, rare_earth=rare_earth_ion)

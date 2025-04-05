@@ -1,6 +1,5 @@
 """The module contains functions for plotting graphs."""
 
-
 from collections import OrderedDict
 from pathlib import Path
 
@@ -54,10 +53,12 @@ class CustomPlot:
         self.fig, self._ax = plt.subplots(dpi=self.dpi)
         return self
 
-    def set_labels(self,
-                   xlabel='x',
-                   ylabel='y',
-                   title=None) -> None:
+    def set_labels(
+        self,
+        xlabel='x',
+        ylabel='y',
+        title=None,
+    ) -> None:
         """Set labels of axis and plot."""
         args = locals()
         del args['self']
@@ -65,11 +66,13 @@ class CustomPlot:
             for _key, _value in args.items():
                 getattr(self._ax, f'set_{_key}')(_value)
 
-    def set_limits(self,
-                   x_min=None,
-                   x_max=None,
-                   y_min=None,
-                   y_max=None) -> None:
+    def set_limits(
+        self,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ) -> None:
         """Set limits of x and y intervals."""
         y_set = self.data.y_set.values()
         limits = {
@@ -88,11 +91,13 @@ class CustomPlot:
                 }
                 getattr(self._ax, f'set_{axis}lim')(**axis_limits)
 
-    def set_locators(self,
-                     x_major=None,
-                     x_minor=None,
-                     y_major=None,
-                     y_minor=None) -> None:
+    def set_locators(
+        self,
+        x_major=None,
+        x_minor=None,
+        y_major=None,
+        y_minor=None,
+    ) -> None:
         """Set major and minor ticks for plot."""
         majors = (
             ut.get_default(
@@ -113,9 +118,11 @@ class CustomPlot:
                 axis.set_major_locator(plt.MultipleLocator(majors[i]))
                 axis.set_minor_locator(plt.MultipleLocator(minors[i]))
 
-    def make_plot(self,
-                  mode='plot',
-                  text: con.Text = None) -> None:
+    def make_plot(
+        self,
+        mode='plot',
+        text: con.Text = None,
+    ) -> None:
         """Draws the plot at specified mode."""
         if self.fig and self._ax:
             functions = {
@@ -145,10 +152,12 @@ class CustomPlot:
             else:
                 plt.show()
 
-    def save_in_two_forms(self,
-                          filename: str,
-                          form_1='png',
-                          form_2='eps') -> None:
+    def save_in_two_forms(
+        self,
+        filename: str,
+        form_1='png',
+        form_2='eps',
+    ) -> None:
         """Save or show the plot."""
         self.save_or_show(filename=filename, form=form_1)
         self.save_or_show(filename=filename, form=form_2)
@@ -166,11 +175,13 @@ class CustomPlot:
 class CubicPlot(CustomPlot):
     """Description of CubicPlot object."""
 
-    def __init__(self,
-                 data,
-                 material:
-                 Sample,
-                 dpi=300) -> None:
+    def __init__(
+        self,
+        data,
+        material:
+        Sample,
+        dpi=300,
+    ) -> None:
         """Initialize Plot object."""
         super().__init__(data=data, dpi=dpi)
         self.material = material
@@ -180,9 +191,11 @@ class CubicPlot(CustomPlot):
         super().__enter__()
         return self
 
-    def get_graph_file_name(self,
-                            data_name: str,
-                            parameters: dict | None = None) -> Path:
+    def get_graph_file_name(
+        self,
+        data_name: str,
+        parameters: dict | None = None,
+    ) -> Path:
         """Return path for plot saving."""
         return get_paths(
             data_name=data_name,
@@ -399,9 +412,9 @@ def get_spectrum_experiment(material: Sample,
 
 
 def get_intensity_on_temperature(
-        material: Sample,
-        crosses: con.CrossPoint,
-        y_max: float,
+    material: Sample,
+    crosses: con.CrossPoint,
+    y_max: float,
 ) -> None:
     """Return dependence of transition intensities on temperature."""
     data_kwargs = {
