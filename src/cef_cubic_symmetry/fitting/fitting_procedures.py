@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
+from cef_cubic_symmetry.common import physics as ph
 from cef_cubic_symmetry.common.constants import DATA_PATHS, INFINITY, PM, Data
-from cef_cubic_symmetry.common.physics import gaussian, multi_gaussian, multi_lorentzian
 from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 
@@ -78,9 +78,9 @@ def multi_peak_fitting(
 ):
     """Returns parameters of function fitted to data
     with several peaks (lorentzian or gaussian)"""
-    function = (multi_lorentzian
+    function = (ph.multi_lorentzian
                 if function_name.lower() == 'lorentz'
-                else multi_gaussian)
+                else ph.multi_gaussian)
     data = filtered_data(data)
     if (len(parameters) - 1) % 3:
         print('The parameters number does not match peaks number!')
@@ -104,8 +104,8 @@ def multi_lorentzian_with_gauss(
         *parameters,
 ):
     """Returns value of multi_peak function for lorentzian."""
-    return (gaussian(arg, center, width, amplitude) +
-            multi_lorentzian(arg, *parameters))
+    return (ph.gaussian(arg, center, width, amplitude) +
+            ph.multi_lorentzian(arg, *parameters))
 
 
 def simple_fitting(data: dict):
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     PEAK_1 = (0, 0.1, 100)
     PEAK_2 = (0.5, 0.15, 20)
     PEAK_3 = (4, 0.15, 20)
-    DATA['y'] = multi_lorentzian(DATA['x'], 0.5, *PEAK_1, *PEAK_2, *PEAK_3)
+    DATA['y'] = ph.multi_lorentzian(DATA['x'], 0.5, *PEAK_1, *PEAK_2, *PEAK_3)
     DATA['y'] += np.random.rand(len(DATA['x']))
     DATA['errors'] = DATA['y'] * 0.01
     START_PARAMETERS = (0.2, *PEAK_1, *PEAK_2, *PEAK_3)
@@ -185,13 +185,13 @@ if __name__ == '__main__':
         min_value=-2,
         max_value=3,
     )
-    print_peak_parameters(multi_lorentzian, P_OPT, P_ERR)
+    print_peak_parameters(ph.multi_lorentzian, P_OPT, P_ERR)
     with CustomPlot(
             data=Data(
                 x=DATA['x'],
                 y_set={
                     'exp': DATA['y'],
-                    'fit': multi_lorentzian(DATA['x'], *P_OPT),
+                    'fit': ph.multi_lorentzian(DATA['x'], *P_OPT),
                 },
                 legend={
                     'exp': 'experiment',

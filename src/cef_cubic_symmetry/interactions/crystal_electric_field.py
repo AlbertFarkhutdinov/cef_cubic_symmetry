@@ -2,7 +2,7 @@
 
 
 from cef_cubic_symmetry.common import physics, utils
-from cef_cubic_symmetry.core.cef_parameters import BParameters
+from cef_cubic_symmetry.core.llw_parameters import BParameters
 from cef_cubic_symmetry.interactions.base_interaction import BaseInteraction
 
 

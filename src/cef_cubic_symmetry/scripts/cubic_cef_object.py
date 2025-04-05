@@ -8,11 +8,10 @@ import sys
 
 from numpy import linspace
 
+from cef_cubic_symmetry.common import utils as ut
 from cef_cubic_symmetry.common.constants import CrossPoint, Material
 from cef_cubic_symmetry.common.path_utils import PathProcessor, get_paths
 from cef_cubic_symmetry.common.tabular_information import F4
-from cef_cubic_symmetry.common.utils import (UTF8File, get_ratios_names, get_repr,
-                          get_time_of_execution, write_row)
 from cef_cubic_symmetry.scripts.cef_object import CEF
 
 
@@ -58,7 +57,7 @@ class Cubic(CEF):
 
     def __repr__(self):
         """Method returns string representation of the Cubic object."""
-        return get_repr(self, 'material', 'llw_parameters')
+        return ut.get_repr(self, 'material', 'llw_parameters')
 
     def get_one_dot(self):
         """Prints information about RE ion with specified parameters"""
@@ -76,7 +75,7 @@ class Cubic(CEF):
             parameters=parameters,
         )
 
-    @get_time_of_execution
+    @ut.get_time_of_execution
     def save_peak_dat(self, number_of_intervals: int, choice=0):
         """
         Saves the dependence of transition energies
@@ -91,7 +90,7 @@ class Cubic(CEF):
             f'Saving of {"energies" if choice == 0 else "intensities"} '
             f'datafiles will take some time...'
         )
-        with UTF8File(file_name, mode='a') as file:
+        with ut.UTF8File(file_name, mode='a') as file:
             for x_parameter in linspace(-1, 1, number_of_intervals + 1):
                 self.llw_parameters['x'] = x_parameter
                 row = (
@@ -99,9 +98,9 @@ class Cubic(CEF):
                     if choice == 0
                     else self.get_intensities()
                 )
-                write_row(file, (x_parameter, *row))
+                ut.write_row(file, (x_parameter, *row))
 
-    @get_time_of_execution
+    @ut.get_time_of_execution
     def save_spectra_with_one_temperature(
             self,
             gamma: float,
@@ -127,9 +126,9 @@ class Cubic(CEF):
             }
         )
         PathProcessor(file_name).remove_if_exists()
-        with UTF8File(file_name, mode='a') as file:
+        with ut.UTF8File(file_name, mode='a') as file:
             for index, energy in enumerate(energies):
-                write_row(file, (energy, spectrum[index]))
+                ut.write_row(file, (energy, spectrum[index]))
 
     def save_spectra_with_many_temperatures(
             self,
@@ -156,7 +155,7 @@ class Cubic(CEF):
                 data_name='spectra',
                 parameters=parameters,
             )
-            with UTF8File(file_name) as file:
+            with ut.UTF8File(file_name) as file:
                 lines[temperature] = list(file)
 
             for index, line in enumerate(lines[temperature]):
@@ -171,12 +170,12 @@ class Cubic(CEF):
             parameters=parameters,
         )
         PathProcessor(file_name).remove_if_exists()
-        with UTF8File(file_name, mode='a') as file:
+        with ut.UTF8File(file_name, mode='a') as file:
             for index, _ in enumerate(data['energies']):
-                write_row(file, row=[val[index] for key, val in data.items()])
+                ut.write_row(file, row=[val[index] for key, val in data.items()])
         return data
 
-    @get_time_of_execution
+    @ut.get_time_of_execution
     def save_susceptibility(self):
         """
         Saves temperature dependence of magnetic susceptibilities to file.
@@ -190,7 +189,7 @@ class Cubic(CEF):
         for axis in ('z', 'x', 'total'):
             file_name = common_file_name.replace('.dat', f'_chi_{axis}.dat')
             PathProcessor(file_name).remove_if_exists()
-            with UTF8File(file_name, mode='a') as file:
+            with ut.UTF8File(file_name, mode='a') as file:
                 row = ['T(Kelvin)']
                 if axis in ('z', 'x'):
                     row += [
@@ -203,7 +202,7 @@ class Cubic(CEF):
                         'chi_total',
                         'inverse_chi',
                     ]
-                write_row(file, row)
+                ut.write_row(file, row)
                 for i, temperature in enumerate(temperatures):
                     row = [temperature]
                     if axis in ('z', 'x'):
@@ -217,9 +216,9 @@ class Cubic(CEF):
                             chi['total'][i],
                             chi['inverse'][i],
                         ]
-                    write_row(file, row)
+                    ut.write_row(file, row)
 
-    @get_time_of_execution
+    @ut.get_time_of_execution
     def get_ratios(self, choice=0):
         """
         Saves the dependence of transition energies ratio
@@ -240,8 +239,8 @@ class Cubic(CEF):
             parameters=parameters
         )
         PathProcessor(ratio_file_name).remove_if_exists()
-        with UTF8File(ratio_file_name, mode='a') as ratio_file:
-            with UTF8File(peak_file_name) as peak_file:
+        with ut.UTF8File(ratio_file_name, mode='a') as ratio_file:
+            with ut.UTF8File(peak_file_name) as peak_file:
                 for line in peak_file:
                     line = line.rstrip('\n')
                     peak_row = [float(energy) for energy in line.split('\t')]
@@ -254,7 +253,7 @@ class Cubic(CEF):
                                 ratios.append(0)
                             else:
                                 ratios.append(peak_row[high] / peak_row[low])
-                    write_row(ratio_file, ratios)
+                    ut.write_row(ratio_file, ratios)
 
     def check_ratios(
             self,
@@ -275,7 +274,7 @@ class Cubic(CEF):
                     rare_earth=self.material.rare_earth.name,
                     w=self.llw_parameters['w'],
                     x=numbers[0],
-                    ratio_name=get_ratios_names(0)[index],
+                    ratio_name=ut.get_ratios_names(0)[index],
                     difference=experimental_value - ratio,
                 )
                 if not points:
@@ -297,7 +296,7 @@ class Cubic(CEF):
                             w=self.llw_parameters['w'],
                             x=current_x,
                             difference=0,
-                            ratio_name=get_ratios_names(0)[index],
+                            ratio_name=ut.get_ratios_names(0)[index],
                         )
                     else:
                         points.append(current)
@@ -321,7 +320,7 @@ class Cubic(CEF):
                 data_name='ratios_energies',
                 parameters={'w': w_parameter},
             )
-            with UTF8File(ratio_file_name) as ratio_file:
+            with ut.UTF8File(ratio_file_name) as ratio_file:
                 for line in ratio_file:
                     line = line.rstrip('\n')
                     numbers = [float(number) for number in line.split('\t')]
@@ -352,7 +351,7 @@ class Cubic(CEF):
             self.llw_parameters = {'w': points[index].w, 'x': points[index].x}
         return points
 
-    @get_time_of_execution
+    @ut.get_time_of_execution
     def save_intensities(self):
         """
         Saves temperature dependence of magnetic susceptibilities to file.
@@ -363,12 +362,12 @@ class Cubic(CEF):
             data_name='intensities_on_temperature',
         )
         PathProcessor(file_name).remove_if_exists()
-        with UTF8File(file_name, mode='a') as file:
+        with ut.UTF8File(file_name, mode='a') as file:
             for _, temperature in enumerate(temperatures):
                 peaks = self.get_peaks(temperature=temperature)
                 intensities = [peak[1] for peak in peaks if peak[0] >= 0]
                 row = [temperature] + intensities
-                write_row(file, row)
+                ut.write_row(file, row)
 
 
 if __name__ == '__main__':

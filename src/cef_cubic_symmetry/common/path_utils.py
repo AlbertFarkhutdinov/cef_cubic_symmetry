@@ -8,7 +8,7 @@ in this project.
 import os
 from pathlib import Path
 
-from cef_cubic_symmetry.common.constants import BASE_DIR, DATA_PATHS, PLOT_PATHS
+from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common.utils import get_value_with_sign
 from cef_cubic_symmetry.core import Sample
 
@@ -41,7 +41,7 @@ def get_paths(
         parameters: dict = None,
 ):
     """Returns path of the file that will be saved."""
-    os.chdir(BASE_DIR)
+    os.chdir(con.BASE_DIR)
     short_name = ''
     if sample:
         short_name = f'{sample.crystal.name}_{sample.rare_earth.info.symbol}'
@@ -59,11 +59,11 @@ def get_paths(
                 full_name += f'_{key}{value:.3f}'
     if is_graph:
         result_path = (
-            PLOT_PATHS[data_name] / short_name / f'{data_name}_{full_name}'
+            con.PLOT_PATHS[data_name] / short_name / f'{data_name}_{full_name}'
         )
     else:
         result_path = (
-            DATA_PATHS[data_name] / short_name /
+            con.DATA_PATHS[data_name] / short_name /
             f'{data_name}_{full_name}{format_name}'
         )
     PathProcessor(result_path).create_parent_dirs()

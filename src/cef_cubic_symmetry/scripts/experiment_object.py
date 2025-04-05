@@ -4,7 +4,7 @@
 import os
 from copy import deepcopy
 
-from cef_cubic_symmetry.common.constants import DATA_PATHS, Data, Material, Scale
+from cef_cubic_symmetry.common import constants as con
 from cef_cubic_symmetry.common.utils import get_repr
 from cef_cubic_symmetry.fitting.fitting_procedures import get_data_from_file
 from cef_cubic_symmetry.scripts import plot_objects as gg
@@ -15,7 +15,7 @@ class Experiment:
     """Class contains experimental parameters"""
 
     def __init__(self,
-                 material: Material,
+                 material: con.Material,
                  experimental_energies: tuple,
                  temperatures: tuple):
         """Initialization of class Experiment"""
@@ -63,7 +63,7 @@ class Experiment:
                 data.append(
                     get_data_from_file(
                         os.path.join(
-                            DATA_PATHS['experiment'],
+                            con.DATA_PATHS['experiment'],
                             f'{self.material.crystal}_'
                             f'{self.material.rare_earth}',
                             '_'.join(
@@ -98,7 +98,7 @@ class Experiment:
             parameters={
                 'setup': spectrometer,
             },
-            scale=Scale(limits=limits, locators=locators),
+            scale=con.Scale(limits=limits, locators=locators),
         )
         return data, _temperatures
 
@@ -151,7 +151,7 @@ class Experiment:
                 'setup': spectrometer,
                 'T': differences[0],
             },
-            scale=Scale(limits=limits, locators=locators),
+            scale=con.Scale(limits=limits, locators=locators),
         )
 
     def get_cross_points(self):
@@ -211,7 +211,7 @@ class Experiment:
                     'w': point.w,
                     'x': point.x
                 },
-                data=Data(
+                data=con.Data(
                     x=spectra['energies'],
                     y_set=intensities,
                     errors=None,
@@ -220,7 +220,7 @@ class Experiment:
                         for temperature in self.temperatures
                     }
                 ),
-                scale=Scale(
+                scale=con.Scale(
                     limits=limits,
                     locators=locators,
                 ),

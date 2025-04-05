@@ -5,14 +5,14 @@ with spectra saving.
 """
 
 
+from cef_cubic_symmetry.common import utils as ut
 from cef_cubic_symmetry.common.constants import Material
-from cef_cubic_symmetry.common.utils import get_json_object, get_time_of_execution
 from cef_cubic_symmetry.scripts import plot_objects as gg
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 from cef_cubic_symmetry.scripts.experiment_object import Experiment
 
 
-@get_time_of_execution
+@ut.get_time_of_execution
 def get_fixed_results(
         rare_earth: str,
         properties: dict,
@@ -56,7 +56,7 @@ def get_fixed_results(
     )
 
 
-@get_time_of_execution
+@ut.get_time_of_execution
 def main(rare_earth: str, properties: dict):
     """Procedure of CEF parameters defining with spectra saving"""
     experiment = Experiment(
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     #         choice=0,
     #     )
 
-    PROPS = get_json_object('properties.json')
+    PROPS = ut.get_json_object('properties.json')
 
     for key, value in PROPS.items():
         main(rare_earth=key, properties=value)
