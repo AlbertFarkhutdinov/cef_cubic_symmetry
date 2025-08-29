@@ -1,4 +1,4 @@
-number_of_f_electrons,element,symbol,total_momentum_ground,lande_factor,f_6,radial_integral_2,radial_integral_4,radial_integral_6,stevens_factor_2,stevens_factor_4,stevens_factor_6
+number_of_f_electrons,element,symbol,total_momentum_ground,lande_factor,f6,radial_integral2,radial_integral4,radial_integral6,stevens_factor2,stevens_factor4,stevens_factor6
 1,cerium,Ce,2.5,6/7,0,0.3666,0.3108,0.5119,-2/35,2/315,0
 2,praseodymium,Pr,4,4/5,1260,0.3380,0.2670,0.4150,-52/2475,-4/5445,272/4459455
 3,neodymium,Nd,4.5,8/11,2520,0.3120,0.2015,0.3300,-7/1089,-136/467181,-1615/42513471
