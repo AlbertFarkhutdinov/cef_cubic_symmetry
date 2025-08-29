@@ -1,6 +1,6 @@
 """The module contains the procedure of CEF parameters calculation."""
 
-from cef_cubic_symmetry.common import utils as ut
+from cef_cubic_symmetry.auxiliary import utils as ut
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts import plot_objects as gg
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic

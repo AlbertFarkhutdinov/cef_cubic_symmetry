@@ -4,8 +4,8 @@ import numpy as np
 from pretty_repr import RepresentableObject
 from scipy.linalg import eigh
 
-from cef_cubic_symmetry.common import physics, utils
-from cef_cubic_symmetry.common.constants import RESOLUTION, THRESHOLD
+from cef_cubic_symmetry.auxiliary import physics, utils
+from cef_cubic_symmetry.auxiliary.constants import RESOLUTION, THRESHOLD
 from cef_cubic_symmetry.core.sample import Sample
 
 

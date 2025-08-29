@@ -3,8 +3,8 @@
 from copy import deepcopy
 from pathlib import Path
 
-from cef_cubic_symmetry.common import constants as con
-from cef_cubic_symmetry.common.utils import get_repr
+from cef_cubic_symmetry.auxiliary import constants as con
+from cef_cubic_symmetry.auxiliary.utils import get_repr
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.fitting.fitting_procedures import get_data_from_file
 from cef_cubic_symmetry.scripts import plot_objects as gg

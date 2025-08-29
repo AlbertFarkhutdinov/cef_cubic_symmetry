@@ -3,7 +3,7 @@ import numpy as np
 from numpy import sqrt
 from scipy.constants import physical_constants
 
-from cef_cubic_symmetry.common import utils
+from cef_cubic_symmetry.auxiliary import utils
 from cef_cubic_symmetry.core.custom_datatypes import MagnetField
 from cef_cubic_symmetry.interactions.base_interaction import BaseInteraction
 

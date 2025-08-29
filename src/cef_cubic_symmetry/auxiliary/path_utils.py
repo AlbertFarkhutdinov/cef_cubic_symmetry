@@ -4,8 +4,8 @@
 import os
 from pathlib import Path
 
-from cef_cubic_symmetry.common import constants as con
-from cef_cubic_symmetry.common.utils import get_value_with_sign
+from cef_cubic_symmetry.auxiliary import constants as con
+from cef_cubic_symmetry.auxiliary.utils import get_value_with_sign
 from cef_cubic_symmetry.core import Sample
 
 

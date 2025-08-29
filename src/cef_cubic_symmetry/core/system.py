@@ -7,9 +7,9 @@ from numpy import linspace
 from pretty_repr import RepresentableObject
 
 from cef_cubic_symmetry import interactions as inter
-from cef_cubic_symmetry.common import physics, utils
-from cef_cubic_symmetry.common.path_utils import get_paths
-from cef_cubic_symmetry.common.utils import UTF8File
+from cef_cubic_symmetry.auxiliary import physics, utils
+from cef_cubic_symmetry.auxiliary.path_utils import get_paths
+from cef_cubic_symmetry.auxiliary.utils import UTF8File
 from cef_cubic_symmetry.core.custom_datatypes import MagnetField
 from cef_cubic_symmetry.core.llw_parameters import BParameters
 from cef_cubic_symmetry.core.sample import Sample

@@ -7,8 +7,13 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-from cef_cubic_symmetry.common import physics as ph
-from cef_cubic_symmetry.common.constants import DATA_PATHS, INFINITY, PM, Data
+from cef_cubic_symmetry.auxiliary import physics as ph
+from cef_cubic_symmetry.auxiliary.constants import (
+    DATA_PATHS,
+    INFINITY,
+    PM,
+    Data,
+)
 from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 

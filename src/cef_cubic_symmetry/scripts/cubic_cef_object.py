@@ -5,9 +5,9 @@ from pathlib import Path
 
 from numpy import linspace
 
-from cef_cubic_symmetry.common import utils as ut
-from cef_cubic_symmetry.common.constants import CrossPoint
-from cef_cubic_symmetry.common.path_utils import PathProcessor, get_paths
+from cef_cubic_symmetry.auxiliary import utils as ut
+from cef_cubic_symmetry.auxiliary.constants import CrossPoint
+from cef_cubic_symmetry.auxiliary.path_utils import PathProcessor, get_paths
 from cef_cubic_symmetry.core.llw_parameters import F4
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cef_object import CEF

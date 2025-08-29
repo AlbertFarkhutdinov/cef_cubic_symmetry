@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from numpy import zeros
 
-from cef_cubic_symmetry.common.constants import DATA_DIR, INFINITY
+from cef_cubic_symmetry.auxiliary.constants import DATA_DIR, INFINITY
 
 
 def get_sign(value: float) -> str:

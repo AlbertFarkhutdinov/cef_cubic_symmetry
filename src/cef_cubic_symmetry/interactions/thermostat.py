@@ -3,7 +3,7 @@
 import numpy as np
 from base_interaction import BaseInteraction
 
-from cef_cubic_symmetry.common import physics, utils
+from cef_cubic_symmetry.auxiliary import physics, utils
 
 
 class Thermostat(BaseInteraction):

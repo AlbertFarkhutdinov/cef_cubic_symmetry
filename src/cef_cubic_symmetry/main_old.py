@@ -1,7 +1,7 @@
 """The module contains the console manager for work with project."""
 
-from cef_cubic_symmetry.common.constants import BASE_DIR
-from cef_cubic_symmetry.common.utils import check_input
+from cef_cubic_symmetry.auxiliary.constants import BASE_DIR
+from cef_cubic_symmetry.auxiliary.utils import check_input
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 

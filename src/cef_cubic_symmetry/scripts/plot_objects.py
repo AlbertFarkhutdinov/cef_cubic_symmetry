@@ -6,9 +6,9 @@ from pathlib import Path
 from cycler import cycler
 from matplotlib import pyplot as plt
 
-from cef_cubic_symmetry.common import constants as con
-from cef_cubic_symmetry.common import utils as ut
-from cef_cubic_symmetry.common.path_utils import get_paths
+from cef_cubic_symmetry.auxiliary import constants as con
+from cef_cubic_symmetry.auxiliary import utils as ut
+from cef_cubic_symmetry.auxiliary.path_utils import get_paths
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
