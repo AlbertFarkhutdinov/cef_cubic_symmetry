@@ -27,9 +27,9 @@ class Cubic(CEF):
     def __init__(self, material: Sample, llw_parameters: dict) -> None:
         """Initialize the Cubic object or read it from a file."""
         super().__init__(material=material)
-        if self.material.rare_earth.name in {'Ce', 'Sm', 'Eu'}:
+        if self.material.rare_earth.identifier in {'Ce', 'Sm', 'Eu'}:
             print(
-                f"The element '{self.material.rare_earth.name}' "
+                f"The element '{self.material.rare_earth.identifier}' "
                 f"is not supported.",
             )
             sys.exit(1)
@@ -48,7 +48,7 @@ class Cubic(CEF):
             parameters['B60'] = (
                 self.llw_parameters['w']
                 * (1 - abs(self.llw_parameters['x']))
-                / self.material.rare_earth.f_6
+                / self.material.rare_earth.info.f6
             )
             parameters['B64'] = -21 * parameters['B60']
         except KeyError:
@@ -71,7 +71,7 @@ class Cubic(CEF):
         parameters = self.llw_parameters if parameters is None else parameters
         return get_paths(
             data_name=data_name,
-            material=self.material,
+            sample=self.material,
             parameters=parameters,
         )
 
@@ -252,7 +252,7 @@ class Cubic(CEF):
         for index, ratio in enumerate(ratios):
             if abs(experimental_value - ratio) < accuracy:
                 current = CrossPoint(
-                    rare_earth=self.material.rare_earth.name,
+                    rare_earth=self.material.rare_earth.identifier,
                     w=self.llw_parameters['w'],
                     x=numbers[0],
                     ratio_name=ut.get_ratios_names(0)[index],
@@ -271,7 +271,7 @@ class Cubic(CEF):
                                      (previous.difference - current.difference)
                                      )
                         points[-1] = CrossPoint(
-                            rare_earth=self.material.rare_earth.name,
+                            rare_earth=self.material.rare_earth.identifier,
                             w=self.llw_parameters['w'],
                             x=current_x,
                             difference=0,

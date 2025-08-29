@@ -130,12 +130,12 @@ class CustomPlot(RepresentableObject):
     def save_in_two_forms(
         self,
         filename: str,
-        form_1='png',
-        form_2='eps',
+        form1='png',
+        form2='eps',
     ) -> None:
         """Save or show the plot."""
-        self.save_or_show(filename=filename, form=form_1)
-        self.save_or_show(filename=filename, form=form_2)
+        self.save_or_show(filename=filename, form=form1)
+        self.save_or_show(filename=filename, form=form2)
 
     @classmethod
     def _set_plot_parameters(cls) -> None:

@@ -1,6 +1,6 @@
 """The module contains the console manager for work with project."""
 
-from cef_cubic_symmetry.auxiliary.constants import BASE_DIR
+from cef_cubic_symmetry.auxiliary.paths import ROOT_PATH
 from cef_cubic_symmetry.auxiliary.utils import check_input
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
@@ -8,7 +8,7 @@ from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 def main() -> None:
     """Run main procedure."""
-    print(f'Working directory: {BASE_DIR}\n')
+    print(f'Working directory: {ROOT_PATH}\n')
     while True:
         command = input('\nInput command (e.g. "help"): ')
         print()

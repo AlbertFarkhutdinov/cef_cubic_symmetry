@@ -27,15 +27,15 @@ class Zeeman(BaseInteraction):
             * physical_constants['Bohr magneton in eV/T'][0] * 1000
         )
         for row in range(size):
-            # mqn_1 =  m = -J...J
-            mqn_1 = row - momentum
-            hamiltonian[row, row] -= factor * mqn_1 * self.magnet_field.z_
+            # mqn1 =  m = -J...J
+            mqn1 = row - momentum
+            hamiltonian[row, row] -= factor * mqn1 * self.magnet_field.z_
             if row < (size - 1):
                 column = row + 1
-                mqn_2 = mqn_1 + 1
+                mqn2 = mqn1 + 1
                 hamiltonian[row, column] -= (
                     0.5 * factor * self.magnet_field.x_
-                    * sqrt(squared_momentum - mqn_1 * mqn_2)
+                    * sqrt(squared_momentum - mqn1 * mqn2)
                 )
                 hamiltonian[column, row] = hamiltonian[row, column]
         return hamiltonian

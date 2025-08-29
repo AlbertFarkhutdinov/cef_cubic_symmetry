@@ -2,27 +2,6 @@
 
 
 from collections import namedtuple
-from pathlib import Path
-
-BASE_DIR = Path.cwd().parent
-
-DATA_DIR = BASE_DIR / 'data'
-PLOTS_DIR = BASE_DIR / 'plots'
-
-DATA_NAMES = (
-    'energies',
-    'intensities',
-    'experiment',
-    'ratios_energies',
-    'ratios_intensities',
-    'parameters',
-    'spectra',
-    'susceptibilities',
-    'intensities_on_temperature',
-)
-
-DATA_PATHS = {key: DATA_DIR / key for key in DATA_NAMES}
-PLOT_PATHS = {key: PLOTS_DIR / key for key in DATA_NAMES}
 
 X_PARAMETER = r'$x$'
 ENERGY_TRANSFER = 'Energy Transfer, meV'

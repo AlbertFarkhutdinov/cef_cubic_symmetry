@@ -15,7 +15,7 @@ from cef_cubic_symmetry.scripts.cubic_cef_object import Cubic
 
 def _set_plot_parameters() -> None:
     """Set rcParams."""
-    custom_parameters = ut.get_json_object('plot_parameters.json')
+    custom_parameters = ut.get_json_object('json/plot_parameters.json')
     custom_parameters[
         'axes.prop_cycle'
     ] = (cycler(color=custom_parameters['axes.prop_cycle']['color']) +
@@ -155,12 +155,12 @@ class CustomPlot:
     def save_in_two_forms(
         self,
         filename: str,
-        form_1='png',
-        form_2='eps',
+        form1='png',
+        form2='eps',
     ) -> None:
         """Save or show the plot."""
-        self.save_or_show(filename=filename, form=form_1)
-        self.save_or_show(filename=filename, form=form_2)
+        self.save_or_show(filename=filename, form=form1)
+        self.save_or_show(filename=filename, form=form2)
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Execute exit from context manager."""
@@ -199,7 +199,7 @@ class CubicPlot(CustomPlot):
         """Return path for plot saving."""
         return get_paths(
             data_name=data_name,
-            material=self.material,
+            sample=self.material,
             parameters=parameters,
             is_graph=True,
         )
@@ -232,7 +232,7 @@ def get_llw_plot(material: Sample,
         parameters = {'w': w_parameter}
         peak_file_name = get_paths(
             data_name=data_name,
-            material=material,
+            sample=material,
             parameters=parameters,
         )
         with ut.UTF8File(peak_file_name) as file:
@@ -313,7 +313,7 @@ def get_llw_ratios_plot(material: Sample,
         parameters = {'w': w_parameter}
         ratio_file_name = get_paths(
             data_name=data_name,
-            material=material,
+            sample=material,
             parameters=parameters,
         )
         with ut.UTF8File(ratio_file_name) as file:
@@ -437,7 +437,7 @@ def get_intensity_on_temperature(
         cubic_object.save_intensities()
         file_name = get_paths(
             data_name=data_name,
-            material=material,
+            sample=material,
             parameters=llw,
         )
         with ut.UTF8File(file_name) as file:

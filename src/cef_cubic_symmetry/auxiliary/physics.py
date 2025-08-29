@@ -167,63 +167,63 @@ def lowering_operator(
 def steven_operators(
     key: str,
     squared_j: float,
-    mqn_1,
-    mqn_2=None,
+    mqn1,
+    mqn2=None,
 ) -> float:
     """Return the result of the Stevens operators'."""
     result = {
-        'o20': lambda: 3 * mqn_1[2] - squared_j,
+        'o20': lambda: 3 * mqn1[2] - squared_j,
         'o40': lambda: (
-            35 * mqn_1[4]
-            - 30 * squared_j * mqn_1[2]
-            + 25 * mqn_1[2]
+            35 * mqn1[4]
+            - 30 * squared_j * mqn1[2]
+            + 25 * mqn1[2]
             - 6 * squared_j
             + 3 * squared_j ** 2
         ),
         'o60': lambda: (
-            231 * mqn_1[1] ** 6
-            - 315 * squared_j * mqn_1[4]
-            + 735 * mqn_1[4]
-            + 105 * squared_j ** 2 * mqn_1[2]
-            - 525 * squared_j * mqn_1[2]
-            + 294 * mqn_1[2]
+            231 * mqn1[1] ** 6
+            - 315 * squared_j * mqn1[4]
+            + 735 * mqn1[4]
+            + 105 * squared_j ** 2 * mqn1[2]
+            - 525 * squared_j * mqn1[2]
+            + 294 * mqn1[2]
             - 5 * squared_j ** 3
             + 40 * squared_j ** 2
             - 60 * squared_j
         ),
     }
-    if mqn_2:
-        result['o22'] = lambda: 0.5 * lowering_operator(mqn_2[1], squared_j, 2)
+    if mqn2:
+        result['o22'] = lambda: 0.5 * lowering_operator(mqn2[1], squared_j, 2)
         result['o43'] = lambda: (
-            0.25 * lowering_operator(mqn_2[1], squared_j, 3)
-            * (mqn_1[1] + mqn_2[1])
+            0.25 * lowering_operator(mqn2[1], squared_j, 3)
+            * (mqn1[1] + mqn2[1])
         )
         result['o63'] = lambda: (
             0.25
             * (
-                11 * (mqn_1[1] ** 3 + mqn_2[3])
-                - 3 * (mqn_1[1] + mqn_2[1]) * squared_j
-                - 59 * (mqn_1[1] + mqn_2[1])
+                11 * (mqn1[1] ** 3 + mqn2[3])
+                - 3 * (mqn1[1] + mqn2[1]) * squared_j
+                - 59 * (mqn1[1] + mqn2[1])
             )
-            * lowering_operator(mqn_2[1], squared_j, 3)
+            * lowering_operator(mqn2[1], squared_j, 3)
         )
-        result['o44'] = lambda: 0.5 * lowering_operator(mqn_2[1], squared_j, 4)
-        result['o66'] = lambda: 0.5 * lowering_operator(mqn_2[1], squared_j, 6)
+        result['o44'] = lambda: 0.5 * lowering_operator(mqn2[1], squared_j, 4)
+        result['o66'] = lambda: 0.5 * lowering_operator(mqn2[1], squared_j, 6)
         result['o42'] = lambda: (
-            (3.5 * (mqn_1[2] + mqn_2[2]) - squared_j - 5)
-            * 0.5 * lowering_operator(mqn_2[1], squared_j, 2)
+            (3.5 * (mqn1[2] + mqn2[2]) - squared_j - 5)
+            * 0.5 * lowering_operator(mqn2[1], squared_j, 2)
         )
         result['o62'] = lambda: (
             (
-                16.5 * (mqn_1[4] + mqn_2[4])
-                - 9 * (mqn_1[2] + mqn_2[2]) * squared_j
-                - 61.5 * (mqn_1[2] + mqn_2[2])
+                16.5 * (mqn1[4] + mqn2[4])
+                - 9 * (mqn1[2] + mqn2[2]) * squared_j
+                - 61.5 * (mqn1[2] + mqn2[2])
                 + squared_j ** 2
                 + 10 * squared_j + 102
-            ) * (0.5 * lowering_operator(mqn_2[1], squared_j, 2))
+            ) * (0.5 * lowering_operator(mqn2[1], squared_j, 2))
         )
         result['o64'] = lambda: (
-            (5.5 * (mqn_1[2] + mqn_2[2]) - squared_j - 38)
-            * 0.5 * lowering_operator(mqn_2[1], squared_j, 4)
+            (5.5 * (mqn1[2] + mqn2[2]) - squared_j - 38)
+            * 0.5 * lowering_operator(mqn2[1], squared_j, 4)
         )
     return result.get(key, lambda: None)()

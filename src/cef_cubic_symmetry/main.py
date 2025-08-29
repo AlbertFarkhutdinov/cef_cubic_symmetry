@@ -1,5 +1,7 @@
 """The module contains the procedure of CEF parameters calculation."""
 
+import pandas as pd
+
 from cef_cubic_symmetry.auxiliary import utils as ut
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.scripts import plot_objects as gg
@@ -117,11 +119,10 @@ def get_scheme() -> None:
         )
 
 
-if __name__ == '__main__':
-    is_recalculated = False
+def run(is_recalculated: bool = False) -> None:
     if is_recalculated:
-        FIXED_PROPS = ut.get_json_object('fixed.json')
-        for key, value in FIXED_PROPS.items():
+        fixed_properties = ut.get_json_object('json/fixed.json')
+        for key, value in fixed_properties.items():
             get_fixed_results(
                 rare_earth=key,
                 properties=value,
@@ -130,10 +131,14 @@ if __name__ == '__main__':
                 choice=0,
             )
 
-    PROPS = ut.get_json_object('properties.json')
+    rare_earths_properties = ut.get_json_object('json/properties.json')
 
-    for key, value in PROPS.items():
+    for key, value in rare_earths_properties.items():
         main(rare_earth=key, properties=value)
 
     if is_recalculated:
         get_scheme()
+
+
+if __name__ == '__main__':
+    run(is_recalculated=True)

@@ -164,7 +164,9 @@ class System(RepresentableObject):
                                                      j_ops_square['-']) *
                                               thermal['boltzmann'][row] /
                                               (column_value - row_value))
-        coefficient = self.sample.rare_earth.lande_factor ** 2
+        lande_parts = self.sample.rare_earth.info.lande_factor.split('/')
+        lande_factor = int(lande_parts[0]) / int(lande_parts[1])
+        coefficient = lande_factor ** 2
         if thermal['temperature'] > 0:
             coefficient /= sum(thermal['boltzmann'])
         for key in ('z', 'x'):

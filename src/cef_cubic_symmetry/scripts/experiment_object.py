@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from cef_cubic_symmetry.auxiliary import constants as con
+from cef_cubic_symmetry.auxiliary.paths import DATA_PATHS
 from cef_cubic_symmetry.auxiliary.utils import get_repr
 from cef_cubic_symmetry.core.sample import Sample
 from cef_cubic_symmetry.fitting.fitting_procedures import get_data_from_file
@@ -190,13 +191,13 @@ class Experiment:
             try:
                 data.append(
                     get_data_from_file(
-                        Path(con.DATA_PATHS['experiment']).joinpath(
-                            f'{self.material.crystal}_'
-                            f'{self.material.rare_earth}',
+                        Path(DATA_PATHS['experiment']).joinpath(
+                            f'{self.material.crystal.name}_'
+                            f'{self.material.rare_earth.identifier}',
                             '_'.join(
                                 [spectrometer,
-                                 self.material.rare_earth,
-                                 self.material.crystal,
+                                 self.material.rare_earth.identifier,
+                                 self.material.crystal.name,
                                  f'{initial_energy}meV',
                                  f'{_temperature}K.dat'],
                             ),

@@ -7,7 +7,8 @@ from pathlib import Path
 import numpy as np
 from numpy import zeros
 
-from cef_cubic_symmetry.auxiliary.constants import DATA_DIR, INFINITY
+from cef_cubic_symmetry.auxiliary.constants import INFINITY
+from cef_cubic_symmetry.auxiliary.paths import DATA_PATH
 
 
 def get_sign(value: float) -> str:
@@ -153,5 +154,5 @@ class UTF8File:
 
 def get_json_object(file_name: str):
     """Return object from JSON file."""
-    with UTF8File(str(DATA_DIR / file_name)) as file:
+    with UTF8File(str(DATA_PATH.joinpath(file_name))) as file:
         return json.load(file)

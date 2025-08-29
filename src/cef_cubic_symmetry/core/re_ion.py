@@ -5,7 +5,7 @@ from typing import Union
 import pandas as pd
 from pretty_repr import RepresentableObject
 
-from cef_cubic_symmetry.auxiliary.constants import DATA_DIR
+from cef_cubic_symmetry.auxiliary.paths import DATA_PATH
 
 
 class REIon(RepresentableObject):
@@ -30,13 +30,13 @@ class REIon(RepresentableObject):
          - total_momentum_ground - total momentum in the ground state;
          - lande_factor - Lande g-factor;
          # TODO describe fields
-         - f_6 - ;
-         - radial_integral_2 - ;
-         - radial_integral_4 - ;
-         - radial_integral_6 - ;
-         - stevens_factor_2 - ;
-         - stevens_factor_4 - ;
-         - stevens_factor_6 - ;
+         - f6 - ;
+         - radial_integral2 - ;
+         - radial_integral4 - ;
+         - radial_integral6 - ;
+         - stevens_factor2 - ;
+         - stevens_factor4 - ;
+         - stevens_factor6 - ;
 
     """
 
@@ -46,7 +46,7 @@ class REIon(RepresentableObject):
     ) -> None:
         """Initialize self. See help(type(self)) for accurate signature."""
         self.identifier = identifier
-        data = pd.read_csv(DATA_DIR / 'rare_earths_properties.csv')
+        data = pd.read_csv(DATA_PATH / 'rare_earths_properties.csv')
         self.info = data.loc[
             data.symbol == self.identifier.capitalize()
             if isinstance(self.identifier, str)

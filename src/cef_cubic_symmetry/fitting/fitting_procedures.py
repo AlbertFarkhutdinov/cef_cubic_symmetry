@@ -9,11 +9,11 @@ from scipy.optimize import curve_fit
 
 from cef_cubic_symmetry.auxiliary import physics as ph
 from cef_cubic_symmetry.auxiliary.constants import (
-    DATA_PATHS,
     INFINITY,
     PM,
     Data,
 )
+from cef_cubic_symmetry.auxiliary.paths import DATA_PATHS
 from cef_cubic_symmetry.scripts.plot_objects import CustomPlot
 
 
@@ -115,13 +115,13 @@ def simple_fitting(data: dict) -> np.ndarray:
     """Run simple fitting."""
     data = filtered_data(data)
     start_width = 0.1
-    peak_0 = (0, start_width, 130)
-    peak_1 = (0.2, start_width, 1.7)
-    peak_2 = (1.5, start_width, 0.2)
+    peak0 = (0, start_width, 130)
+    peak1 = (0.2, start_width, 1.7)
+    peak2 = (1.5, start_width, 0.2)
     p_opt, p_err = fitting(
         multi_lorentzian_with_gauss,
         data,
-        parameters=(*peak_0, 0, *peak_1, *peak_2),
+        parameters=(*peak0, 0, *peak1, *peak2),
         min_value=-2,
         max_value=2,
     )
@@ -169,13 +169,13 @@ if __name__ == '__main__':
     DATA = {
         'x': np.array([0.01 * i for i in range(-300, 500)]),
     }
-    PEAK_1 = (0, 0.1, 100)
-    PEAK_2 = (0.5, 0.15, 20)
-    PEAK_3 = (4, 0.15, 20)
-    DATA['y'] = ph.multi_lorentzian(DATA['x'], 0.5, *PEAK_1, *PEAK_2, *PEAK_3)
+    PEAK1 = (0, 0.1, 100)
+    PEAK2 = (0.5, 0.15, 20)
+    PEAK3 = (4, 0.15, 20)
+    DATA['y'] = ph.multi_lorentzian(DATA['x'], 0.5, *PEAK1, *PEAK2, *PEAK3)
     DATA['y'] += np.random.rand(len(DATA['x']))
     DATA['errors'] = DATA['y'] * 0.01
-    START_PARAMETERS = (0.2, *PEAK_1, *PEAK_2, *PEAK_3)
+    START_PARAMETERS = (0.2, *PEAK1, *PEAK2, *PEAK3)
     P_OPT, P_ERR = multi_peak_fitting(
         function_name='lorentz',
         data=DATA,

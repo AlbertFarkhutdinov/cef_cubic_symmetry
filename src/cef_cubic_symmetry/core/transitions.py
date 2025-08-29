@@ -69,20 +69,20 @@ class Transitions(RepresentableObject):
 
             j_ops['-'][row, row] = j_ops['+'][row, row]
             for column in range(row + 1, size):
-                mqn_1 = size - 1 - momentum
+                mqn1 = size - 1 - momentum
                 j_ops['z'][row, column] += (
                     eigenfunctions[size - 1, row] *
-                    eigenfunctions[size - 1, column] * mqn_1
+                    eigenfunctions[size - 1, column] * mqn1
                 )
                 for row_j in range(size - 1):
-                    mqn_1 = row_j - momentum
+                    mqn1 = row_j - momentum
                     j_ops['z'][row, column] += (
                         eigenfunctions[row_j, row] *
-                        eigenfunctions[row_j, column] * mqn_1
+                        eigenfunctions[row_j, column] * mqn1
                     )
                     column_j = row_j + 1
-                    mqn_2 = column_j - momentum
-                    common_root = np.sqrt(squared_momentum - mqn_1 * mqn_2)
+                    mqn2 = column_j - momentum
+                    common_root = np.sqrt(squared_momentum - mqn1 * mqn2)
                     j_ops['+'][row, column] += (
                         eigenfunctions[column_j, row] *
                         eigenfunctions[row_j, column] *
@@ -117,15 +117,15 @@ class Transitions(RepresentableObject):
         _, transition_probabilities = self.get_transition_probabilities(
             eigenfunctions=eigen_f,
         )
-        for level_1 in range(size):
-            for level_2 in range(size):
+        for level1 in range(size):
+            for level2 in range(size):
                 intensity_of_transition = (
-                    transition_probabilities[level_2, level_1] *
-                    boltzmann_factors[level_1]
+                    transition_probabilities[level2, level1] *
+                    boltzmann_factors[level1]
                 )
                 if intensity_of_transition > 0:
                     peaks.append({
-                        'energy': eigen_v[level_2] - eigen_v[level_1],
+                        'energy': eigen_v[level2] - eigen_v[level1],
                         'intensity': intensity_of_transition,
                     })
         return peaks
@@ -212,7 +212,9 @@ class Transitions(RepresentableObject):
                     gamma,
                 )
 
-        spectrum *= 72.65 * self.sample.rare_earth.lande_factor ** 2
+        lande_parts = self.sample.rare_earth.info.lande_factor.split('/')
+        lande_factor = int(lande_parts[0]) / int(lande_parts[1])
+        spectrum *= 72.65 * lande_factor ** 2
 
         return spectrum
 
