@@ -1,7 +1,7 @@
 # Ruff config: https://docs.astral.sh/ruff/settings
 preview = true
 fix = false
-target-version = "py39"
+target-version = "py313"
 line-length = 79
 extend-exclude = [
   "*.ipynb",
